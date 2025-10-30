@@ -191,7 +191,7 @@ export default function VehicleLoanDashboard() {
 
   return (
     <LazyMotion features={domAnimation}>
-      <div className={`min-h-screen transition-colors duration-300 ${darkMode ? "dark bg-gray-950" : "bg-gradient-to-br from-blue-50 via-cyan-50 to-indigo-50"}`}>
+      <div className={`min-h-screen w-full transition-colors duration-300 ${darkMode ? "dark bg-gray-950" : "bg-gradient-to-br from-blue-50 via-cyan-50 to-indigo-50"}`}>
         {/* Sticky Header */}
         <motion.div
           initial={{ y: -80 }}
@@ -265,9 +265,9 @@ export default function VehicleLoanDashboard() {
               transition={{ duration: 0.7 }}
             >
               <p className="text-xs md:text-sm font-medium text-cyan-200 tracking-widest uppercase mb-4">
-                Sistem Peminjaman Kendaraan Dinas
+                Sistem Peminjaman Kendaraan ITS
               </p>
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white mb-5 leading-tight">
+              <h1 className="text-5xl md:text-7xl lg:text-5xl font-black text-white mb-5 leading-tight">
                 <motion.span
                   className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-white via-cyan-100 to-white"
                   initial={{ y: 60, rotateX: -60 }}
@@ -275,7 +275,7 @@ export default function VehicleLoanDashboard() {
                   transition={{ duration: 0.8, delay: 0.2 }}
                   style={{ transformStyle: "preserve-3d" }}
                 >
-                  ITS
+                  Biro Manajemen
                 </motion.span>{" "}
                 <motion.span
                   className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-[#00AEEF] to-[#FFC107]"
@@ -284,7 +284,7 @@ export default function VehicleLoanDashboard() {
                   transition={{ duration: 0.8, delay: 0.4 }}
                   style={{ transformStyle: "preserve-3d" }}
                 >
-                  FLEET
+                  Aset
                 </motion.span>
               </h1>
               <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto font-light">
@@ -385,7 +385,7 @@ export default function VehicleLoanDashboard() {
               viewport={{ once: true }}
               className="text-3xl md:text-4xl font-bold text-center mb-12"
             >
-              Mengapa <span className="text-[#002D72]">ITS Fleet</span>?
+              Mengapa <span className="text-[#002D72]">ITS Transportation</span>?
             </motion.h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
