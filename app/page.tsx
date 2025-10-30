@@ -1,7 +1,12 @@
-import ClientUser from "@/components/home/client-user";
+"use client";
+
+import PageUser from "@/components/home/client-user";
+
 
 export default function Home() {
   return (
-    <ClientUser />
+    <>
+      <PageUser />
+    </>
   );
 }
