@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import {
-    IconBook,
+  IconBook,
   IconCalendar,
   IconCamera,
   IconCar,
@@ -48,50 +48,50 @@ const data = {
     avatar: "/avatars/shadcn.jpg",
   },
   navMain: [
-    { title: "Dashboard", url: "#", icon: IconDashboard },
-    { title: "Form Peminjaman", url: "#", icon: IconFile },
-    { title: "Riwayat Peminjaman", url: "#", icon: IconHistory },
-    { title: "SOP", url: "#", icon: IconBook },
+    { title: "Dashboard", url: "/", icon: IconDashboard },
+    { title: "Form Peminjaman", url: "/form", icon: IconFile },
+    { title: "Riwayat Peminjaman", url: "/riwayat", icon: IconHistory },
+    { title: "SOP", url: "/sop", icon: IconBook },
   ],
   navClouds: [
     {
       title: "Capture",
       icon: IconCamera,
       isActive: true,
-      url: "#",
+      url: "/capture",
       items: [
-        { title: "Active Proposals", url: "#" },
-        { title: "Archived", url: "#" },
+        { title: "Active Proposals", url: "/capture/active" },
+        { title: "Archived", url: "/capture/archived" },
       ],
     },
     {
       title: "Proposal",
       icon: IconFileDescription,
-      url: "#",
+      url: "/proposal",
       items: [
-        { title: "Active Proposals", url: "#" },
-        { title: "Archived", url: "#" },
+        { title: "Active Proposals", url: "/proposal/active" },
+        { title: "Archived", url: "/proposal/archived" },
       ],
     },
     {
       title: "Prompts",
       icon: IconFileAi,
-      url: "#",
+      url: "/prompts",
       items: [
-        { title: "Active Proposals", url: "#" },
-        { title: "Archived", url: "#" },
+        { title: "Active Proposals", url: "/prompts/active" },
+        { title: "Archived", url: "/prompts/archived" },
       ],
     },
   ],
   navSecondary: [
-    { title: "Settings", url: "#", icon: IconSettings },
+    { title: "Settings", url: "/settings", icon: IconSettings },
   ],
   documents: [
-    { name: "Jenis Kendaraan", url: "#", icon: IconCar },
-    { name: "SOP Kendaraan", url: "#", icon: IconReport },
-    { name: "Jadwal Kendaraan", url: "#", icon: IconCalendar },
-    { name: "Biaya Kendaraan", url: "#", icon: IconCurrencyDollar },
-    { name: "Foto Kendaraan", url: "#", icon: IconPhoto },
+    { name: "Jenis Kendaraan", url: "/jenis", icon: IconCar },
+    { name: "SOP Kendaraan", url: "/sop", icon: IconReport },
+    { name: "Jadwal Kendaraan", url: "/jadwal", icon: IconCalendar },
+    { name: "Biaya Kendaraan", url: "/biaya", icon: IconCurrencyDollar },
+    { name: "Foto Kendaraan", url: "/foto", icon: IconPhoto },
   ],
 }
 
@@ -102,8 +102,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild className="p-1.5">
-              <Link href="#">
+            <Link href="/" className="block">
+              <SidebarMenuButton className="p-1.5">
                 <Image
                   src={Logo}
                   alt="Logo"
@@ -111,8 +111,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   height={50}
                   className="py-2 px-2 rounded-full"
                 />
-              </Link>
-            </SidebarMenuButton>
+              </SidebarMenuButton>
+            </Link>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
