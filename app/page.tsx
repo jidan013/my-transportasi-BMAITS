@@ -10,7 +10,7 @@ import MaintenanceSchedule from "@/components/maintenance/MaintenanceSchedule";
 import RecentActivity from "@/components/activity/RecentActivity";
 import VehicleFilters from "@/components/vihecles/VehicleFilters";
 import { VEHICLES, ACTIVITIES, MAINTENANCE_SCHEDULES } from "@/lib/data";
-import SkeletonCard from "@/components/ui/skeleton";
+import Skeleton from "@/components/ui/skeleton";
 import Footer from "@/components/layouts/Footer";
 
 const VehicleList = lazy(() => import("@/components/vihecles/VihecleList"));
@@ -55,7 +55,7 @@ export default function PageUser() {
           <RecentActivity activities={ACTIVITIES} isLoading={isLoading} />
           <section>
             <VehicleFilters search={search} setSearch={setSearch} filterStatus={filterStatus} setFilterStatus={setFilterStatus} />
-            <Suspense fallback={<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"><SkeletonCard /></div>}>
+            <Suspense fallback={<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"><Skeleton /></div>}>
               <VehicleList vehicles={filteredVehicles} isLoading={isLoading} />
             </Suspense>
           </section>

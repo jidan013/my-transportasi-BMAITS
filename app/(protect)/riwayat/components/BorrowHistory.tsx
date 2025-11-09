@@ -70,7 +70,20 @@ export default function BorrowHistory() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {filtered.length > 0 ? (
           filtered.map((item, index) => (
-            <BorrowCard key={index} {...item} />
+           <BorrowCard
+  key={index}
+  {...item}
+  status={
+    item.status === "selesai"
+      ? "returned"
+      : item.status === "disetujui"
+      ? "approved"
+      : item.status === "ditolak"
+      ? "rejected"
+      : "pending"
+  }
+/>
+
           ))
         ) : (
           <p className="text-gray-500 dark:text-gray-400 text-center col-span-2 py-10">
