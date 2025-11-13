@@ -1,27 +1,43 @@
-"use client";
+"use client"
 
-import { lazy, Suspense } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import SkeletonCard from "../ui/skeleton";
+import { lazy, Suspense } from "react"
+import { AnimatePresence, motion } from "framer-motion"
+import SkeletonCard from "../ui/skeleton"
 
-const VehicleCard = lazy(() => import("@/components/vihecles/VihecleCard"));
+// Lazy load komponen kartu kendaraan
+const VehicleCard = lazy(() => import("@/components/vihecles/VihecleCard"))
 
-interface Props {
-  vehicles: any;
-  isLoading: boolean;
+// Definisi tipe data kendaraan
+export interface Vehicle {
+  id: string;
+  name: string;
+  type: string;
+  plate: string;
+  status: "available" | "borrowed" | "maintenance";
+  borrower?: string;
+  returnDate?: string;
+  image: string;
+  year: number;
+  capacity: string;
 }
 
-export default function VehicleList({ vehicles, isLoading }: Props) {
+// Props untuk VehicleList
+interface VehicleListProps {
+  vehicles: Vehicle[]
+  isLoading: boolean
+}
+
+export default function VehicleList({ vehicles, isLoading }: VehicleListProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
       <AnimatePresence mode="popLayout">
         {isLoading ? (
-          // tampilkan skeleton
+          // ⏳ Skeleton loading state
           Array.from({ length: 6 }).map((_, i) => (
             <SkeletonCard key={`skeleton-${i}`} />
           ))
         ) : vehicles.length === 0 ? (
-          // tidak ada data
+          // 🚫 Tidak ada data
           <motion.div
             key="no-data"
             className="col-span-full text-center text-gray-500 dark:text-gray-400 py-8"
@@ -31,14 +47,22 @@ export default function VehicleList({ vehicles, isLoading }: Props) {
             Tidak ada kendaraan ditemukan.
           </motion.div>
         ) : (
-          // render daftar kendaraan
-          vehicles.map((vehicle) => (
+          // 🚗 Render daftar kendaraan
+          vehicles.map((vehicle: Vehicle) => (
             <Suspense key={vehicle.id} fallback={<SkeletonCard />}>
-              <VehicleCard vehicle={vehicle} />
+              <motion.div
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <VehicleCard vehicle={vehicle} />
+              </motion.div>
             </Suspense>
           ))
         )}
       </AnimatePresence>
     </div>
-  );
+  )
 }
