@@ -7,7 +7,7 @@ import SkeletonCard from "../ui/skeleton";
 const VehicleCard = lazy(() => import("@/components/vihecles/VihecleCard"));
 
 interface Props {
-  vehicles: any[];
+  vehicles: any;
   isLoading: boolean;
 }
 

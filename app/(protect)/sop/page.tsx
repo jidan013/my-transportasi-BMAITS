@@ -1,7 +1,9 @@
+import AccordionDemo from "./components/SopClient";
+
 export default function SopPage() {
     return (
         <div>
-            <h1>SOP</h1>
+            <AccordionDemo />
         </div>
     );
 }

@@ -87,7 +87,7 @@ const data = {
     { title: "Settings", url: "/settings", icon: IconSettings },
   ],
   documents: [
-    { name: "Jenis Kendaraan", url: "/jenis", icon: IconCar },
+    { name: "Jenis Kendaraan", url: "/jenis-kendaraan", icon: IconCar },
     { name: "SOP Kendaraan", url: "/sop", icon: IconReport },
     { name: "Jadwal Kendaraan", url: "/jadwal", icon: IconCalendar },
     { name: "Biaya Kendaraan", url: "/biaya", icon: IconCurrencyDollar },
