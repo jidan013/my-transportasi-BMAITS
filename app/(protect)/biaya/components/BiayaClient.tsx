@@ -62,7 +62,7 @@ function formatIDR(value: number): string {
 }
 
 
-function getIcon(kategori: string): JSX.Element | null {
+export function getIcon(kategori: string): React.ReactNode {
   switch (kategori) {
     case "Exclusive":
       return <Car className="w-5 h-5" />;
