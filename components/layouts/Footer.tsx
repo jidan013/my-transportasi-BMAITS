@@ -32,7 +32,7 @@ export default function Footer() {
                   <span className="text-lg font-extrabold text-white">ITS</span>
                 </div>
                 <div>
-                  <h3 className="text-lg font-extrabold">ITS Fleet</h3>
+                  <h3 className="text-lg font-extrabold">ITS</h3>
                   <p className="text-xs text-cyan-400">Biro Manajemen Aset</p>
                 </div>
               </div>
