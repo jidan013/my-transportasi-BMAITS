@@ -4,6 +4,17 @@ import React, { useMemo, useState, useRef } from "react";
 import { Download, Search, Filter, Bus, Car, Truck, Users } from "lucide-react";
 import Footer from "@/components/layouts/Footer";
 
+export interface TarifObject {
+  [key: string]: number;
+}
+
+export interface VehicleItem {
+  name: string;
+  kategori: string;
+  kapasitas: number | null;
+  tarif: TarifObject;
+}
+
 const VEHICLE_RATES = {
   exclusive: [
     { name: "Hyundai H-1 XG CDRI NEXT GEN A/T", kategori: "Exclusive", kapasitas: 5, tarif: { "B-Dalam": 300000, "B-Luar": 400000, "C-Dalam": 400000, "C-Luar": 500000 } },
@@ -25,7 +36,7 @@ const VEHICLE_RATES = {
   ],
 };
 
-const ALL_ITEMS = [
+const ALL_ITEMS: VehicleItem[] = [
   ...VEHICLE_RATES.exclusive,
   ...VEHICLE_RATES.operasional,
   ...VEHICLE_RATES.angkutanBarang,
@@ -34,8 +45,15 @@ const ALL_ITEMS = [
 const CATEGORIES = ["All", "Exclusive", "Operasional", "Angkutan Barang"];
 const FILTERS = ["All", "B-Dalam", "B-Luar", "C-Dalam", "C-Luar"];
 
-function formatIDR(value) {
-  if (value == null) return "-";
+interface TarifItem {
+  kategori: string;
+  nama: string;
+  tarif: number;
+}
+
+
+function formatIDR(value: number): string {
+  if (value == null) return "";
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
     currency: "IDR",
@@ -43,14 +61,36 @@ function formatIDR(value) {
   }).format(value);
 }
 
-function getIcon(kategori) {
+
+function getIcon(kategori: string): JSX.Element | null {
   switch (kategori) {
-    case "Exclusive": return <Car className="w-5 h-5" />;
-    case "Operasional": return <Bus className="w-5 h-5" />;
-    case "Angkutan Barang": return <Truck className="w-5 h-5" />;
-    default: return null;
+    case "Exclusive":
+      return <Car className="w-5 h-5" />;
+
+    case "Operasional":
+      return <Bus className="w-5 h-5" />;
+
+    case "Angkutan Barang":
+      return <Truck className="w-5 h-5" />;
+
+    default:
+      return null;
   }
 }
+
+function getIconSvg(kategori: string): string {
+  switch (kategori) {
+    case "Exclusive":
+      return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"><circle cx="10" cy="10" r="8"/></svg>`;
+    case "Operasional":
+      return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"><rect x="3" y="6" width="14" height="8"/></svg>`;
+    case "Angkutan Barang":
+      return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"><polygon points="3,15 17,15 14,8 3,8"/></svg>`;
+    default:
+      return "";
+  }
+}
+
 
 export default function Page() {
   const [category, setCategory] = useState("All");
@@ -65,7 +105,7 @@ export default function Page() {
     });
   }, [category, query]);
 
-  function getTarifDisplay(item) {
+  function getTarifDisplay(item: VehicleItem): TarifObject {
     if (filter === "All") return item.tarif;
     return { [filter]: item.tarif[filter] ?? null };
   }
@@ -115,26 +155,28 @@ export default function Page() {
           )
           .join("");
 
+          const iconSvg = getIconSvg(item.kategori);
+
         return `
-          <div style="margin-bottom: 32px; page-break-inside: avoid;">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-              ${getIcon(item.kategori) ? `<span style="color: #3b82f6;">${getIcon(item.kategori).props.outerHTML}</span>` : ''}
-              <h3 style="margin: 0; font-size: 1.1rem; font-weight: 600;">${item.name}</h3>
-            </div>
-            <div style="font-size: 0.9rem; color: #666; margin-bottom: 8px;">
-              <strong>Kategori:</strong> ${item.kategori} | 
-              <strong>Kapasitas:</strong> ${item.kapasitas ?? "Tidak tersedia"}
-            </div>
-            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
-              <thead>
-                <tr style="background: #f8f9fa;">
-                  <th style="text-align: left; padding: 8px 12px; border-bottom: 2px solid #ddd;">Jenis Layanan</th>
-                  <th style="text-align: right; padding: 8px 12px; border-bottom: 2px solid #ddd;">Tarif (Rp)</th>
-                </tr>
-              </thead>
-              <tbody>${rows}</tbody>
-            </table>
+          <div style="margin-bottom: 32px; page-break-inside: avoid; font-family: 'Segoe UI', sans-serif;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            ${iconSvg ? `<span style="color: #3b82f6; width: 20px; height: 20px;">${iconSvg}</span>` : ""}
+            <h3 style="margin: 0; font-size: 1.1rem; font-weight: 600;">${item.name}</h3>
           </div>
+          <div style="font-size: 0.9rem; color: #666; margin-bottom: 8px;">
+            <strong>Kategori:</strong> ${item.kategori} | 
+            <strong>Kapasitas:</strong> ${item.kapasitas ?? "Tidak tersedia"}
+          </div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+            <thead>
+              <tr style="background: #f8f9fa;">
+                <th style="text-align: left; padding: 8px 12px; border-bottom: 2px solid #ddd;">Jenis Layanan</th>
+                <th style="text-align: right; padding: 8px 12px; border-bottom: 2px solid #ddd;">Tarif (Rp)</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
         `;
       })
       .join("<hr style='border: 0; border-top: 1px dashed #ccc; margin: 24px 0;'>");
@@ -321,13 +363,13 @@ export default function Page() {
         </div>
 
         {/* Footer Note */}
-        <div className="my-10 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-5">
+        <div className="my-12 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-5">
           <p className="text-sm text-amber-800 dark:text-amber-300">
             <strong>Catatan:</strong> Tarif di atas adalah tarif <strong>per 12 jam</strong>. Biaya tambahan seperti pengemudi, BBM, tol, atau parkir dapat dikenakan sesuai ketentuan layanan. Hubungi bagian logistik untuk informasi lebih lanjut.
           </p>
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </main>
   );
 }
