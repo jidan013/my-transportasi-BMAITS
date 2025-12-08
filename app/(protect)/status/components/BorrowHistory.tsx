@@ -52,7 +52,7 @@ export default function BorrowHistory() {
     <div className="max-w-6xl mx-auto p-6">
       <div className="mb-8 flex items-center justify-between">
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-          Riwayat Peminjaman
+          Status Peminjaman
         </h2>
       </div>
 

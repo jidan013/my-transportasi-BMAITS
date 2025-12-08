@@ -154,12 +154,11 @@ export default function SopAccordionPage() {
               <ul className="list-disc ml-6 space-y-2">
                 <li>
                   <b>Surat Permohonan Peminjaman:</b> surat resmi dari pemohon kepada
-                  Kepala Biro SARPRAS berisi tujuan kegiatan dan tanggal penggunaan mobil
+                  Kepala Biro Manajemen Aset berisi tujuan kegiatan dan tanggal penggunaan mobil
                   dinas.
                 </li>
                 <li>
-                  <b>Surat Perintah Jalan:</b> surat izin resmi dari Kepala Biro Sarana dan
-                  Prasarana ITS untuk penggunaan mobil dinas.
+                  <b>Surat Perintah Jalan:</b> surat izin resmi dari Kepala Biro Manajemen Aset untuk penggunaan mobil dinas.
                 </li>
               </ul>
             </MotionContent>
@@ -192,7 +191,7 @@ export default function SopAccordionPage() {
                   {[
                     ["Pemohon", "Mengajukan surat permohonan peminjaman sesuai Tata Naskah ITS."],
                     ["Staf Layanan Surat", "Mencatat surat masuk dan meneruskan ke Kepala Biro SARPRAS."],
-                    ["Kepala Biro SARPRAS", "Menelaah dan meneruskan ke Kabag Logistik dan Keamanan."],
+                    ["Kepala Biro Manajemen Aset", "Menelaah dan meneruskan ke Kabag Logistik dan Keamanan."],
                     ["Kabag Logistik & Keamanan", "Menelaah kegiatan serta rekomendasi biaya perawatan & BBM."],
                     ["Kasubbag Layanan Logistik", "Menugaskan sopir dan memerintahkan penerbitan Surat Jalan."],
                     ["Staf", "Menggandakan surat jalan, mengarsipkan, dan menyerahkan kepada sopir."],
@@ -235,7 +234,7 @@ export default function SopAccordionPage() {
             <MotionContent isOpen={openItem === "item-8"}>
               <ol className="list-decimal ml-6 space-y-1">
                 <li>Unit kerja membuat surat permohonan peminjaman mobil dinas.</li>
-                <li>Surat diteruskan melalui proses disposisi Kepala Biro SARPRAS.</li>
+                <li>Surat diteruskan melalui proses disposisi Kepala Biro Manajemen Aset.</li>
                 <li>Kabag Logistik dan Keamanan menelaah serta memberi rekomendasi.</li>
                 <li>Kasubbag Layanan Logistik menugaskan sopir dan menyiapkan Surat Jalan.</li>
                 <li>Staf menggandakan dan menyerahkan surat jalan kepada sopir.</li>

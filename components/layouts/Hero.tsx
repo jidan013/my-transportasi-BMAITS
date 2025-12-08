@@ -87,7 +87,7 @@ export default function Hero() {
           data-aos-delay="500"
           className="text-base sm:text-lg md:text-xl text-white/80 max-w-3xl mx-auto font-light mb-10"
         >
-          Platform modern untuk pengelolaan armada institusi dengan efisiensi, transparansi, dan kemudahan.
+          Ajukan peminjaman kendaraan dinas dengan mudah dan cepat.
         </p>
 
         {/* Tombol */}

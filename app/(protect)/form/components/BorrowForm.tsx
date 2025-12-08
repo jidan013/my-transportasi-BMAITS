@@ -2,7 +2,7 @@
 
 import { useState, useId } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useReducedMotion } from "framer-motion"; // FIX: langsung pakai dari framer-motion
+import { useReducedMotion } from "framer-motion";
 import {
   IconSend,
   IconCircleCheckFilled,
@@ -74,13 +74,12 @@ export default function BorrowForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // ▶️ Next Step atau Submit
   const handleNext = () => {
     if (step === 1 && validateStep1()) setStep(2);
     else if (step === 2 && validateStep2()) handleSubmit();
   };
 
-  // 📤 Submit Data
+  // Submit Data
   const handleSubmit = () => {
     // Bisa kirim ke API di sini pakai fetch/axios
     setShowSuccess(true);

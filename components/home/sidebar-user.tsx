@@ -50,8 +50,7 @@ const data = {
   navMain: [
     { title: "Dashboard", url: "/", icon: IconDashboard },
     { title: "Form Peminjaman", url: "/form", icon: IconFile },
-    { title: "Riwayat Peminjaman", url: "/riwayat", icon: IconHistory },
-    { title: "SOP", url: "/sop", icon: IconBook },
+    { title: "Status Peminjaman", url: "/status", icon: IconHistory },
   ],
   navClouds: [
     {
@@ -92,6 +91,7 @@ const data = {
     { name: "Jadwal Kendaraan", url: "/jadwal", icon: IconCalendar },
     { name: "Biaya Kendaraan", url: "/biaya", icon: IconCurrencyDollar },
     { name: "Foto Kendaraan", url: "/foto", icon: IconPhoto },
+    { name: "Kontak Admin", url: "/kontak", icon: IconHelp },
   ],
 }
 
