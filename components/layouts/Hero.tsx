@@ -18,7 +18,7 @@ export default function Hero() {
         }}
       />
 
-      {/* Floating Blobs – GPU Accelerated */}
+      
       <div className="absolute inset-0 pointer-events-none">
         <div
           className="absolute top-10 left-10 w-80 h-80 bg-cyan-400/20 rounded-full blur-3xl animate-float"
@@ -38,7 +38,7 @@ export default function Hero() {
         </p>
 
         {/* Animated Title */}
-        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold text-white mb-8 leading-tight">
+        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-7xl font-extrabold text-white mb-8 leading-tight">
           {words.map((word, i) => (
             <span
               key={word}
@@ -83,7 +83,7 @@ export default function Hero() {
 
         {/* Scroll Hint */}
         <p className="mt-16 text-white/60 text-sm animate-pulse">
-          Gulir ke bawah untuk melihat jadwal →
+          Gulir ke bawah untuk tampilan selanjutnya →
         </p>
       </div>
 
