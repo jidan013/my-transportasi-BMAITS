@@ -1,4 +1,4 @@
-import BorrowHistory from "@/app/(protect)/status/components/BorrowHistory";
+import BorrowHistory from "@/app/(protect)/status/components/BorrowStatus";
 
 export default function RiwayatPeminjamanPage() {
   return <BorrowHistory />;

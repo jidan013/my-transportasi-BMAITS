@@ -1,5 +1,6 @@
 "use client";
 
+import {Bus, Car} from "lucide-react"
 import { useState, useId } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useReducedMotion } from "framer-motion";
@@ -10,18 +11,220 @@ import {
 import ProgressBar from "./ProgressBar";
 import Step1Identity from "./Step1Identity";
 import Step2Details from "./Step2Details";
+import { LucideIcon } from "lucide-react";
 
-interface Vehicle {
-  id: string;
-  name: string;
-  plate: string;
-  status: "available" | "borrowed" | "maintenance";
+export type VehicleStatus = "available"| "borrowed"| "maintenance";
+export interface Vehicle {
+  id: number
+  icon: LucideIcon
+  nama: string
+  jenis: string
+  warna: string
+  plate: string
+  bbm: string
+  kapasitas: string
+  status: VehicleStatus
 }
 
 const mockVehicles: Vehicle[] = [
-  { id: "1", name: "Toyota Avanza", plate: "B 1234 XYZ", status: "available" },
-  { id: "2", name: "Mitsubishi Pajero", plate: "B 5678 ABC", status: "available" },
-  { id: "3", name: "Daihatsu Xenia", plate: "B 9012 DEF", status: "maintenance" },
+  {
+    id: 1,
+    icon: Bus,
+    nama: "BUS MANDIRI",
+    jenis: "Bus",
+    warna: "Putih Biru",
+    plate: "L 7808 AE",
+    bbm: "Dexlite",
+    status: "available",
+    kapasitas: "35 Orang",
+  },
+  {
+    id: 2,
+    icon: Bus,
+    nama: "BUS BNI",
+    jenis: "Bus",
+    warna: "Putih Oren",
+    plate: "L 7684 AP",
+    bbm: "Dexlite",
+    status: "available",
+    kapasitas: "28 Orang",
+  },
+  {
+    id: 3,
+    icon: Bus,
+    nama: "BUS SPS",
+    jenis: "Bus",
+    warna: "Putih Biru",
+    plate: "L 7151 AH",
+    bbm: "Dexlite",
+    status: "available",
+    kapasitas: "28 Orang",
+  },
+  {
+    id: 4,
+    icon: Bus,
+    nama: "BUS IKOMA",
+    jenis: "Bus",
+    warna: "Putih Biru",
+    plate: "L 7608 AP",
+    bbm: "Dexlite",
+    status: "available",
+    kapasitas: "27 Orang",
+  },
+  {
+    id: 5,
+    icon: Bus,
+    nama: "HAICE",
+    jenis: "Microbus",
+    warna: "Hitam",
+    plate: "L 7010 N",
+    bbm: "Dexlite",
+    status: "available",
+    kapasitas: "14 Orang",
+  },
+  {
+    id: 6,
+    icon: Car,
+    nama: "HYUNDAI",
+    jenis: "Kendaraan Dinas",
+    warna: "Hitam",
+    plate: "L 1843 OD",
+    bbm: "Dexlite",
+    status: "available",
+    kapasitas: "5 Orang",
+  },
+  {
+    id: 7,
+    icon: Car,
+    nama: "SEDAN VIOS XSK ITS",
+    jenis: "Sedan",
+    warna: "Hitam",
+    plate: "L 1069 OE",
+    bbm: "Pertamak",
+    status: "available",
+    kapasitas: "3 Orang",
+  },
+  {
+    id: 8,
+    icon: Car,
+    nama: "SEDAN ALTIS XWR4",
+    jenis: "Sedan",
+    warna: "Hitam",
+    plate: "L 1081 OE",
+    bbm: "Pertamak",
+    status: "available",
+    kapasitas: "3 Orang",
+  },
+  {
+    id: 9,
+    icon: Car,
+    nama: "SEDAN ALTIS XWR3",
+    jenis: "Sedan",
+    warna: "Hitam",
+    plate: "L 1080 OE",
+    bbm: "Pertamak",
+    status: "available",
+    kapasitas: "3 Orang",
+  },
+  {
+    id: 10,
+    icon: Car,
+    nama: "INNOVA XDPP",
+    jenis: "MPV",
+    warna: "Hitam",
+    plate: "L 1511 EP",
+    bbm: "Dexlite",
+    status: "available",
+    kapasitas: "5 Orang",
+  },
+  {
+    id: 11,
+    icon: Car,
+    nama: "INNOVA XFTSPK",
+    jenis: "MPV",
+    warna: "Hitam",
+    plate: "L 1852 AP",
+    bbm: "Pertamak",
+    status: "available",
+    kapasitas: "5 Orang",
+  },
+  {
+    id: 12,
+    icon: Car,
+    nama: "INNOVA X ELEKTRO",
+    jenis: "MPV",
+    warna: "Abu-abu",
+    plate: "L 1502 BP",
+    bbm: "Pertamak",
+    status: "available",
+    kapasitas: "5 Orang",
+  },
+  {
+    id: 13,
+    icon: Car,
+    nama: "INNOVA XDRPM",
+    jenis: "MPV",
+    warna: "Hijau",
+    plate: "L 1059 AP",
+    bbm: "Pertamak",
+    status: "available",
+    kapasitas: "5 Orang",
+  },
+  {
+    id: 14,
+    icon: Car,
+    nama: "AVANZA XDKG",
+    jenis: "MPV",
+    warna: "Hitam",
+    plate: "L 1031 CP",
+    bbm: "Pertamak",
+    status: "available",
+    kapasitas: "5 Orang",
+  },
+  {
+    id: 15,
+    icon: Car,
+    nama: "AVANZA X INFORMATIKA",
+    jenis: "MPV",
+    warna: "Putih",
+    plate: "L 6001 DP",
+    bbm: "Pertamak",
+    status: "available",
+    kapasitas: "5 Orang",
+  },
+  {
+    id: 16,
+    icon: Car,
+    nama: "AVANZA XBURB",
+    jenis: "MPV",
+    warna: "Silver",
+    plate: "L 1393 DL",
+    bbm: "Pertamak",
+    status: "available",
+    kapasitas: "5 Orang",
+  },
+  {
+    id: 17,
+    icon: Car,
+    nama: "AVANZA XBK",
+    jenis: "MPV",
+    warna: "Silver",
+    plate: "L 1068 OD",
+    bbm: "Pertamak",
+    status: "available",
+    kapasitas: "5 Orang",
+  },
+  {
+    id: 18,
+    icon: Car,
+    nama: "AVANZA XBSP",
+    jenis: "MPV",
+    warna: "Silver",
+    plate: "L 1171 OD",
+    bbm: "Pertamak",
+    status: "available",
+    kapasitas: "5 Orang",
+  },
 ];
 
 export default function BorrowForm() {
