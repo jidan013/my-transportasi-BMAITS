@@ -14,6 +14,7 @@ import {
   Settings,
   CheckCircle2,
   AlertTriangle,
+  LucideIcon,
 } from "lucide-react"
 import {
   ResponsiveContainer,
@@ -25,7 +26,7 @@ import {
   Tooltip,
 } from "recharts"
 
-const kendaraanAwal = [
+const kendaraanAwal : item[] = [
   {
     id: 1,
     icon: Bus,
@@ -242,11 +243,23 @@ const pemakaianBulanan = [
   { bulan: "Des", pemakaian: 33 },
 ]
 
+interface item {
+  id: number
+  icon: LucideIcon
+  nama: string
+  jenis: string
+  warna: string
+  plat: string
+  bbm: string
+  status: string
+  kapasitas: string
+}
+
 export default function KendaraanPage() {
   const [kendaraan, setKendaraan] = useState(kendaraanAwal)
   const [searchTerm, setSearchTerm] = useState("")
   const [filterStatus, setFilterStatus] = useState("Semua")
-  const [form, setForm] = useState({ nama: "", jenis: "", kapasitas: "", status: "Aktif" })
+  const [form, setForm] = useState({ nama: "", jenis: "", kapasitas: "", status: "Aktif", plat: "", warna: "", bbm: "" })
   const [editingId, setEditingId] = useState<number | null>(null)
   const [notification, setNotification] = useState<{ message: string; type: "success" | "warning" } | null>(null)
 
@@ -276,16 +289,19 @@ export default function KendaraanPage() {
       ])
       showNotif("Kendaraan berhasil ditambahkan", "success")
     }
-    setForm({ nama: "", jenis: "", kapasitas: "", status: "Aktif" })
+    setForm({ nama: "", jenis: "", kapasitas: "", status: "Aktif", plat: "", warna: "", bbm: "" })
   }
 
-  const handleEdit = (item: any ) => {
+  const handleEdit = (item: item  ) => {
     setEditingId(item.id)
     setForm({
       nama: item.nama,
       jenis: item.jenis,
       kapasitas: item.kapasitas,
       status: item.status,
+      plat: item.plat,
+      warna: item.warna,
+      bbm: item.bbm
     })
   }
 
