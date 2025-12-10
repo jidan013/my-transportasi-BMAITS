@@ -6,25 +6,33 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import idLocale from '@fullcalendar/core/locales/id';
 import type { EventClickArg, EventInput } from '@fullcalendar/core';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { Car, Bus, Truck, CarFront, Phone } from 'lucide-react';
 
-// === DATA KENDARAAN ===
 const vehicles = [
-  { id: '1', name: 'Toyota Avanza',     plate: 'B 1234 XYZ', color: '#003366' },
-  { id: '2', name: 'Honda Jazz',        plate: 'B 5678 ABC', color: '#00509e' },
-  { id: '3', name: 'Daihatsu Xenia',    plate: 'B 9012 DEF', color: '#0066cc' },
-  { id: '4', name: 'Mitsubishi Pajero', plate: 'B 9999 ZZZ', color: '#0077b6' },
-  { id: '5', name: 'Suzuki Ertiga',     plate: 'B 8888 ERT', color: '#0099cc' },
+  { id: '1', name: 'Toyota Avanza', plate: 'B 1234 XYZ', icon: Car },
+  { id: '2', name: 'Honda Jazz', plate: 'B 5678 ABC', icon: CarFront },
+  { id: '3', name: 'Daihatsu Xenia', plate: 'B 9012 DEF', icon: Car },
+  { id: '4', name: 'Mitsubishi Pajero', plate: 'B 9999 ZZZ', icon: Truck },
+  { id: '5', name: 'Suzuki Ertiga', plate: 'B 8888 ERT', icon: Bus },
 ] as const;
 
-const bookings : BookingExtendedProps[] = [
+interface Booking {
+  vehicleId: string;
+  borrower: string;
+  purpose: string;
+  start: string;
+  end: string;
+  notes?: string;
+}
+
+const bookings: Booking[] = [
   {
     vehicleId: '1',
     borrower: 'Budi Santoso',
     purpose: 'Kunjungan ke klien Jakarta',
     start: '2025-12-03',
     end: '2025-12-07',
-    notes: 'Bawa dokumen penting',
   },
   {
     vehicleId: '2',
@@ -33,148 +41,158 @@ const bookings : BookingExtendedProps[] = [
     start: '2025-12-05',
     end: '2025-12-08',
   },
-  {
-    vehicleId: '3',
-    borrower: 'Ahmad Fauzi',
-    purpose: 'Survey lapangan',
-    start: '2025-12-04',
-    end: '2025-12-05',
-  },
-  {
-    vehicleId: '1',
-    borrower: 'Rina Wulandari',
-    purpose: 'Rapat di kantor pusat',
-    start: '2025-12-10',
-    end: '2025-12-12',
-  },
-] as const;
+];
 
-// === TIPE EXTENDED PROPS (notes selalu string karena kita pakai ?? '-') ===
 interface BookingExtendedProps {
-  start: string;
-  end: string;
-  vehicleId: string;
   borrower: string;
   purpose: string;
-  notes?: string;
-  plate?: string;
+  notes: string;
+  plate: string;
 }
 
 export default function CalendarPage() {
-  const events = useMemo<EventInput[]>(() => {
-    return bookings.map((booking) => {
-      const vehicle = vehicles.find((v) => v.id === booking.vehicleId)!;
+  const [selectedEvent, setSelectedEvent] = useState<{
+    title: string;
+    start: string;
+    end: string;
+    data: BookingExtendedProps;
+  } | null>(null);
 
-      
+  const events = useMemo<EventInput[]>(() => {
+    return bookings.map((b) => {
+      const v = vehicles.find((x) => x.id === b.vehicleId)!;
+
       return {
-        title: vehicle.name,
-        start: booking.start,
-        end: booking.end,
-        backgroundColor: vehicle.color,
-        borderColor: vehicle.color,
-        textColor: 'white',
+        title: v.name,
+        start: b.start,
+        end: b.end,
+        backgroundColor: '#003366',
+        borderColor: '#003366',
+        textColor: '#fff',
         extendedProps: {
-          borrower: booking.borrower,
-          purpose: booking.purpose,
-          notes: booking.notes? booking.notes : '-',  
-          plate: vehicle.plate,
+          borrower: b.borrower,
+          purpose: b.purpose,
+          notes: b.notes ?? '-',
+          plate: v.plate,
         },
       };
     });
   }, []);
 
   const handleEventClick = (info: EventClickArg) => {
-    const e = info.event.extendedProps as BookingExtendedProps;
+    const props = info.event.extendedProps as BookingExtendedProps;
 
-    const startStr = info.event.start?.toLocaleDateString('id-ID', {
-      dateStyle: 'full',
-    }) ?? 'Tidak diketahui';
+    const start =
+      info.event.start?.toLocaleDateString('id-ID', { dateStyle: 'full' }) ?? '-';
+    const end = info.event.end
+      ? new Date(info.event.end.getTime() - 86400000).toLocaleDateString(
+          'id-ID',
+          { dateStyle: 'full' }
+        )
+      : start;
 
-    const endStr = info.event.end
-      ? new Date(info.event.end.getTime() - 86400000).toLocaleDateString('id-ID', {
-          dateStyle: 'full',
-        })
-      : startStr;
-
-    alert(
-      `KENDARAAN\n${info.event.title}\n${e.plate}\n\n` +
-      `PEMINJAM\n${e.borrower}\n\n` +
-      `KEPERLUAN\n${e.purpose}\n\n` +
-      `CATATAN\n${e.notes}\n\n` +
-      `PERIODE\n${startStr}${endStr !== startStr ? `\ns/d\n${endStr}` : ''}`
-    );
+    setSelectedEvent({
+      title: info.event.title,
+      start,
+      end,
+      data: props,
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header ITS Premium */}
-      <div className="bg-gradient-to-r from-[#003366] to-[#00509e] shadow-2xl">
-        <div className="max-w-7xl mx-auto px-6 py-14 text-white text-center">
-          <h1 className="text-5xl md:text-6xl font-black tracking-tight">
+    <div className="min-h-screen bg-slate-100 flex flex-col">
+      {/* HEADER */}
+      <header className="bg-gradient-to-r from-[#002244] to-[#00509e] text-white">
+        <div className="px-8 py-16 text-center">
+          <h1 className="text-5xl font-black tracking-wide">
             Jadwal Kendaraan Dinas
           </h1>
-          <p className="mt-4 text-xl text-blue-100 font-light">
+          <p className="mt-4 text-lg text-blue-100">
             Institut Teknologi Sepuluh Nopember
           </p>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        {/* Legend Kendaraan */}
-        <div className="mb-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
-          {vehicles.map((v) => (
-            <div
-              key={v.id}
-              className="group flex flex-col items-center bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
-            >
+      {/* CONTENT */}
+      <main className="flex-1 px-8 py-10 space-y-10">
+        {/* VEHICLE LEGEND */}
+        <section className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-6">
+          {vehicles.map((v) => {
+            const Icon = v.icon;
+            return (
               <div
-                className="w-full h-24 rounded-xl mb-4 shadow-inner"
-                style={{ backgroundColor: v.color }}
-              />
-              <h3 className="font-bold text-gray-800">{v.name}</h3>
-              <p className="text-sm text-gray-500 font-mono mt-1">{v.plate}</p>
-            </div>
-          ))}
-        </div>
+                key={v.id}
+                className="bg-white rounded-2xl p-6 text-center shadow hover:shadow-xl transition"
+              >
+                <Icon className="mx-auto h-10 w-10 text-[#003366]" />
+                <h3 className="mt-3 font-bold">{v.name}</h3>
+                <p className="text-xs text-gray-500 font-mono">{v.plate}</p>
+              </div>
+            );
+          })}
+        </section>
 
-        {/* Kalender */}
-        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-200">
+        {/* CALENDAR FULL WIDTH */}
+        <section className="bg-white rounded-3xl shadow-xl p-6">
           <FullCalendar
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             initialView="dayGridMonth"
+            height="auto"
+            locale="id"
+            locales={[idLocale]}
+            events={events}
+            eventClick={handleEventClick}
             headerToolbar={{
               left: 'prev,next today',
               center: 'title',
               right: 'dayGridMonth,timeGridWeek,timeGridDay',
             }}
-            height="800px"
-            locales={[idLocale]}
-            locale="id"
-            events={events}
-            eventClick={handleEventClick}
             buttonText={{
               today: 'Hari Ini',
               month: 'Bulan',
               week: 'Minggu',
               day: 'Hari',
             }}
-            dayMaxEvents={4}
-            moreLinkContent={(args) => `+${args.num} lagi`}
-            eventClassNames="cursor-pointer font-bold text-sm rounded-xl transition-all hover:scale-105 hover:shadow-2xl hover:z-10"
+            eventClassNames="cursor-pointer font-semibold rounded-xl px-2"
           />
-        </div>
+        </section>
+      </main>
 
-        {/* Footer */}
-        <div className="mt-14 text-center">
-          <p className="text-2xl text-gray-700">
-            Total Peminjaman Aktif:{' '}
-            <span className="text-5xl font-black text-[#003366]">{events.length}</span>
-          </p>
-          <p className="mt-4 text-gray-500 text-sm">
-            Sistem Informasi Kendaraan • BMATS ITS © 2025
-          </p>
+      {/* FOOTER */}
+      <footer className="bg-white border-t text-center py-6 text-sm text-gray-500">
+        Sistem Informasi Kendaraan Dinas • BMATS ITS © 2025
+      </footer>
+
+      {/* MODAL */}
+      {selectedEvent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl">
+            <h2 className="text-2xl font-black mb-6 text-[#003366]">
+              {selectedEvent.title}
+            </h2>
+
+            <div className="space-y-3 text-sm">
+              <p><strong>Plat:</strong> {selectedEvent.data.plate}</p>
+              <p><strong>Peminjam:</strong> {selectedEvent.data.borrower}</p>
+              <p><strong>Keperluan:</strong> {selectedEvent.data.purpose}</p>
+              <p><strong>Catatan:</strong> {selectedEvent.data.notes}</p>
+              <p>
+                <strong>Periode:</strong><br />
+                {selectedEvent.start}
+                {selectedEvent.end !== selectedEvent.start &&
+                  ` s/d ${selectedEvent.end}`}
+              </p>
+            </div>
+
+            <button
+              onClick={() => setSelectedEvent(null)}
+              className="mt-8 w-full rounded-xl bg-[#003366] py-3 font-semibold text-white hover:bg-[#002244]"
+            >
+              Tutup
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
