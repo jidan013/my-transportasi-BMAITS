@@ -6,7 +6,7 @@ import { IconProps } from "@tabler/icons-react";
 interface Props {
   title: string;
   value: number;
-  icon: React.FC<IconProps>; // ✅ perbaiki tipe ikon di sini
+  icon: React.FC<IconProps>;
   color: string;
   bg: string;
 }

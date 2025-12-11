@@ -49,6 +49,7 @@ const data = {
   },
   navMain: [
     { title: "Dashboard", url: "/", icon: IconDashboard },
+    { title: "Jadwal Kendaraan", url: "/jadwal", icon: IconCalendar },
     { title: "Form Peminjaman", url: "/form", icon: IconFile },
     { title: "Status Peminjaman", url: "/status", icon: IconHistory },
   ],
@@ -86,11 +87,10 @@ const data = {
     { title: "Settings", url: "/settings", icon: IconSettings },
   ],
   documents: [
-    { name: "Jenis Kendaraan", url: "/jenis-kendaraan", icon: IconCar },
     { name: "SOP Kendaraan", url: "/sop", icon: IconReport },
-    { name: "Jadwal Kendaraan", url: "/jadwal", icon: IconCalendar },
-    { name: "Biaya Kendaraan", url: "/biaya", icon: IconCurrencyDollar },
     { name: "Foto Kendaraan", url: "/foto", icon: IconPhoto },
+    { name: "Jenis Kendaraan", url: "/jenis-kendaraan", icon: IconCar },
+    { name: "Biaya Kendaraan", url: "/biaya", icon: IconCurrencyDollar },
     { name: "Kontak Admin", url: "/kontak", icon: IconHelp },
   ],
 }
