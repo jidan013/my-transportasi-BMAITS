@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import StatusBadge from "../StatusBidge";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { Car, Bus, LucideIcon } from "lucide-react";
+import Link from "next/link";
 
 const VehicleImage = {
   BUS_MANDIRI: "/FotoKendaraan/bus-mandiri.jpeg",
@@ -310,13 +311,20 @@ const VehicleCard = memo(({ vehicle }: { vehicle: Vehicle }) => {
           />
         </div>
         {vehicle.status === "available" && (
-          <motion.button
+          <motion.div
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
-            className="mt-5 w-full py-3 bg-gradient-to-r from-[#002D72] to-[#00AEEF] text-white font-semibold rounded-xl shadow-md text-sm hover:shadow-lg transition-all"
           >
-            Pinjam Sekarang
-          </motion.button>
+            <Link
+              href="/form"
+              className="mt-5 block w-full py-3 bg-gradient-to-r from-[#002D72] to-[#00AEEF] 
+               text-white font-semibold rounded-xl shadow-md text-sm 
+               hover:shadow-lg transition-all text-center"
+            >
+              Pinjam Sekarang
+            </Link>
+          </motion.div>
+
         )}
       </div>
     </motion.div>
