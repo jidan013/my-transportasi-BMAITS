@@ -15,6 +15,7 @@ import {
   FileSignature,
   Workflow,
   BookOpen,
+  LucideIcon,
 } from "lucide-react"
 import * as React from "react"
 
@@ -51,17 +52,16 @@ function SmoothTrigger({
   children,
   isOpen,
 }: {
-  icon: any
+  icon: LucideIcon
   children: React.ReactNode
   isOpen: boolean
 }) {
   return (
     <div
-      className={`flex justify-between items-center rounded-xl px-6 py-5 transition-all duration-300 shadow-sm ${
-        isOpen
+      className={`flex justify-between items-center rounded-xl px-6 py-5 transition-all duration-300 shadow-sm ${isOpen
           ? "bg-gradient-to-r from-blue-50 to-white border border-blue-200"
           : "bg-white hover:bg-blue-50 border border-gray-200"
-      }`}
+        }`}
     >
       <div className="flex items-center gap-3 text-gray-900 font-semibold text-lg">
         <Icon className="w-5 h-5 text-blue-600" />
@@ -81,7 +81,7 @@ function SmoothTrigger({
 export default function SopAccordionPage() {
   const [openItem, setOpenItem] = React.useState<string | null>("item-1")
 
-  const renderTrigger = (id: string, label: string, icon: any) => (
+  const renderTrigger = (id: string, label: string, icon: LucideIcon) => (
     <AccordionTrigger
       onClick={() => setOpenItem(openItem === id ? null : id)}
       className="w-full !no-underline !p-0 bg-transparent focus-visible:ring-0 focus-visible:outline-none"
@@ -131,9 +131,10 @@ export default function SopAccordionPage() {
           <AccordionItem value="item-1">
             {renderTrigger("item-1", "1. Tujuan", FileText)}
             <MotionContent isOpen={openItem === "item-1"}>
-              Memberikan panduan proses peminjaman mobil dinas untuk kegiatan
-              protokoler para pejabat serta memastikan pelayanan yang efektif,
-              efisien, dan tertib administrasi.
+              Memberikan pedoman pelaksanaan layanan peminjaman kendaraan dinas di lingkungan
+              Institut Teknologi Sepuluh Nopember (ITS) agar terlaksana secara tertib,
+              terkendali, akuntabel, dan sesuai ketentuan yang berlaku.
+
             </MotionContent>
           </AccordionItem>
 
@@ -141,9 +142,10 @@ export default function SopAccordionPage() {
           <AccordionItem value="item-2">
             {renderTrigger("item-2", "2. Ruang Lingkup", FolderKanban)}
             <MotionContent isOpen={openItem === "item-2"}>
-              Prosedur ini mencakup seluruh tahapan mulai dari penerimaan surat
-              permohonan peminjaman mobil dinas hingga mobil digunakan untuk kegiatan
-              resmi.
+              Prosedur ini mencakup proses pengajuan, verifikasi, persetujuan, penugasan sopir,
+              penerbitan surat perintah jalan, hingga pengembalian kendaraan dinas yang
+              digunakan untuk kepentingan kedinasan.
+
             </MotionContent>
           </AccordionItem>
 
@@ -153,14 +155,23 @@ export default function SopAccordionPage() {
             <MotionContent isOpen={openItem === "item-3"}>
               <ul className="list-disc ml-6 space-y-2">
                 <li>
-                  <b>Surat Permohonan Peminjaman:</b> surat resmi dari pemohon kepada
-                  Kepala Biro Manajemen Aset berisi tujuan kegiatan dan tanggal penggunaan mobil
-                  dinas.
+                  <b>Kendaraan Dinas:</b> kendaraan milik ITS yang digunakan untuk mendukung
+                  pelaksanaan tugas kedinasan.
                 </li>
                 <li>
-                  <b>Surat Perintah Jalan:</b> surat izin resmi dari Kepala Biro Manajemen Aset untuk penggunaan mobil dinas.
+                  <b>Peminjaman Kendaraan Dinas:</b> penggunaan kendaraan dinas oleh unit kerja
+                  atau pejabat ITS untuk keperluan resmi.
+                </li>
+                <li>
+                  <b>Surat Permohonan:</b> surat resmi pengajuan peminjaman kendaraan dinas dari
+                  unit kerja kepada Biro Manajemen Aset.
+                </li>
+                <li>
+                  <b>Surat Perintah Jalan:</b> dokumen resmi sebagai dasar operasional penggunaan
+                  kendaraan dinas.
                 </li>
               </ul>
+
             </MotionContent>
           </AccordionItem>
 
@@ -169,9 +180,11 @@ export default function SopAccordionPage() {
             {renderTrigger("item-4", "4. Dokumen Terkait", FileSignature)}
             <MotionContent isOpen={openItem === "item-4"}>
               <ul className="list-disc ml-6 space-y-1">
-                <li>Surat Permohonan Peminjaman</li>
-                <li>Surat Perintah Jalan</li>
+                <li>Surat Permohonan Peminjaman Kendaraan Dinas</li>
+                <li>Surat Perintah Jalan Kendaraan Dinas</li>
+                <li>Dokumen pendukung kegiatan kedinasan</li>
               </ul>
+
             </MotionContent>
           </AccordionItem>
 
@@ -190,7 +203,7 @@ export default function SopAccordionPage() {
                 <tbody className="divide-y divide-gray-100">
                   {[
                     ["Pemohon", "Mengajukan surat permohonan peminjaman sesuai Tata Naskah ITS."],
-                    ["Staf Layanan Surat", "Mencatat surat masuk dan meneruskan ke Kepala Biro SARPRAS."],
+                    ["Staf Layanan Surat", "Mencatat surat masuk dan meneruskan ke Kepala Biro Manajemen Aset."],
                     ["Kepala Biro Manajemen Aset", "Menelaah dan meneruskan ke Kabag Logistik dan Keamanan."],
                     ["Kabag Logistik & Keamanan", "Menelaah kegiatan serta rekomendasi biaya perawatan & BBM."],
                     ["Kasubbag Layanan Logistik", "Menugaskan sopir dan memerintahkan penerbitan Surat Jalan."],
@@ -213,9 +226,11 @@ export default function SopAccordionPage() {
             {renderTrigger("item-6", "6. Record / Catatan Mutu", FileText)}
             <MotionContent isOpen={openItem === "item-6"}>
               <ul className="list-disc ml-6 space-y-1">
-                <li>Surat Permohonan Peminjaman</li>
-                <li>Surat Perintah Jalan Sopir</li>
+                <li>Arsip Surat Permohonan Peminjaman</li>
+                <li>Arsip Surat Perintah Jalan</li>
+                <li>Catatan penggunaan kendaraan dinas</li>
               </ul>
+
             </MotionContent>
           </AccordionItem>
 
@@ -223,8 +238,10 @@ export default function SopAccordionPage() {
           <AccordionItem value="item-7">
             {renderTrigger("item-7", "7. Indikator Keberhasilan", CheckCircle)}
             <MotionContent isOpen={openItem === "item-7"}>
-              Surat Perintah Jalan dapat diselesaikan dalam waktu maksimal{" "}
-              <b>1 hari kerja</b>.
+              Pelayanan peminjaman kendaraan dinas dilaksanakan sesuai prosedur dan
+              Surat Perintah Jalan diterbitkan maksimal <b>1 (satu) hari kerja</b>
+              setelah permohonan disetujui.
+
             </MotionContent>
           </AccordionItem>
 
@@ -233,14 +250,15 @@ export default function SopAccordionPage() {
             {renderTrigger("item-8", "8. Alur / Flowchart Prosedur", Workflow)}
             <MotionContent isOpen={openItem === "item-8"}>
               <ol className="list-decimal ml-6 space-y-1">
-                <li>Unit kerja membuat surat permohonan peminjaman mobil dinas.</li>
-                <li>Surat diteruskan melalui proses disposisi Kepala Biro Manajemen Aset.</li>
-                <li>Kabag Logistik dan Keamanan menelaah serta memberi rekomendasi.</li>
-                <li>Kasubbag Layanan Logistik menugaskan sopir dan menyiapkan Surat Jalan.</li>
-                <li>Staf menggandakan dan menyerahkan surat jalan kepada sopir.</li>
-                <li>Sopir mengambil mobil dan melaksanakan kegiatan.</li>
-                <li>Setelah kegiatan selesai, mobil dikembalikan dan administrasi ditutup.</li>
+                <li>Unit kerja mengajukan surat permohonan peminjaman kendaraan dinas.</li>
+                <li>Surat diterima dan diverifikasi oleh Biro Manajemen Aset.</li>
+                <li>Permohonan disetujui oleh pejabat berwenang.</li>
+                <li>Kabag Logistik dan Keamanan memberikan rekomendasi operasional.</li>
+                <li>Kasubbag Layanan Logistik menugaskan sopir dan kendaraan.</li>
+                <li>Surat Perintah Jalan diterbitkan.</li>
+                <li>Kendaraan digunakan sesuai ketentuan dan dikembalikan setelah kegiatan selesai.</li>
               </ol>
+
             </MotionContent>
           </AccordionItem>
         </Accordion>

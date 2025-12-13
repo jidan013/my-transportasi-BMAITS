@@ -27,7 +27,7 @@ export default function Step1Identity({ data, errors, onChange, formId }: Props)
 
       <div>
         <label htmlFor={`${formId}-userNip`} className="block text-sm font-semibold text-gray-700 dark:text-gray-200">
-          NIP / NIM
+          NRP
         </label>
         <input
           id={`${formId}-userNip`}
@@ -35,7 +35,7 @@ export default function Step1Identity({ data, errors, onChange, formId }: Props)
           value={data.userNip}
           onChange={onChange}
           className="mt-1 w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00AEEF]"
-          placeholder="Masukkan NIP"
+          placeholder="Masukkan NRP"
         />
         {errors.userNip && <p className="text-red-500 text-sm mt-1">{errors.userNip}</p>}
       </div>
@@ -50,7 +50,7 @@ export default function Step1Identity({ data, errors, onChange, formId }: Props)
           value={data.department}
           onChange={onChange}
           className="mt-1 w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00AEEF]"
-          placeholder="Contoh: Bagian Umum / Keuangan"
+          placeholder="Contoh: Biro Umum / Keuangan"
         />
         {errors.department && <p className="text-red-500 text-sm mt-1">{errors.department}</p>}
       </div>

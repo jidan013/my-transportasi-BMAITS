@@ -16,8 +16,6 @@ export default function Header({ stats }: HeaderProps) {
   const items = [
     { label: "Armada", value: stats.total, icon: IconCar, color: "text-[#002D72] dark:text-[#00AEEF]" },
     { label: "Dipinjam", value: stats.borrowed, icon: IconUsers, color: "text-orange-600 dark:text-orange-400" },
-    { label: "Jatuh Tempo", value: stats.dueToday, icon: IconAlertTriangle, color: "text-red-600 dark:text-red-400" },
-    { label: "Maintenance", value: stats.maintenance, icon: IconTools, color: "text-purple-600 dark:text-purple-400" },
   ];
 
   return (
