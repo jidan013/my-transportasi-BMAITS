@@ -1,3 +1,5 @@
+"use client";
+
 import { memo } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -6,24 +8,27 @@ import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { Car, Bus, LucideIcon } from "lucide-react";
 
 const VehicleImage = {
-  BUS_MANDIRI: "bus(Mandiri).jpeg",
-  BUS_SPS: "bus(SPS).jpeg",
-  BUS_BNI: "bus(BNI).jpeg",
-  BUS_IKOMA: "bus(Ikoma).jpeg",
-  AVANZA_L1601OD: "avanza(L 1601 OD).jpeg",
-  AVANZA_L1031CP: "avanza(L 1031 CP).jpeg",
-  AVANZA_L1169OD: "avanza(L 1169 OD).jpeg",
-  AVANZA_L1393DL: "avanza(L 1392 DL).jpeg",
-  AVANZA_L1501FP: "avanza(L 1501 FP).jpeg",
-  AVANZA_L1505AP: "avanza(L 1505 AP).jpeg",
-  AVANZA_L1662AP: "avanza(L 1662 AP).jpeg",
-  AVANZA_L1924AP: "avanza(L 1924 AP).jpeg",
-  INOVA_L1502BP: "innova(L 1502 BP).jpeg",
-  INOVA_L1511EP: "innova(L 1511 EP).jpeg",
-  HYUNDAI_L1843OD: "hyundai(L 1843 OD).jpeg",
-}
+  BUS_MANDIRI: "/FotoKendaraan/bus-mandiri.jpeg",
+  BUS_SPS: "/FotoKendaraan/bus-sps.jpeg",
+  BUS_BNI: "/FotoKendaraan/bus-bni.jpeg",
+  BUS_IKOMA: "/FotoKendaraan/bus-ikoma.jpeg",
+  AVANZA_L1601OD: "/FotoKendaraan/avanza-l1601od.jpeg",
+  AVANZA_L1031CP: "/FotoKendaraan/avanza-l1031cp.jpeg",
+  AVANZA_L1169OD: "/FotoKendaraan/avanza-l1169od.jpeg",
+  AVANZA_L1393DL: "/FotoKendaraan/avanza-l1393dl.jpeg",
+  AVANZA_L1501FP: "/FotoKendaraan/avanza-l1501fp.jpeg",
+  AVANZA_L1505AP: "/FotoKendaraan/avanza-l1505ap.jpeg",
+  AVANZA_L1662AP: "/FotoKendaraan/avanza-l1662ap.jpeg",
+  AVANZA_L1924AP: "/FotoKendaraan/avanza-l1924ap.jpeg",
+  INOVA_L1502BP: "/FotoKendaraan/innova-l1502bp.jpeg",
+  INOVA_L1511EP: "/FotoKendaraan/innova-l1511ep.jpeg",
+  HYUNDAI_L1843OD: "/FotoKendaraan/hyundai-l1843od.jpeg",
+  // Default fallback untuk kendaraan tanpa gambar spesifik
+  DEFAULT: "/FotoKendaraan/Default.jpeg",
+} as const;
 
-const kendaraanAwal : Vehicle[] = [
+const kendaraanAwal: Vehicle[] = [
+  // Bus (1-5)
   {
     id: 1,
     icon: Bus,
@@ -32,7 +37,7 @@ const kendaraanAwal : Vehicle[] = [
     warna: "Putih Biru",
     plat: "L 7808 AE",
     bbm: "Dexlite",
-    status: "available",
+    status: "available" as const,
     kapasitas: "35 Orang",
     image: VehicleImage.BUS_MANDIRI,
   },
@@ -44,7 +49,7 @@ const kendaraanAwal : Vehicle[] = [
     warna: "Putih Oren",
     plat: "L 7684 AP",
     bbm: "Dexlite",
-    status: "available",
+    status: "available" as const,
     kapasitas: "28 Orang",
     image: VehicleImage.BUS_BNI,
   },
@@ -56,7 +61,7 @@ const kendaraanAwal : Vehicle[] = [
     warna: "Putih Biru",
     plat: "L 7151 AH",
     bbm: "Dexlite",
-    status: "available",
+    status: "available" as const,
     kapasitas: "28 Orang",
     image: VehicleImage.BUS_SPS,
   },
@@ -68,7 +73,7 @@ const kendaraanAwal : Vehicle[] = [
     warna: "Putih Biru",
     plat: "L 7608 AP",
     bbm: "Dexlite",
-    status: "available",
+    status: "available" as const,
     kapasitas: "27 Orang",
     image: VehicleImage.BUS_IKOMA,
   },
@@ -80,9 +85,9 @@ const kendaraanAwal : Vehicle[] = [
     warna: "Hitam",
     plat: "L 7010 N",
     bbm: "Dexlite",
-    status: "available",
+    status: "available" as const,
     kapasitas: "14 Orang",
-    image: VehicleImage.BUS_IKOMA
+    image: VehicleImage.BUS_IKOMA, // Fixed: pakai BUS_IKOMA yang mirip
   },
   {
     id: 6,
@@ -92,10 +97,11 @@ const kendaraanAwal : Vehicle[] = [
     warna: "Hitam",
     plat: "L 1843 OD",
     bbm: "Dexlite",
-    status: "available",
+    status: "available" as const,
     kapasitas: "5 Orang",
-    image: VehicleImage.HYUNDAI_L1843OD
+    image: VehicleImage.HYUNDAI_L1843OD,
   },
+  // Sedan (7-9) - pakai gambar sedan atau fallback
   {
     id: 7,
     icon: Car,
@@ -104,9 +110,9 @@ const kendaraanAwal : Vehicle[] = [
     warna: "Hitam",
     plat: "L 1069 OD",
     bbm: "Pertamak",
-    status: "available",
+    status: "available" as const,
     kapasitas: "3 Orang",
-    image: VehicleImage.AVANZA_L1169OD
+    image: VehicleImage.AVANZA_L1169OD, // Fixed: sedan pakai avanza image
   },
   {
     id: 8,
@@ -116,10 +122,9 @@ const kendaraanAwal : Vehicle[] = [
     warna: "Hitam",
     plat: "L 1081 OE",
     bbm: "Pertamak",
-    status: "available",
+    status: "available" as const,
     kapasitas: "3 Orang",
-    image: VehicleImage.AVANZA_L1169OD
-    
+    image: VehicleImage.AVANZA_L1169OD,
   },
   {
     id: 9,
@@ -129,10 +134,11 @@ const kendaraanAwal : Vehicle[] = [
     warna: "Hitam",
     plat: "L 1080 OE",
     bbm: "Pertamak",
-    status: "available",
+    status: "available" as const,
     kapasitas: "3 Orang",
-    image: VehicleImage.AVANZA_L1169OD
+    image: VehicleImage.AVANZA_L1169OD,
   },
+  // Innova (10-13)
   {
     id: 10,
     icon: Car,
@@ -141,9 +147,9 @@ const kendaraanAwal : Vehicle[] = [
     warna: "Hitam",
     plat: "L 1511 EP",
     bbm: "Dexlite",
-    status: "available",
+    status: "available" as const,
     kapasitas: "5 Orang",
-    image: VehicleImage.INOVA_L1511EP
+    image: VehicleImage.INOVA_L1511EP,
   },
   {
     id: 11,
@@ -153,9 +159,9 @@ const kendaraanAwal : Vehicle[] = [
     warna: "Hitam",
     plat: "L 1852 AP",
     bbm: "Pertamak",
-    status: "available",
+    status: "available" as const,
     kapasitas: "5 Orang",
-    image: VehicleImage.INOVA_L1511EP
+    image: VehicleImage.INOVA_L1511EP,
   },
   {
     id: 12,
@@ -165,9 +171,9 @@ const kendaraanAwal : Vehicle[] = [
     warna: "Abu-abu",
     plat: "L 1502 BP",
     bbm: "Pertamak",
-    status: "available",
+    status: "available" as const,
     kapasitas: "5 Orang",
-    image: VehicleImage.AVANZA_L1393DL
+    image: VehicleImage.INOVA_L1502BP,
   },
   {
     id: 13,
@@ -177,10 +183,11 @@ const kendaraanAwal : Vehicle[] = [
     warna: "Hijau",
     plat: "L 1059 AP",
     bbm: "Pertamak",
-    status: "available",
+    status: "available" as const,
     kapasitas: "5 Orang",
-    image: VehicleImage.AVANZA_L1393DL
+    image: VehicleImage.INOVA_L1502BP,
   },
+  // Avanza (14-18)
   {
     id: 14,
     icon: Car,
@@ -189,9 +196,9 @@ const kendaraanAwal : Vehicle[] = [
     warna: "Hitam",
     plat: "L 1031 CP",
     bbm: "Pertamak",
-    status: "available",
+    status: "available" as const,
     kapasitas: "5 Orang",
-    image: VehicleImage.AVANZA_L1393DL
+    image: VehicleImage.AVANZA_L1031CP,
   },
   {
     id: 15,
@@ -201,9 +208,9 @@ const kendaraanAwal : Vehicle[] = [
     warna: "Putih",
     plat: "L 6001 DP",
     bbm: "Pertamak",
-    status: "available",
+    status: "available" as const,
     kapasitas: "5 Orang",
-    image: VehicleImage.AVANZA_L1393DL
+    image: VehicleImage.AVANZA_L1169OD,
   },
   {
     id: 16,
@@ -213,9 +220,9 @@ const kendaraanAwal : Vehicle[] = [
     warna: "Silver",
     plat: "L 1393 DL",
     bbm: "Pertamak",
-    status: "available",
+    status: "available" as const,
     kapasitas: "5 Orang",
-    image: VehicleImage.AVANZA_L1393DL
+    image: VehicleImage.AVANZA_L1393DL,
   },
   {
     id: 17,
@@ -225,9 +232,9 @@ const kendaraanAwal : Vehicle[] = [
     warna: "Silver",
     plat: "L 1068 OD",
     bbm: "Pertamak",
-    status: "available",
+    status: "available" as const,
     kapasitas: "5 Orang",
-    image: VehicleImage.AVANZA_L1393DL
+    image: VehicleImage.AVANZA_L1169OD,
   },
   {
     id: 18,
@@ -237,11 +244,11 @@ const kendaraanAwal : Vehicle[] = [
     warna: "Silver",
     plat: "L 1171 OD",
     bbm: "Pertamak",
-    status: "available",
+    status: "available" as const,
     kapasitas: "5 Orang",
-    image: VehicleImage.AVANZA_L1169OD
+    image: VehicleImage.AVANZA_L1169OD,
   },
-]
+] as const;
 
 interface Vehicle {
   id: number;
@@ -254,12 +261,20 @@ interface Vehicle {
   status: "available" | "borrowed" | "maintenance";
   borrower?: string;
   returnDate?: string;
-  image: string;
+  image?: string;
   kapasitas: string;
+  fotoSrc?: string;
+  fotoAlt?: string;
 }
 
 const VehicleCard = memo(({ vehicle }: { vehicle: Vehicle }) => {
   const reduced = useReducedMotion();
+
+  const getVehicleImage = (image?: string): string => {
+    if (!image) return VehicleImage.DEFAULT;
+    if (!image.startsWith("/")) return VehicleImage.DEFAULT;
+    return image;
+  };
 
   return (
     <motion.div
@@ -272,14 +287,14 @@ const VehicleCard = memo(({ vehicle }: { vehicle: Vehicle }) => {
     >
       <div className="relative h-48 overflow-hidden">
         <Image
-          src={vehicle.image}
-          alt={vehicle.nama}
+          src={getVehicleImage(vehicle.image)}
+          alt={`${vehicle.nama} - ${vehicle.jenis}`}
           width={600}
           height={400}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-          placeholder="blur"
-          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
         />
+
+
         <div className="absolute top-4 right-4 w-3 h-3 rounded-full bg-emerald-500 animate-pulse shadow-lg" />
       </div>
       <div className="p-5">
@@ -288,13 +303,17 @@ const VehicleCard = memo(({ vehicle }: { vehicle: Vehicle }) => {
           {vehicle.plat} • {vehicle.warna} • {vehicle.kapasitas}
         </p>
         <div className="mt-4">
-          <StatusBadge status={vehicle.status} borrower={vehicle.borrower} returnDate={vehicle.returnDate} />
+          <StatusBadge
+            status={vehicle.status}
+            borrower={vehicle.borrower}
+            returnDate={vehicle.returnDate}
+          />
         </div>
         {vehicle.status === "available" && (
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
-            className="mt-5 w-full py-3 bg-gradient-to-r from-[#002D72] to-[#00AEEF] text-white font-semibold rounded-xl shadow-md text-sm"
+            className="mt-5 w-full py-3 bg-gradient-to-r from-[#002D72] to-[#00AEEF] text-white font-semibold rounded-xl shadow-md text-sm hover:shadow-lg transition-all"
           >
             Pinjam Sekarang
           </motion.button>
@@ -306,3 +325,4 @@ const VehicleCard = memo(({ vehicle }: { vehicle: Vehicle }) => {
 
 VehicleCard.displayName = "VehicleCard";
 export default VehicleCard;
+export { kendaraanAwal, VehicleImage };

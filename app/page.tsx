@@ -37,8 +37,8 @@ export default function PageUser() {
 
   const filteredVehicles = useMemo(() => {
     return VEHICLES.filter(v =>
-      (v.name.toLowerCase().includes(search.toLowerCase()) ||
-        v.plate.toLowerCase().includes(search.toLowerCase())) &&
+      (v.nama.toLowerCase().includes(search.toLowerCase()) ||
+        v.plat.toLowerCase().includes(search.toLowerCase())) &&
       (!filterStatus || v.status === filterStatus)
     );
   }, [search, filterStatus]);

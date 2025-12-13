@@ -11,20 +11,23 @@ export const useReducedMotion = () => {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
-    // Cegah error "window is not defined" saat server render
+    // Cegah error saat SSR
     if (typeof window === "undefined") return;
 
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-
-    // Update state saat mount
+    
+    // Set initial state
     setPrefersReducedMotion(mediaQuery.matches);
-
-    // Update ketika user ubah preferensi
-    const handler = (event: MediaQueryListEvent) =>
+    
+    // Handler dengan proper typing
+    const handler = (event: MediaQueryListEvent) => {
       setPrefersReducedMotion(event.matches);
-
+    };
+    
+    // Add listener (modern browsers support addEventListener)
     mediaQuery.addEventListener("change", handler);
 
+    // Cleanup
     return () => {
       mediaQuery.removeEventListener("change", handler);
     };
