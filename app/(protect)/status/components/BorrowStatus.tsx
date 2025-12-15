@@ -44,7 +44,7 @@ const mockHistory: BorrowItem[] = [
   },
   {
     borrower: "Siti Rahma",
-    vehicle: "Suzuki Ertiga",
+    vehicle: "Haiace",
     plate: "L 4321 ABC",
     borrowDate: "2025-09-28",
     returnDate: "2025-09-29",
@@ -58,7 +58,7 @@ const mockHistory: BorrowItem[] = [
   },
   {
     borrower: "Budi Santoso",
-    vehicle: "Mitsubishi Pajero",
+    vehicle: "Toyota Avanza",
     plate: "N 9988 DD",
     borrowDate: "2025-10-05",
     returnDate: "2025-10-10",
@@ -70,7 +70,7 @@ const mockHistory: BorrowItem[] = [
   },
   {
     borrower: "Rina Putri",
-    vehicle: "Honda Jazz",
+    vehicle: "Toyota Avanza",
     plate: "B 7744 TT",
     borrowDate: "2025-11-01",
     returnDate: "2025-11-03",

@@ -2,22 +2,17 @@
 
 import * as React from "react"
 import {
-  IconBook,
   IconCalendar,
   IconCamera,
   IconCar,
-  IconChartBar,
   IconDashboard,
   IconDatabase,
   IconFile,
   IconFileAi,
   IconFileDescription,
-  IconFileWord,
-  IconFolder,
   IconHelp,
   IconHistory,
   IconReport,
-  IconSearch,
   IconSettings,
   IconCurrencyDollar,
   IconPhoto
@@ -47,11 +42,13 @@ const data = {
     email: "amir@its.ac.id",
     avatar: "/avatars/shadcn.jpg",
   },
+  
   navMain: [
     { title: "Dashboard", url: "/", icon: IconDashboard },
     { title: "Jadwal Kendaraan", url: "/jadwal", icon: IconCalendar },
     { title: "Form Peminjaman", url: "/form", icon: IconFile },
     { title: "Status Peminjaman", url: "/status", icon: IconHistory },
+    { title: "Laporan Peminjaman", url: "/laporan", icon: IconReport },
   ],
   navClouds: [
     {

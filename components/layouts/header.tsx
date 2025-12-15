@@ -4,7 +4,6 @@
 import { useId } from "react";
 import { motion } from "framer-motion";
 import { IconCar, IconCircleCheckFilled, IconUsers, IconAlertTriangle, IconTools } from "@tabler/icons-react";
-import DarkModeToggle from "../ui/DarkMode";
 
 interface HeaderProps {
   stats: { total: number; available: number; borrowed: number; dueToday: number; maintenance: number };
@@ -40,7 +39,6 @@ export default function Header({ stats }: HeaderProps) {
             </motion.div>
           ))}
         </div>
-        <DarkModeToggle />
       </div>
     </motion.header>
   );

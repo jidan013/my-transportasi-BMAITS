@@ -102,7 +102,7 @@ const kendaraanAwal: Vehicle[] = [
     kapasitas: "5 Orang",
     image: VehicleImage.HYUNDAI_L1843OD,
   },
-  // Sedan (7-9) - pakai gambar sedan atau fallback
+ 
   {
     id: 7,
     icon: Car,
@@ -113,7 +113,7 @@ const kendaraanAwal: Vehicle[] = [
     bbm: "Pertamak",
     status: "available" as const,
     kapasitas: "3 Orang",
-    image: VehicleImage.AVANZA_L1169OD, // Fixed: sedan pakai avanza image
+    image: VehicleImage.AVANZA_L1169OD,
   },
   {
     id: 8,
