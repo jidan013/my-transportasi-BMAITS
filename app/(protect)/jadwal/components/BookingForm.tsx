@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -7,7 +7,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import idLocale from '@fullcalendar/core/locales/id';
 import type { EventClickArg, EventInput } from '@fullcalendar/core';
 import { useMemo, useState } from 'react';
-import { Car, Bus, Truck, CarFront, Phone } from 'lucide-react';
+import { Car, Bus, Truck, CarFront } from 'lucide-react';
 
 const vehicles = [
   { id: '1', name: 'Toyota Avanza', plate: 'B 1234 XYZ', icon: Car },
