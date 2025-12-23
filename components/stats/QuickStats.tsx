@@ -37,20 +37,6 @@ export default function QuickStats({ stats }: Props) {
       color: "text-emerald-600 dark:text-emerald-400",
       bg: "bg-gradient-to-br from-emerald-500 to-teal-500",
     },
-    {
-      title: "Dipinjam",
-      value: stats.borrowed,
-      icon: IconClockHour4,
-      color: "text-orange-600 dark:text-orange-400",
-      bg: "bg-gradient-to-br from-orange-500 to-red-500",
-    },
-    {
-      title: "Maintenance",
-      value: stats.maintenance,
-      icon: IconTools,
-      color: "text-purple-600 dark:text-purple-400",
-      bg: "bg-gradient-to-br from-purple-500 to-indigo-500",
-    },
   ];
 
   return (
