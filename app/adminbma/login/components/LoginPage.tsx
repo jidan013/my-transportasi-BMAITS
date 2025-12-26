@@ -12,7 +12,8 @@ interface LoginFormData {
 interface LoginResponse {
     token: string;
     redirectTo?: string; 
-}
+}   
+
 
 export default function AdminLoginPage() {
     const [formData, setFormData] = useState<LoginFormData>({ email: "", password: "" });
