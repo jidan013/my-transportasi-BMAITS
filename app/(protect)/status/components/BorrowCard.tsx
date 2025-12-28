@@ -9,9 +9,9 @@ import {
   IconX,
   IconFileCheck,
   IconMail,
-  type TablerIcon,
 } from "@tabler/icons-react";
-import { JSX } from "react";
+import type { IconProps } from "@tabler/icons-react";
+import type { ComponentType, ReactNode } from "react";
 
 /* =====================
    TYPES
@@ -38,10 +38,12 @@ export interface BorrowCardProps {
 }
 
 /* =====================
-   CONFIG MAPS (TYPE SAFE)
+   ICON MAPS (TYPE SAFE)
 ===================== */
 
-const timelineIcons: Record<TimelineKey, TablerIcon> = {
+type IconComponent = ComponentType<IconProps>;
+
+const timelineIcons: Record<TimelineKey, IconComponent> = {
   diajukan: IconClock,
   ditinjau: IconFileCheck,
   disetujui: IconCheck,
@@ -52,7 +54,7 @@ const statusConfig: Record<
   BorrowStatus,
   {
     label: string;
-    icon: JSX.Element;
+    icon: ReactNode;
     className: string;
   }
 > = {
@@ -104,7 +106,7 @@ export default function BorrowCard({
       whileHover={{ y: -4, scale: 1.01 }}
       className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-5 transition-all"
     >
-      {/* ================= HEADER ================= */}
+      {/* HEADER */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-gradient-to-br from-[#00AEEF] to-[#002D72] rounded-lg">
@@ -127,7 +129,7 @@ export default function BorrowCard({
         </span>
       </div>
 
-      {/* ================= INFO ================= */}
+      {/* INFO */}
       <div className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
         <p>
           <span className="font-medium">Peminjam:</span> {borrower}
@@ -150,7 +152,7 @@ export default function BorrowCard({
         </p>
       </div>
 
-      {/* ================= TIMELINE ================= */}
+      {/* TIMELINE */}
       <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
         <h4 className="mb-4 font-semibold text-gray-800 dark:text-gray-200">
           Status Pengajuan
