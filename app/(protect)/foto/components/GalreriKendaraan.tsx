@@ -4,38 +4,46 @@ import Image from 'next/image';
 import { Bus, Car, LucideIcon } from 'lucide-react';
 import { useState } from 'react';
 
-const VehicleImage = {
-  BUS_MANDIRI: "/FotoKendaraan/bus(Mandiri).jpeg",
-  BUS_SPS: "/FotoKendaraan/bus(SPS).jpeg",
-  BUS_BNI: "/FotoKendaraan/bus(BNI).jpeg",
-  BUS_IKOMA: "/FotoKendaraan/bus(Ikoma).jpeg",
-  AVANZA_L1601OD: "/FotoKendaraan/avanza(L 1601 OD).jpeg",
-  AVANZA_L1031CP: "/FotoKendaraan/avanza(L 1031 CP).jpeg",
-  AVANZA_L1169OD: "/FotoKendaraan/avanza(L 1169 OD).jpeg",
-  AVANZA_L1393DL: "/FotoKendaraan/avanza(L 1392 DL).jpeg",
-  AVANZA_L1501FP: "/FotoKendaraan/avanza(L 1501 FP).jpeg",
-  AVANZA_L1505AP: "/FotoKendaraan/avanza(L 1505 AP).jpeg",
-  AVANZA_L1662AP: "/FotoKendaraan/avanza(L 1662 AP).jpeg",
-  AVANZA_L1924AP: "/FotoKendaraan/avanza(L 1924 AP).jpeg",
-  INOVA_L1502BP: "/FotoKendaraan/innova(L 1502 BP).jpeg",
-  INOVA_L1511EP: "/FotoKendaraan/innova(L 1511 EP).jpeg",
-  HYUNDAI_L1843OD: "/FotoKendaraan/hyundai(L 1843 OD).jpeg",
-}
+const VehicleImageMap: Record<string, string> = {
+  // BUS
+  L7808AE: "/FotoKendaraan/MANDIRI.png",
+  L7684AP: "/FotoKendaraan/BNI.png",
+  L7151AH: "/FotoKendaraan/SPS.png",
+  L7608AP: "/FotoKendaraan/IKOMA.png",
+
+  // MOBIL
+  L1511EP: "/FotoKendaraan/L1511EP.png",
+  L1502BP: "/FotoKendaraan/L1502BP.png",
+  L1031CP: "/FotoKendaraan/L1031CP.png",
+  L1393DL: "/FotoKendaraan/L1393DL.png",
+  L1843OD: "/FotoKendaraan/L1843OD.png",
+  L1081OE: "/FotoKendaraan/L1081OE.png",
+  L1080OE: "/FotoKendaraan/L1080OE.png",
+
+  DEFAULT: "/FotoKendaraan/Default.jpeg",
+};
+
+
+const resolveImage = (plat: string) => {
+  const key = plat.replace(/\s+/g, '').toUpperCase();
+  return VehicleImageMap[key] || VehicleImageMap.DEFAULT;
+};
 
 interface Kendaraan {
   id: number;
   icon: LucideIcon;
   nama: string;
   jenis: string;
-  warna: string;
   plat: string;
+  warna: string;
   bbm: string;
-  status: string;
+  status: "available" | "borrowed" | "maintenance";
+  borrower?: string;
+  returnDate?: string;
   kapasitas: string;
-  image: string;
 }
 
-const kendaraanList: Kendaraan[] = [
+const kendaraanAwal: Kendaraan[] = [
   {
     id: 1,
     icon: Bus,
@@ -46,7 +54,6 @@ const kendaraanList: Kendaraan[] = [
     bbm: "Dexlite",
     status: "available",
     kapasitas: "35 Orang",
-    image: VehicleImage.BUS_MANDIRI,
   },
   {
     id: 2,
@@ -58,7 +65,6 @@ const kendaraanList: Kendaraan[] = [
     bbm: "Dexlite",
     status: "available",
     kapasitas: "28 Orang",
-    image: VehicleImage.BUS_BNI,
   },
   {
     id: 3,
@@ -70,7 +76,6 @@ const kendaraanList: Kendaraan[] = [
     bbm: "Dexlite",
     status: "available",
     kapasitas: "28 Orang",
-    image: VehicleImage.BUS_SPS,
   },
   {
     id: 4,
@@ -82,7 +87,6 @@ const kendaraanList: Kendaraan[] = [
     bbm: "Dexlite",
     status: "available",
     kapasitas: "27 Orang",
-    image: VehicleImage.BUS_IKOMA,
   },
   {
     id: 5,
@@ -94,7 +98,6 @@ const kendaraanList: Kendaraan[] = [
     bbm: "Dexlite",
     status: "available",
     kapasitas: "14 Orang",
-    image: VehicleImage.BUS_IKOMA,
   },
   {
     id: 6,
@@ -106,7 +109,6 @@ const kendaraanList: Kendaraan[] = [
     bbm: "Dexlite",
     status: "available",
     kapasitas: "5 Orang",
-    image: VehicleImage.HYUNDAI_L1843OD,
   },
   {
     id: 7,
@@ -118,7 +120,6 @@ const kendaraanList: Kendaraan[] = [
     bbm: "Pertamak",
     status: "available",
     kapasitas: "3 Orang",
-    image: VehicleImage.AVANZA_L1169OD,
   },
   {
     id: 8,
@@ -130,7 +131,6 @@ const kendaraanList: Kendaraan[] = [
     bbm: "Pertamak",
     status: "available",
     kapasitas: "3 Orang",
-    image: VehicleImage.AVANZA_L1169OD,
   },
   {
     id: 9,
@@ -142,7 +142,6 @@ const kendaraanList: Kendaraan[] = [
     bbm: "Pertamak",
     status: "available",
     kapasitas: "3 Orang",
-    image: VehicleImage.AVANZA_L1169OD,
   },
   {
     id: 10,
@@ -154,7 +153,6 @@ const kendaraanList: Kendaraan[] = [
     bbm: "Dexlite",
     status: "available",
     kapasitas: "5 Orang",
-    image: VehicleImage.INOVA_L1511EP,
   },
   {
     id: 11,
@@ -166,7 +164,6 @@ const kendaraanList: Kendaraan[] = [
     bbm: "Pertamak",
     status: "available",
     kapasitas: "5 Orang",
-    image: VehicleImage.INOVA_L1511EP,
   },
   {
     id: 12,
@@ -178,7 +175,6 @@ const kendaraanList: Kendaraan[] = [
     bbm: "Pertamak",
     status: "available",
     kapasitas: "5 Orang",
-    image: VehicleImage.INOVA_L1502BP,
   },
   {
     id: 13,
@@ -190,7 +186,6 @@ const kendaraanList: Kendaraan[] = [
     bbm: "Pertamak",
     status: "available",
     kapasitas: "5 Orang",
-    image: VehicleImage.AVANZA_L1393DL,
   },
   {
     id: 14,
@@ -202,7 +197,6 @@ const kendaraanList: Kendaraan[] = [
     bbm: "Pertamak",
     status: "available",
     kapasitas: "5 Orang",
-    image: VehicleImage.AVANZA_L1031CP,
   },
   {
     id: 15,
@@ -214,7 +208,6 @@ const kendaraanList: Kendaraan[] = [
     bbm: "Pertamak",
     status: "available",
     kapasitas: "5 Orang",
-    image: VehicleImage.AVANZA_L1393DL,
   },
   {
     id: 16,
@@ -226,7 +219,6 @@ const kendaraanList: Kendaraan[] = [
     bbm: "Pertamak",
     status: "available",
     kapasitas: "5 Orang",
-    image: VehicleImage.AVANZA_L1393DL,
   },
   {
     id: 17,
@@ -238,7 +230,6 @@ const kendaraanList: Kendaraan[] = [
     bbm: "Pertamak",
     status: "available",
     kapasitas: "5 Orang",
-    image: VehicleImage.AVANZA_L1393DL,
   },
   {
     id: 18,
@@ -250,9 +241,9 @@ const kendaraanList: Kendaraan[] = [
     bbm: "Pertamak",
     status: "available",
     kapasitas: "5 Orang",
-    image: VehicleImage.AVANZA_L1169OD,
   },
 ];
+
 
 export default function GaleriKendaraan() {
   const [selected, setSelected] = useState<Kendaraan | null>(null);
@@ -266,7 +257,7 @@ export default function GaleriKendaraan() {
           </h1>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {kendaraanList.map((k) => (
+            {kendaraanAwal.map((k) => (
               <div
                 key={k.id}
                 className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl flex flex-col h-full group"
@@ -274,7 +265,7 @@ export default function GaleriKendaraan() {
               >
                 <div className="relative h-64 w-full bg-gray-200 flex-shrink-0 overflow-hidden group-hover:brightness-110">
                   <Image
-                    src={k.image}
+                    src={resolveImage(k.plat)}
                     alt={k.nama}
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-110"
@@ -331,7 +322,7 @@ export default function GaleriKendaraan() {
             {/* Header dengan Close Button */}
             <div className="relative h-96 w-full flex-shrink-0 overflow-hidden rounded-t-3xl">
               <Image
-                src={selected.image}
+                src={resolveImage(selected.plat)}
                 alt={selected.nama}
                 fill
                 className="object-contain"
