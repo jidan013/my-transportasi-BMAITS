@@ -38,8 +38,8 @@ import Link from "next/link"
 
 const data = {
   user: {
-    name: "Mr. Amir Montero",
-    email: "amir@its.ac.id",
+    name: "Administrator",
+    email: "admin@its.ac.id",
     avatar: "/avatars/shadcn.jpg",
   },
   
@@ -48,6 +48,7 @@ const data = {
     { title: "Jadwal Kendaraan", url: "/jadwal", icon: IconCalendar },
     { title: "Form Peminjaman", url: "/form", icon: IconFile },
     { title: "Status Peminjaman", url: "/status", icon: IconHistory },
+    { title: "Permintaan", url: "/permintaan", icon: IconDatabase },
     { title: "Laporan Peminjaman", url: "/laporan", icon: IconReport },
   ],
   navClouds: [
@@ -81,7 +82,6 @@ const data = {
     },
   ],
   navSecondary: [
-    { title: "Settings", url: "/settings", icon: IconSettings },
   ],
   documents: [
     { name: "SOP Kendaraan", url: "/sop", icon: IconReport },

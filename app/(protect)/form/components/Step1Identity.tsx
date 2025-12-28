@@ -42,7 +42,7 @@ export default function Step1Identity({ data, errors, onChange, formId }: Props)
 
       <div className="sm:col-span-2">
         <label htmlFor={`${formId}-department`} className="block text-sm font-semibold text-gray-700 dark:text-gray-200">
-          Unit Kerja / Departemen
+          Unit Kerja / Departemen / Pensiunan
         </label>
         <input
           id={`${formId}-department`}

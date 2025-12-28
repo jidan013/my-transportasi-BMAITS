@@ -5,7 +5,6 @@ import { LazyMotion, domAnimation } from "framer-motion";
 import Header from "@/components/layouts/header";
 import Hero from "@/components/layouts/Hero";
 import QuickStats from "@/components/stats/QuickStats";
-import MaintenanceSchedule from "@/components/maintenance/MaintenanceSchedule";
 import RecentActivity from "@/components/activity/RecentActivity";
 import VehicleFilters from "@/components/vihecles/VehicleFilters";
 import { VEHICLES, ACTIVITIES, MAINTENANCE_SCHEDULES } from "@/lib/data";
@@ -50,7 +49,6 @@ export default function PageUser() {
         <Hero />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 py-12 space-y-16">
           <QuickStats stats={stats} />
-          <MaintenanceSchedule schedules={MAINTENANCE_SCHEDULES} isLoading={isLoading} />
           <RecentActivity activities={ACTIVITIES} isLoading={isLoading} />
           <section>
             <VehicleFilters search={search} setSearch={setSearch} filterStatus={filterStatus} setFilterStatus={setFilterStatus} />
