@@ -51,8 +51,6 @@ interface Vehicle {
 /* =======================
    IMAGE RESOLVER
 ======================= */
-const normalize = (value: string) =>
-  value.toUpperCase().replace(/\s+/g, "_");
 
 const resolveVehicleImage = (vehicle: Vehicle): string => {
   const platKey = vehicle.plat.replace(/\s+/g, "").toUpperCase();
