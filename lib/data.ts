@@ -32,7 +32,7 @@ export interface Vehicle {
   bbm: string
   status: Status
   kapasitas: string
-  image: VehicleImageKey // Use the const assertion type
+  image: VehicleImageKey
   borrower?: string
   returnDate?: string
 }

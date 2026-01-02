@@ -7,7 +7,7 @@ import Hero from "@/components/layouts/Hero";
 import QuickStats from "@/components/stats/QuickStats";
 import RecentActivity from "@/components/activity/RecentActivity";
 import VehicleFilters from "@/components/vihecles/VehicleFilters";
-import { VEHICLES, ACTIVITIES, MAINTENANCE_SCHEDULES } from "@/lib/data";
+import { VEHICLES, ACTIVITIES} from "@/lib/data";
 import Skeleton from "@/components/ui/skeleton";
 import Footer from "@/components/layouts/Footer";
 
