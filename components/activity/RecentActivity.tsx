@@ -1,4 +1,3 @@
-// components/activity/RecentActivity.tsx
 "use client";
 
 import { motion } from "framer-motion";

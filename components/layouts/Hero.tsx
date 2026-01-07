@@ -8,7 +8,7 @@ export default function Hero() {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-4 py-16 md:py-20">
-      {/* Background Gradient + Noise Texture */}
+      {/* Background Gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#001f5b] via-[#002d72] to-[#00aeef]/90" />
       <div
         className="absolute inset-0 opacity-10 mix-blend-overlay pointer-events-none"

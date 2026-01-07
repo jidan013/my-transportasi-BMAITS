@@ -1,174 +1,132 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { JSX, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
+import axios from "axios";
 
-/* =====================
-   TYPE
-===================== */
-interface LoginFormData {
-  email: string;
-  password: string;
-}
+import { adminLogin } from "@/lib/services/auth";
+import type { LoginPayload } from "@/types/auth";
 
-interface LoginResponse {
-  token: string;
-  redirectTo?: string;
-}
+export default function AdminLoginPage(): JSX.Element {
+  const router = useRouter();
 
-/* =====================
-   DUMMY ADMIN (DEV ONLY)
-===================== */
-const DUMMY_ADMIN = {
-  email: "admin@its.ac.id",
-  password: "admin123",
-  token: "dummy-admin-token",
-};
-
-/* =====================
-   COMPONENT
-===================== */
-export default function AdminLoginPage() {
-  const [formData, setFormData] = useState<LoginFormData>({
+  const [formData, setFormData] = useState<LoginPayload>({
     email: "",
     password: "",
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
 
-  const router = useRouter();
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
 
-  const handleInputChange = useCallback(
-    (field: keyof LoginFormData) =>
-      (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData((prev) => ({ ...prev, [field]: e.target.value }));
-        if (error) setError("");
-      },
-    [error]
-  );
+  const handleChange =
+    (field: keyof LoginPayload) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFormData((prev) => ({ ...prev, [field]: e.target.value }));
+      if (error) setError("");
+    };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
     e.preventDefault();
-    setError("");
-    setIsLoading(true);
+    setLoading(true);
 
     try {
-      /* ===== DUMMY LOGIN ===== */
-      if (
-        formData.email === DUMMY_ADMIN.email &&
-        formData.password === DUMMY_ADMIN.password
-      ) {
-        localStorage.setItem("adminToken", DUMMY_ADMIN.token);
-        router.push("/adminbma/dashboard");
-        return;
+      await adminLogin(formData);
+      router.push("/adminbma/dashboard");
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        setError(
+          err.response?.data?.message ??
+            "Login gagal. Akses administrator ditolak."
+        );
+      } else {
+        setError("Terjadi kesalahan sistem.");
       }
-
-      /* ===== API LOGIN ===== */
-      const res = await fetch("/api/auth/admin-login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.message || "Login gagal. Akses admin ditolak.");
-      }
-
-      const data: LoginResponse = await res.json();
-      localStorage.setItem("adminToken", data.token);
-
-      router.push(data.redirectTo || "/adminbma/dashboard");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Terjadi kesalahan");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-200 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white/80 backdrop-blur-xl shadow-xl rounded-2xl border border-slate-200/50 p-8 space-y-6">
-        <div className="text-center space-y-2">
-          <div className="w-16 h-16 mx-auto bg-gradient-to-r from-black to-slate-800 rounded-2xl flex items-center justify-center shadow-lg">
-            <svg
-              className="w-8 h-8 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-              />
-            </svg>
-          </div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 px-4">
+      <div className="w-full max-w-md bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl border border-slate-200 p-8 space-y-6">
+        {/* HEADER */}
+        <div className="text-center space-y-1">
+          <h1 className="text-2xl font-bold text-slate-900">
             Admin Panel
           </h1>
           <p className="text-sm text-slate-600">
-            Masukkan kredensial admin
+            Masuk menggunakan akun administrator
           </p>
         </div>
 
+        {/* FORM */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-800 text-sm">
+            <div className="text-sm text-red-700 bg-red-50 border border-red-200 p-3 rounded-xl">
               {error}
             </div>
           )}
 
-          <div className="space-y-2">
+          {/* EMAIL */}
+          <div className="space-y-1">
             <label className="text-sm font-medium text-slate-700">
-              Email Admin
+              Email
             </label>
             <input
               type="email"
               required
-              disabled={isLoading}
+              disabled={loading}
               value={formData.email}
-              onChange={handleInputChange("email")}
+              onChange={handleChange("email")}
               placeholder="admin@its.ac.id"
-              className="w-full px-4 py-3 border rounded-xl"
+              className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-black transition"
             />
           </div>
 
-          <div className="space-y-2">
+          {/* PASSWORD */}
+          <div className="space-y-1">
             <label className="text-sm font-medium text-slate-700">
-              Kata Sandi
+              Password
             </label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
                 required
-                disabled={isLoading}
+                disabled={loading}
                 value={formData.password}
-                onChange={handleInputChange("password")}
+                onChange={handleChange("password")}
                 placeholder="••••••••"
-                className="w-full px-4 py-3 border rounded-xl pr-12"
+                className="w-full px-4 py-3 rounded-xl border border-slate-300 pr-12 focus:outline-none focus:ring-2 focus:ring-black transition"
               />
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-3 flex items-center"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute inset-y-0 right-3 flex items-center text-slate-500 hover:text-slate-700"
+                aria-label="Toggle password visibility"
               >
-                {showPassword ? <EyeOff /> : <Eye />}
+                {showPassword ? (
+                  <EyeOff size={18} />
+                ) : (
+                  <Eye size={18} />
+                )}
               </button>
             </div>
           </div>
 
+          {/* SUBMIT */}
           <button
             type="submit"
-            disabled={isLoading}
-            className="w-full bg-black text-white py-3 rounded-xl flex justify-center gap-2"
+            disabled={loading}
+            className="w-full bg-black text-white py-3 rounded-xl flex justify-center items-center gap-2 hover:bg-slate-900 transition disabled:opacity-70"
           >
-            {isLoading ? (
+            {loading ? (
               <>
-                <Loader2 className="animate-spin" /> Memproses
+                <Loader2 className="animate-spin" size={18} />
+                Memproses
               </>
             ) : (
               "Masuk Admin"
@@ -176,8 +134,9 @@ export default function AdminLoginPage() {
           </button>
         </form>
 
+        {/* FOOTER */}
         <p className="text-xs text-center text-slate-500">
-          Khusus administrator berwenang
+          Akses terbatas untuk administrator berwenang
         </p>
       </div>
     </div>

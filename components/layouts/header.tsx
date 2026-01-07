@@ -3,7 +3,7 @@
 
 import { useId } from "react";
 import { motion } from "framer-motion";
-import { IconCar, IconCircleCheckFilled, IconUsers, IconAlertTriangle, IconTools } from "@tabler/icons-react";
+import { IconCar, IconUsers} from "@tabler/icons-react";
 
 interface HeaderProps {
   stats: { total: number; available: number; borrowed: number; dueToday: number; maintenance: number };
