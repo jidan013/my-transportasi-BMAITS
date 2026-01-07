@@ -2,7 +2,7 @@ import Api from "@/lib/axios";
 import type {
   LoginPayload,
   LoginResponse,
-  MeResponse,
+  User,
 } from "@/types/auth";
 
 /* =====================
@@ -19,8 +19,8 @@ export async function adminLogin(
 /* =====================
    GET LOGGED USER
 ===================== */
-export async function getMe(): Promise<MeResponse> {
-  const res = await Api.get("/api/user");
+export async function getMe(): Promise<User> {
+  const res = await Api.get<User>("/user");
   return res.data;
 }
 
