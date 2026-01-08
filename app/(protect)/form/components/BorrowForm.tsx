@@ -53,6 +53,7 @@ export default function BorrowForm() {
     keperluan: "",
   });
 
+<<<<<<< HEAD
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const checkAvailableVehicles = useCallback(async () => {
@@ -89,10 +90,14 @@ export default function BorrowForm() {
     }
   }, [checkAvailableVehicles, step]);
 
+=======
+  // Handle Change
+>>>>>>> 9d1429d (testing)
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+<<<<<<< HEAD
     setFormData(prev => ({ ...prev, [name]: value }));
     
     if (name in errors) {
@@ -101,6 +106,30 @@ export default function BorrowForm() {
         delete newErrors[name];
         return newErrors;
       });
+=======
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  // Validasi Step 1
+  const validateStep1 = () => {
+    const newErrors: Record<string, string> = {};
+    if (!formData.userName.trim()) newErrors.userName = "Nama wajib diisi";
+    if (!formData.userNip.trim()) newErrors.userNip = "NIP wajib diisi";
+    if (!formData.department.trim()) newErrors.department = "Unit kerja wajib diisi";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Validasi Step 2
+  const validateStep2 = () => {
+    const newErrors: Record<string, string> = {};
+    if (!formData.vehicleId) newErrors.vehicleId = "Pilih kendaraan";
+    if (!formData.borrowDate) newErrors.borrowDate = "Tanggal pinjam wajib diisi";
+    if (!formData.returnDate) newErrors.returnDate = "Tanggal kembali wajib diisi";
+    else if (new Date(formData.returnDate) <= new Date(formData.borrowDate)) {
+      newErrors.returnDate = "Tanggal kembali harus setelah tanggal pinjam";
+>>>>>>> 9d1429d (testing)
     }
   };
 

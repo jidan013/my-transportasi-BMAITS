@@ -22,7 +22,7 @@ interface Props {
 export default function QuickStats({ stats }: Props) {
   const items = [
     {
-      title: "Total Armada",
+      title: "Total Kendaraan",
       value: stats.total,
       icon: IconCar,
       color: "text-[#002D72] dark:text-[#00AEEF]",

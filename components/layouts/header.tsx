@@ -13,7 +13,7 @@ export default function Header({ stats }: HeaderProps) {
   const uid = useId();
 
   const items = [
-    { label: "Armada", value: stats.total, icon: IconCar, color: "text-[#002D72] dark:text-[#00AEEF]" },
+    { label: "Total Kendaraan", value: stats.total, icon: IconCar, color: "text-[#002D72] dark:text-[#00AEEF]" },
     { label: "Dipinjam", value: stats.borrowed, icon: IconUsers, color: "text-orange-600 dark:text-orange-400" },
   ];
 
