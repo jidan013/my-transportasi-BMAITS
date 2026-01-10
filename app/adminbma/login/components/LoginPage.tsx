@@ -82,7 +82,7 @@ export default function AdminLoginPage(): JSX.Element {
               disabled={loading}
               value={formData.email}
               onChange={handleChange("email")}
-              placeholder="admin@its.ac.id"
+              placeholder="example@its.ac.id"
               className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-black transition"
             />
           </div>

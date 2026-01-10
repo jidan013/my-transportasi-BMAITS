@@ -8,7 +8,7 @@ import { IconSearch } from "@tabler/icons-react";
    TYPES
 ====================== */
 interface TimelineItem {
-  key: "diajukan" | "ditinjau" | "disetujui" | "terbit";
+  key: "diajukan" | "ditinjau" | "disetujui";
   label: string;
   time: string;
 }
@@ -39,7 +39,6 @@ const mockHistory: BorrowItem[] = [
       { key: "diajukan", label: "Diajukan", time: "12 Okt 2025" },
       { key: "ditinjau", label: "Ditinjau", time: "12 Okt 2025" },
       { key: "disetujui", label: "Disetujui", time: "12 Okt 2025" },
-      { key: "terbit", label: "Surat Terbit", time: "13 Okt 2025" },
     ],
   },
   {
@@ -53,7 +52,6 @@ const mockHistory: BorrowItem[] = [
       { key: "diajukan", label: "Diajukan", time: "28 Sep 2025" },
       { key: "ditinjau", label: "Ditinjau", time: "28 Sep 2025" },
       { key: "disetujui", label: "Disetujui", time: "28 Sep 2025" },
-      { key: "terbit", label: "Dikembalikan", time: "29 Sep 2025" },
     ],
   },
   {

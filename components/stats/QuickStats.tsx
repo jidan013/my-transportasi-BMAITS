@@ -4,8 +4,6 @@ import { motion } from "framer-motion";
 import {
   IconCar,
   IconCheck,
-  IconClockHour4,
-  IconTools,
   IconTrendingUp,
 } from "@tabler/icons-react";
 import StatsCard from "@/components/stats/StatsCard";

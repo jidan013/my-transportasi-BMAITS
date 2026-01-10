@@ -12,8 +12,7 @@ import type { FC, ComponentType } from "react";
 export type StatusKey =
   | "diajukan"
   | "ditinjau"
-  | "disetujui"
-  | "terbit";
+  | "disetujui";
 
 export interface StatusTimelineItem {
   key: StatusKey;
@@ -35,7 +34,6 @@ const icons: Record<
   diajukan: IconClock,
   ditinjau: IconFileCheck,
   disetujui: IconCheck,
-  terbit: IconMail,
 };
 
 /* ======================

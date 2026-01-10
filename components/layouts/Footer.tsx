@@ -1,6 +1,4 @@
 "use client";
-
-import Link from "next/link";
 import { motion, LazyMotion, domAnimation } from "framer-motion";
 import {
   IconMail,
