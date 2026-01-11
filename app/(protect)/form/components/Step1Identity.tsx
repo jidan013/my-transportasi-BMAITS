@@ -1,58 +1,107 @@
 "use client";
 
+interface FormData {
+  nama: string;
+  nrp: string;
+  unit: string; 
+  vehicle_id: string;
+  tanggal_peminjaman: string;
+  tanggal_kembali: string;
+  keperluan: string;
+}
+
 interface Props {
-  data: Record<string, string>;
+  data: FormData;
   errors: Record<string, string>;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: React.ChangeEventHandler<HTMLInputElement>;
   formId: string;
 }
 
-export default function Step1Identity({ data, errors, onChange, formId }: Props) {
+export default function Step1Identity({
+  data,
+  errors,
+  onChange,
+  formId,
+}: Props) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      {/* Nama Lengkap */}
       <div>
-        <label htmlFor={`${formId}-userName`} className="block text-sm font-semibold text-gray-700 dark:text-gray-200">
-          Nama Lengkap
+        <label 
+          htmlFor={`${formId}-name`} 
+          className="block text-sm font-semibold mb-2 text-gray-700"
+        >
+          Nama Lengkap <span className="text-red-500">*</span>
         </label>
         <input
-          id={`${formId}-userName`}
-          name="userName"
-          value={data.userName}
+          id={`${formId}-name`}
+          name="nama"
+          type="text"
+          value={data.nama}
           onChange={onChange}
-          className="mt-1 w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00AEEF]"
-          placeholder="Masukkan nama Anda"
+          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all input"
+          placeholder="Masukkan nama lengkap Anda"
+          maxLength={100}
+          autoComplete="name"
         />
-        {errors.userName && <p className="text-red-500 text-sm mt-1">{errors.userName}</p>}
+        {errors.nama && (
+          <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+            <span>⚠️</span> {errors.nama}
+          </p>
+        )}
       </div>
 
+      {/* NRP */}
       <div>
-        <label htmlFor={`${formId}-userNip`} className="block text-sm font-semibold text-gray-700 dark:text-gray-200">
-          NRP
+        <label 
+          htmlFor={`${formId}-nrp`} 
+          className="block text-sm font-semibold mb-2 text-gray-700"
+        >
+          NRP <span className="text-red-500">*</span>
         </label>
         <input
-          id={`${formId}-userNip`}
-          name="userNip"
-          value={data.userNip}
+          id={`${formId}-nrp`}
+          name="nrp"
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          value={data.nrp}
           onChange={onChange}
-          className="mt-1 w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00AEEF]"
-          placeholder="Masukkan NRP"
+          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all input"
+          placeholder="120200001"
+          maxLength={10}
+          autoComplete="off"
         />
-        {errors.userNip && <p className="text-red-500 text-sm mt-1">{errors.userNip}</p>}
+        {errors.nrp && (
+          <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+            <span>⚠️</span> {errors.nrp}
+          </p>
+        )}
+        <p className="text-xs text-gray-500 mt-1">Format: 8-10 digit angka</p>
       </div>
 
       <div className="sm:col-span-2">
-        <label htmlFor={`${formId}-department`} className="block text-sm font-semibold text-gray-700 dark:text-gray-200">
-          Unit Kerja / Departemen / Pensiunan
+        <label 
+          htmlFor={`${formId}-unit`} 
+          className="block text-sm font-semibold mb-2 text-gray-700"
+        >
+          Unit/Departemen/Pensiunan
         </label>
         <input
-          id={`${formId}-department`}
-          name="department"
-          value={data.department}
+          id={`${formId}-unit`}
+          name="unit"
+          type="text"
+          value={data.unit || ""}
           onChange={onChange}
-          className="mt-1 w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00AEEF]"
-          placeholder="Contoh: Biro Umum / Keuangan"
+          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all input"
+          placeholder="Contoh: Siskamling / Logistik / Pensiunan TNI AU 2023"
         />
-        {errors.department && <p className="text-red-500 text-sm mt-1">{errors.department}</p>}
+        {errors.unit && (
+          <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+            <span>⚠️</span> {errors.unit}
+          </p>
+        )}
+        <p className="text-xs text-gray-500 mt-1">Opsional - untuk keperluan administrasi</p>
       </div>
     </div>
   );

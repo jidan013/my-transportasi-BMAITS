@@ -2,19 +2,13 @@
 
 import * as React from "react";
 import {
-  IconCalendar,
-  IconCar,
-  IconDashboard,
-  IconDatabase,
-  IconFile,
-  IconHistory,
-  IconReport,
-  IconHelp,
-  IconCurrencyDollar,
-  IconPhoto,
+  IconCalendar, IconCar, IconDashboard, IconDatabase, 
+  IconFile, IconHistory, IconReport, IconHelp, 
+  IconCurrencyDollar, IconPhoto,
 } from "@tabler/icons-react";
 
-import type { User } from "@/types/auth";
+import type { Admin } from "@/types/auth";
+import type { NavItem, DocumentItem } from "@/types/navigation";
 
 import { NavDocuments } from "@/components/home/navbar-document";
 import { NavMain } from "@/components/home/navbar-main";
@@ -22,23 +16,19 @@ import { NavSecondary } from "@/components/home/navbar-second";
 import { NavUser } from "@/components/home/navbar-user";
 
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
+  Sidebar, SidebarContent, SidebarFooter, 
+  SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
 import Image from "next/image";
 import Logo from "@/public/Logo.png";
 import Link from "next/link";
+import { getAdminMe } from "@/lib/services/auth-service";
 
-import { getMe } from "@/lib/services/auth";
-
-
-const NAV_MAIN = [
+/* =====================
+   NAV CONFIG
+===================== */
+export const NAV_MAIN: NavItem[] = [
   { title: "Dashboard", url: "/", icon: IconDashboard },
   { title: "Jadwal Kendaraan", url: "/jadwal", icon: IconCalendar },
   { title: "Form Peminjaman", url: "/form", icon: IconFile },
@@ -47,7 +37,7 @@ const NAV_MAIN = [
   { title: "Laporan Peminjaman", url: "/laporan", icon: IconReport, role: "admin" },
 ];
 
-const DOCUMENTS = [
+export const DOCUMENTS: DocumentItem[] = [
   { name: "SOP Kendaraan", url: "/sop", icon: IconReport },
   { name: "Foto Kendaraan", url: "/foto", icon: IconPhoto },
   { name: "Jenis Kendaraan", url: "/jenis-kendaraan", icon: IconCar },
@@ -55,47 +45,49 @@ const DOCUMENTS = [
   { name: "Kontak Admin", url: "/kontak", icon: IconHelp },
 ];
 
-
-export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
-  const [user, setUser] = React.useState<User | null>(null);
+/* =====================
+   COMPONENT
+===================== */
+export function AppSidebar(props: React.ComponentPropsWithRef<typeof Sidebar>) {
+  const [user, setUser] = React.useState<Admin | null>(null);
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    getMe()
+    getAdminMe()
       .then(setUser)
-      .catch(() => setUser(null));
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false));
   }, []);
 
-  const filteredNavMain = React.useMemo(
-    () =>
-      NAV_MAIN.filter(
-        (item) => !item.role || item.role === user?.role
-      ),
-    [user]
-  );
+  const filteredNavMain = React.useMemo((): NavItem[] => {
+    if (!user || user.role !== "admin") {
+      return NAV_MAIN.filter(item => !item.role);
+    }
+    return NAV_MAIN;
+  }, [user]);
+
+  if (loading) return null;
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
-      {/* Header */}
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <Link href="/">
               <SidebarMenuButton>
-                <Image src={Logo} alt="Logo" width={250} height={50} />
+                <Image src={Logo} alt="Logo" width={220} height={48} priority />
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
 
-      {/* Content */}
       <SidebarContent>
         <NavMain items={filteredNavMain} />
         <NavDocuments items={DOCUMENTS} />
         <NavSecondary items={[]} className="mt-auto" />
       </SidebarContent>
 
-      {/* Footer */}
       <SidebarFooter>
         {user && (
           <NavUser

@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { getMe } from "@/lib/services/auth";
+import { getMe } from "@/lib/services/auth-service";
 import type { User } from "@/types/auth";
 
 interface AuthContextType {
