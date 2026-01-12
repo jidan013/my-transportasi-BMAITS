@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 /* =====================
-   CONFIG
+   ADMIN ROUTES
 ===================== */
 const ADMIN_ROUTES = [
   "/permintaan",
@@ -10,53 +10,55 @@ const ADMIN_ROUTES = [
   "/adminbma/dashboard",
 ];
 
-export async function middleware(req: NextRequest) {
+/* =====================
+   HELPERS
+===================== */
+function isAdminRoute(pathname: string) {
+  return ADMIN_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(route + "/")
+  );
+}
+
+function getRoleFromToken(token: string): string | null {
+  try {
+    const payload = JSON.parse(
+      Buffer.from(token.split(".")[1], "base64").toString()
+    );
+    return payload?.role ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/* =====================
+   MIDDLEWARE
+===================== */
+export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Cek hanya route admin
-  const isAdminRoute = ADMIN_ROUTES.some((route) =>
-    pathname.startsWith(route)
-  );
-
-  if (!isAdminRoute) {
+  if (!isAdminRoute(pathname)) {
     return NextResponse.next();
   }
 
-  try {
-    // Call backend untuk cek user
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/adminbma/me`,
-      {
-        headers: {
-          Cookie: req.headers.get("cookie") || "",
-        },
-        credentials: "include",
-      }
-    );
+  const token = req.cookies.get("token")?.value;
 
-    // Kalau tidak login
-    if (!res.ok) {
-      return NextResponse.redirect(
-        new URL("/adminbma/login", req.url)
-      );
-    }
-
-    const user = await res.json();
-
-    // Kalau bukan admin
-    if (user.role !== "admin") {
-      return NextResponse.redirect(
-        new URL("/unauthorized", req.url)
-      );
-    }
-
-    return NextResponse.next();
-
-  } catch {
+  // belum login
+  if (!token) {
     return NextResponse.redirect(
       new URL("/adminbma/login", req.url)
     );
   }
+
+  const role = getRoleFromToken(token);
+
+  // bukan admin
+  if (role !== "admin") {
+    return NextResponse.redirect(
+      new URL("/unauthorized", req.url)
+    );
+  }
+
+  return NextResponse.next();
 }
 
 /* =====================
