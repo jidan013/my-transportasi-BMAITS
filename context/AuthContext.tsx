@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { getMe } from "@/lib/services/auth-service";
+import { getAdminMe } from "@/lib/services/auth-service";
 import type { User } from "@/types/auth";
 
 interface AuthContextType {
@@ -19,7 +19,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getMe()
+    getAdminMe()
       .then((user) => {
         setUser(user);
       })
