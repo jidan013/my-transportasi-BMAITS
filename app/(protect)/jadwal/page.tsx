@@ -1,9 +1,10 @@
-import BookingForm from "./components/BookingForm";
+import CalendarPage from "./components/CalendarPage";
+
 
 export default function JadwalPage() {
     return (
         <div>
-            <BookingForm />
+            <CalendarPage />
         </div>
     );
 }

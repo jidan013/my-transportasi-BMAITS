@@ -19,4 +19,5 @@ export interface Booking {
   vehicle_id: number;
   status: BookingStatus;
   created_at: string;
+  catatan?: string;
 }
