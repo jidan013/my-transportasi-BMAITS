@@ -1,4 +1,3 @@
-import type { BookingPayload } from './booking';
 import type { Vehicle } from './vehicle';
 
 // ✅ Form state (UI-friendly)
