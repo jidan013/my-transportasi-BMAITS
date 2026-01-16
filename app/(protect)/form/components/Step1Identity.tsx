@@ -94,7 +94,7 @@ export default function Step1Identity({
           value={data.unit || ""}
           onChange={onChange}
           className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all input"
-          placeholder="Contoh: Siskamling / Logistik / Pensiunan TNI AU 2023"
+          placeholder="Contoh: Biro Keuangan, Departemen Informatika, Pensiunan"
         />
         {errors.unit && (
           <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
