@@ -3,6 +3,7 @@
 import {
   IconDotsVertical,
   IconLogout,
+  IconLogin, // Tambah icon login
 } from "@tabler/icons-react"
 
 import {
@@ -25,18 +26,81 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import Link from "next/link"
+import { useAuth } from "@/context/AuthContext"
 
+// Props baru untuk handle guest state
 export function NavUser({
   user,
+  isGuest = false, // Tambah prop untuk guest mode
 }: {
   user: {
     name: string
     email: string
     avatar: string
   }
+  isGuest?: boolean
 }) {
   const { isMobile } = useSidebar()
+  const { user: authUser } = useAuth() 
 
+
+  const handleLogout = () => {
+    localStorage.removeItem("admin_token")
+    localStorage.removeItem("admin_user")
+    document.cookie = "admin_token=; path=/; max-age=0"
+    window.location.href = "/adminbma/login"
+  }
+
+  
+  if (isGuest || !authUser) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <SidebarMenuButton
+                size="lg"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              >
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback className="bg-blue-100 text-blue-600 rounded-lg font-medium">
+                    ?
+                  </AvatarFallback>
+                </Avatar>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-medium">Tamu</span>
+                  <span className="text-muted-foreground truncate text-xs">
+                    Login Admin
+                  </span>
+                </div>
+                <IconDotsVertical className="ml-auto size-4" />
+              </SidebarMenuButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+              side={isMobile ? "bottom" : "right"}
+              align="end"
+              sideOffset={4}
+            >
+              <DropdownMenuLabel>
+                Silakan login sebagai admin untuk akses fitur lengkap
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href="/adminbma/login" className="flex items-center">
+                  <IconLogin className="mr-2 h-4 w-4" />
+                  <span>Login Admin</span>
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    )
+  }
+
+  // Jika sudah login (admin)
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -48,7 +112,7 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarFallback className="rounded-lg">{user.name.slice(0,2).toUpperCase()}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
@@ -69,7 +133,7 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">{user.name.slice(0,2).toUpperCase()}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
@@ -81,10 +145,18 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
+              {/* Tambah menu admin jika perlu */}
+              {authUser.role === 'admin' && (
+                <DropdownMenuItem asChild>
+                  <Link href="/admin" className="flex items-center">
+                    Panel Admin
+                  </Link>
+                </DropdownMenuItem>
+              )}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <IconLogout />
+            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer flex items-center">
+              <IconLogout className="mr-2 h-4 w-4" />
               Logout
             </DropdownMenuItem>
           </DropdownMenuContent>

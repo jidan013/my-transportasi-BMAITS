@@ -12,7 +12,7 @@ export interface Admin {
   id: number;
   name: string;
   email: string;
-  role: "admin";
+  role?:string;
   avatar?: string | null;
 }
 
@@ -24,6 +24,6 @@ export interface LoginPayload {
 export interface LoginResponse {
   success: boolean;
   message: string;
-  admin: Admin;
-  user: User;
+  access_token: string;
+  user: Admin;
 }

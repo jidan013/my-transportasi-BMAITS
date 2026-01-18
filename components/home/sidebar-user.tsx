@@ -26,15 +26,15 @@ import Link from "next/link";
 import { getAdminMe } from "@/lib/services/auth-service";
 
 /* =====================
-   NAV CONFIG
+   NAV CONFIG - DENGAN ROLE
 ===================== */
-export const NAV_MAIN: NavItem[] = [
+export const NAV_MAIN: (NavItem & { role?: 'admin' })[] = [
   { title: "Dashboard", url: "/", icon: IconDashboard },
   { title: "Jadwal Kendaraan", url: "/jadwal", icon: IconCalendar },
   { title: "Form Peminjaman", url: "/form", icon: IconFile },
   { title: "Status Peminjaman", url: "/status", icon: IconHistory },
-  { title: "Permintaan", url: "/permintaan", icon: IconDatabase, },
-  { title: "Laporan Peminjaman", url: "/laporan", icon: IconReport,},
+  { title: "Permintaan", url: "/permintaan", icon: IconDatabase, role: 'admin' },
+  { title: "Laporan Peminjaman", url: "/laporan", icon: IconReport, role: 'admin' },
 ];
 
 export const DOCUMENTS: DocumentItem[] = [
@@ -53,15 +53,34 @@ export function AppSidebar(props: React.ComponentPropsWithRef<typeof Sidebar>) {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
+    const token = localStorage.getItem("admin_token");
+    
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
     getAdminMe()
       .then(setUser)
-      .catch(() => setUser(null))
+      .catch((err) => {
+        console.error("Failed to fetch admin:", err);
+
+        if (err.response?.status === 401) {
+          localStorage.removeItem("admin_token");
+          localStorage.removeItem("admin_user");
+          document.cookie = "admin_token=; path=/; max-age=0";
+          window.location.href = "/adminbma/login";
+        }
+        setUser(null);
+      })
       .finally(() => setLoading(false));
   }, []);
 
+  // ✅ FILTER MENU BERDASARKAN ROLE ADMIN
   const filteredNavMain = React.useMemo((): NavItem[] => {
     if (!user || user.role !== "admin") {
-      return NAV_MAIN.filter(item => !item.role);
+      // Hilangkan menu dengan role='admin'
+      return NAV_MAIN.filter(item => !item.role || item.role !== 'admin');
     }
     return NAV_MAIN;
   }, [user]);
@@ -89,7 +108,7 @@ export function AppSidebar(props: React.ComponentPropsWithRef<typeof Sidebar>) {
       </SidebarContent>
 
       <SidebarFooter>
-        {user && (
+        {user ? (
           <NavUser
             user={{
               name: user.name,
@@ -97,6 +116,10 @@ export function AppSidebar(props: React.ComponentPropsWithRef<typeof Sidebar>) {
               avatar: user.avatar ?? "/avatars/default.png",
             }}
           />
+        ) : (
+          <div className="p-4 text-xs text-muted-foreground text-center">
+            Mode Tamu
+          </div>
         )}
       </SidebarFooter>
     </Sidebar>
