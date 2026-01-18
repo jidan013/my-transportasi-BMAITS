@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader2, CheckCircle } from "lucide-react";
 
 import { loginAdmin } from "@/lib/services/auth-service";
-import type { LoginPayload, LoginResponse, Admin } from "@/types/auth";
+import type { LoginResponse } from "@/types/auth";
 
 interface FormState {
   email: string;
@@ -74,7 +74,7 @@ export default function AdminLoginPage() {
       
       setTimeout(() => {
         router.push("/adminbma/dashboard");
-        router.refresh(); // Force refresh untuk update session
+        router.refresh(); 
       }, 2000);
 
     } catch (err: unknown) {

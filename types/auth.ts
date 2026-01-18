@@ -12,7 +12,6 @@ export interface Admin {
   id: number;
   name: string;
   email: string;
-  // role: "admin";
   role?:string;
   avatar?: string | null;
 }
@@ -26,7 +25,5 @@ export interface LoginResponse {
   success: boolean;
   message: string;
   access_token: string;
-  // admin: Admin;
   user: Admin;
-  // user: Admin;
 }
