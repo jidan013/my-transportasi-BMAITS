@@ -48,6 +48,19 @@ export default function AdminLoginPage() {
 
     try {
       const res: LoginResponse = await loginAdmin(formData);
+
+      if (res.access_token) {
+        localStorage.setItem("admin_token", res.access_token);
+        localStorage.setItem("admin_user", JSON.stringify(res.user));
+        
+        setSuccess(true);
+        
+        setTimeout(() => {
+          router.push("/adminbma/dashboard");
+        }, 1500);
+      } else {
+        throw new Error("Token tidak ditemukan");
+      }
       
       if (!res.success) {
         throw new Error(res.message || "Email atau password salah");
@@ -74,7 +87,7 @@ export default function AdminLoginPage() {
       setError(message);
       
       // Redirect dengan error query param yang benar
-      router.push(`/adminbma/login?error=${encodeURIComponent(message)}`);
+      // router.push(`/adminbma/login?error=${encodeURIComponent(message)}`);
     } finally {
       setLoading(false);
     }

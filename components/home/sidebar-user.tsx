@@ -53,9 +53,25 @@ export function AppSidebar(props: React.ComponentPropsWithRef<typeof Sidebar>) {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
+    const token = localStorage.getItem("admin_token");
+    
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
     getAdminMe()
       .then(setUser)
-      .catch(() => setUser(null))
+      .catch((err) => {
+        console.error("Failed to fetch admin:", err);
+
+        if (err.response?.status === 401) {
+        localStorage.removeItem("admin_token");
+        localStorage.removeItem("admin_user");
+        document.cookie = "admin_token=; path=/; max-age=0"; // Hapus cookie
+        window.location.href = "/adminbma/login";
+      } setUser(null);
+      })
       .finally(() => setLoading(false));
   }, []);
 
