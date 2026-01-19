@@ -33,8 +33,8 @@ export const NAV_MAIN: (NavItem & { role?: 'admin' })[] = [
   { title: "Jadwal Kendaraan", url: "/jadwal", icon: IconCalendar },
   { title: "Form Peminjaman", url: "/form", icon: IconFile },
   { title: "Status Peminjaman", url: "/status", icon: IconHistory },
-  { title: "Permintaan", url: "/permintaan", icon: IconDatabase, role: 'admin' },
-  { title: "Laporan Peminjaman", url: "/laporan", icon: IconReport, role: 'admin' },
+  { title: "Permintaan", url: "/permintaan", icon: IconDatabase, },
+  { title: "Laporan Peminjaman", url: "/laporan", icon: IconReport, },
 ];
 
 export const DOCUMENTS: DocumentItem[] = [
