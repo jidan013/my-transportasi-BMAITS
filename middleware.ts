@@ -1,84 +1,75 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-interface AdminUser {
-  role: 'admin';
-  name: string;
-  email: string;
+/* =====================
+   ADMIN ROUTES
+===================== */
+const ADMIN_ROUTES = [
+  "/permintaan",
+  "/laporan",
+  "/adminbma/dashboard",
+];
+
+/* =====================
+   HELPERS
+===================== */
+function isAdminRoute(pathname: string): boolean {
+  return ADMIN_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(route + "/")
+  );
 }
 
-async function validateAdminToken(token: string): Promise<AdminUser | null> {
+function getRoleFromToken(token: string): string | null {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) return null;
-    
-    const user = await response.json();
-    return user.role === 'admin' ? user : null;
+    const payload = JSON.parse(
+      Buffer.from(token.split(".")[1], "base64").toString()
+    );
+    return payload?.role ?? null;
   } catch {
     return null;
   }
 }
 
-export async function middleware(request: NextRequest) {
-  const token = request.cookies.get('admin_token')?.value;
+/* =====================
+   MIDDLEWARE
+===================== */
+export function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
 
-  // Skip untuk static files & API
-  if (request.nextUrl.pathname.startsWith('/api') ||
-      request.nextUrl.pathname.startsWith('/_next') ||
-      request.nextUrl.pathname.includes('favicon.ico')) {
+  // Hanya jaga route admin
+  if (!isAdminRoute(pathname)) {
     return NextResponse.next();
   }
 
-  const pathname = request.nextUrl.pathname;
-  
-  // Admin-only paths (WAJIB LOGIN ADMIN)
-  const adminOnlyPaths = ['/laporan', '/permintaan'];
-  const isAdminOnlyPath = adminOnlyPaths.some(path => 
-    pathname === path || pathname.startsWith(path + '/')
-  );
+  // Ambil token dari cookies (sesuaikan nama cookie yang dipakai backend)
+  const token =
+    req.cookies.get("token")?.value ||
+    req.cookies.get("access_token")?.value ||
+    req.cookies.get("auth_token")?.value;
 
-  // Public paths (tanpa login OK)
-  const publicPaths = ['/', '/jadwal', '/form', '/status', '/sop', '/foto', '/jenis-kendaraan', '/biaya', '/kontak'];
-  const isPublicPath = publicPaths.some(path => 
-    pathname === path || pathname.startsWith(path + '/')
-  );
-
-  // 1. Admin-only paths → WAJIB login admin
-  if (isAdminOnlyPath) {
-    if (!token) {
-      return NextResponse.redirect(new URL('/adminbma/login?redirect=' + encodeURIComponent(pathname), request.url));
-    }
-
-    const user = await validateAdminToken(token);
-    if (!user) {
-      const response = NextResponse.redirect(new URL('/adminbma/login?redirect=' + encodeURIComponent(pathname), request.url));
-      response.cookies.delete('admin_token');
-      return response;
-    }
-
-    // Pass admin info ke client
-    const response = NextResponse.next();
-    response.headers.set('x-admin-auth', 'true');
-    response.headers.set('x-admin-name', user.name);
-    response.headers.set('x-admin-email', user.email);
-    return response;
+  // Tidak ada token → redirect ke "/"
+  if (!token) {
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
-  // 2. Public paths → bebas akses
-  if (isPublicPath || !pathname || pathname === '/adminbma/login') {
-    return NextResponse.next();
+  const role = getRoleFromToken(token);
+
+  // Role bukan admin → redirect ke "/"
+  if (role !== "admin") {
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
-  // 3. Default → allow
+  // Lolos semua cek → lanjut
   return NextResponse.next();
 }
 
+/* =====================
+   MATCHER
+===================== */
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  matcher: [
+    "/permintaan/:path*",
+    "/laporan/:path*",
+    "/adminbma/dashboard/:path*",
+  ],
 };

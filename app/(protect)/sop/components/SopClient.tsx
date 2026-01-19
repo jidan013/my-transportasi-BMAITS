@@ -272,7 +272,7 @@ export default function SopAccordionPage() {
         className="text-center text-gray-500 mt-16 text-sm"
       >
         <div className="h-[2px] w-24 bg-blue-600 mx-auto mb-4 rounded-full" />
-        <p className="font-medium">Subbag Layanan Logistik & Transportasi</p>
+        <p className="font-medium">Subbagian Layanan Transportasi</p>
         <p>Biro Manajemen Aset – Institut Teknologi Sepuluh Nopember (ITS)</p>
         <p className="mt-1 text-gray-400 italic">
           Dokumen Internal • Versi Terkendali • © 2025
