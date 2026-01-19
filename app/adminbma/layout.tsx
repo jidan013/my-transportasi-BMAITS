@@ -1,15 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-type SanctumTokenPayload = {
+type TokenPayload = {
   id: number;
-  name: string;
   role: "ADMIN" | "CLIENT";
   exp: number;
-  iat: number;
-  [key: string]: unknown;
 };
 
 export default function AdminLayout({
@@ -18,81 +15,43 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const checkAuth = async (): Promise<void> => {
-      try {
-        // 1. CEK localStorage token (sanctum SPA token)
-        const token = localStorage.getItem("adminToken");
-        
-        if (!token) {
-          router.replace("/adminbma/login");
-          return;
-        }
+    const token = localStorage.getItem("adminToken");
 
-        // 2. DECODE JWT TOKEN (type-safe)
-        const payload: SanctumTokenPayload = JSON.parse(
-          decodeURIComponent(
-            escape(atob(token.split(".")[1]))
-          )
-        );
+    if (!token) {
+      router.push("/adminbma/login");
+      return;
+    }
 
-        // 3. VALIDASI ROLE ADMIN
-        if (payload.role !== "ADMIN") {
-          localStorage.removeItem("adminToken");
-          router.replace("/adminbma/dashboard");
-          return;
-        }
+    try {
+      // Manual JWT decode (Sanctum SPA token)
+      const payloadBase64 = token.split(".")[1];
+      const payloadJson = decodeURIComponent(
+        escape(atob(payloadBase64))
+      );
+      const decoded: TokenPayload = JSON.parse(payloadJson);
 
-        // 4. CEK TOKEN EXPIRY
-        if (payload.exp * 1000 < Date.now()) {
-          localStorage.removeItem("adminToken");
-          router.replace("/adminbma/login");
-          return;
-        }
-
-        // 5. VERIFIKASI DENGAN SANCTUM API (CSRF protection)
-        const response = await fetch("/sanctum/csrf-cookie", {
-          credentials: "include", // Sanctum cookies
-        });
-
-        if (response.ok) {
-          setIsAuthenticated(true);
-        } else {
-          throw new Error("Sanctum CSRF validation failed");
-        }
-
-      } catch (error: unknown) {
-        console.error("Auth check failed:", error);
+      // Role protection
+      if (decoded.role !== "ADMIN") {
         localStorage.removeItem("adminToken");
-        router.replace("/adminbma/login");
+        router.push("/");
+        return;
       }
-    };
 
-    checkAuth();
+      // Token expiry check
+      if (decoded.exp * 1000 < Date.now()) {
+        localStorage.removeItem("adminToken");
+        router.push("/adminbma/login");
+        return;
+      }
+
+    } catch (error: unknown) {
+      console.error("Token validation failed:", error);
+      localStorage.removeItem("adminToken");
+      router.push("/adminbma/login");
+    }
   }, [router]);
 
-  // Loading state saat check auth
-  if (isAuthenticated === null) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-100">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
-          <p className="text-sm text-slate-500">Verifying authentication...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Belum authenticated
-  if (!isAuthenticated) {
-    return null; // Middleware/router akan handle redirect
-  }
-
-  return (
-    <div className="w-full min-h-screen bg-gray-50">
-      {children}
-    </div>
-  );
+  return <div className="w-full">{children}</div>;
 }
