@@ -53,6 +53,25 @@ export default function AdminLoginPage() {
     setShowPassword(prev => !prev);
   };
 
+  // ✅ Type-safe error handling tanpa any
+  const getErrorMessage = (err: unknown): string => {
+    if (err instanceof Error) {
+      return err.message;
+    }
+    
+    // Handle axios error pattern
+    const axiosError = err as { 
+      response?: { 
+        data?: { 
+          message?: string 
+        } 
+      } 
+    };
+    
+    return axiosError.response?.data?.message ?? 
+           "Login gagal. Periksa email dan password.";
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     if (loading) return;
@@ -64,11 +83,10 @@ export default function AdminLoginPage() {
     try {
       const res: LoginResponse = await loginAdmin(credentials);
       
-      console.log("Login response:", res); // Debug log
+      console.log("Login response:", res);
       
-      // CEK access_token, BUKAN res.success
+      // CEK access_token
       if (res.access_token) {
-        // Simpan token ke localStorage
         localStorage.setItem("admin_token", res.access_token);
         localStorage.setItem("admin_user", JSON.stringify(res.user));
         
@@ -76,7 +94,6 @@ export default function AdminLoginPage() {
         
         setSuccess(true);
         
-        // Redirect ke dashboard
         setTimeout(() => {
           console.log("🚀 Redirecting to dashboard...");
           router.push("/adminbma/dashboard");
@@ -85,20 +102,10 @@ export default function AdminLoginPage() {
         throw new Error("Token tidak ditemukan dalam response");
       }
       
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("❌ Login error:", err);
-      
-      let message = "Login gagal. Periksa email dan password.";
-      
-      if (err.response?.data?.message) {
-        message = err.response.data.message;
-      } else if (err.message) {
-        message = err.message;
-      }
-      
-      setError(message);
+      setError(getErrorMessage(err));
       setSuccess(false);
-      
     } finally {
       setLoading(false);
     }

@@ -5,8 +5,8 @@ import type { NextRequest } from "next/server";
    ADMIN ROUTES
 ===================== */
 const ADMIN_ROUTES = [
-  "/permintaan",
-  "/laporan",
+  // "/permintaan",
+  // "/laporan",
   "/adminbma/dashboard",
 ];
 
