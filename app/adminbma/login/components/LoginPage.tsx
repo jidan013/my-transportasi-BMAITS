@@ -23,11 +23,15 @@ export default function AdminLoginPage() {
 
     const checkAuth = async (): Promise<void> => {
       try {
-        await getAdminMe();
-        if (isMounted) {
-          router.replace("/adminbma/dashboard");
+        const token = localStorage.getItem("admin_token");
+        if (token) {
+          await getAdminMe();
+          if (isMounted) {
+            router.replace("/adminbma/dashboard");
+          }
         }
       } catch {
+        // Not authenticated, stay on login page
       }
     };
 
@@ -37,10 +41,12 @@ export default function AdminLoginPage() {
 
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setCredentials(prev => ({ ...prev, email: e.target.value }));
+    if (error) setError(null);
   };
 
   const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setCredentials(prev => ({ ...prev, password: e.target.value }));
+    if (error) setError(null);
   };
 
   const togglePassword = (): void => {
@@ -53,18 +59,46 @@ export default function AdminLoginPage() {
 
     setLoading(true);
     setError(null);
+    setSuccess(false);
 
     try {
       const res: LoginResponse = await loginAdmin(credentials);
-      if (!res.success) throw new Error(res.message ?? "Login gagal");
       
-      setSuccess(true);
-      setTimeout(() => {
-        router.replace("/adminbma/dashboard"); // ✅ Hardcode - no useSearchParams
-        router.refresh();
-      }, 1500);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Login admin gagal");
+      console.log("Login response:", res); // Debug log
+      
+      // CEK access_token, BUKAN res.success
+      if (res.access_token) {
+        // Simpan token ke localStorage
+        localStorage.setItem("admin_token", res.access_token);
+        localStorage.setItem("admin_user", JSON.stringify(res.user));
+        
+        console.log("💾 Token saved:", res.access_token);
+        
+        setSuccess(true);
+        
+        // Redirect ke dashboard
+        setTimeout(() => {
+          console.log("🚀 Redirecting to dashboard...");
+          router.push("/adminbma/dashboard");
+        }, 1500);
+      } else {
+        throw new Error("Token tidak ditemukan dalam response");
+      }
+      
+    } catch (err: any) {
+      console.error("❌ Login error:", err);
+      
+      let message = "Login gagal. Periksa email dan password.";
+      
+      if (err.response?.data?.message) {
+        message = err.response.data.message;
+      } else if (err.message) {
+        message = err.message;
+      }
+      
+      setError(message);
+      setSuccess(false);
+      
     } finally {
       setLoading(false);
     }
@@ -90,10 +124,11 @@ export default function AdminLoginPage() {
             type="email"
             name="email"
             required
+            disabled={loading || success}
             value={credentials.email}
             onChange={handleEmailChange}
             placeholder="admin@its.ac.id"
-            className="w-full px-4 py-3 border rounded-xl"
+            className="w-full px-4 py-3 border rounded-xl disabled:bg-gray-100"
           />
 
           <div className="relative">
@@ -102,15 +137,17 @@ export default function AdminLoginPage() {
               type={showPassword ? "text" : "password"}
               name="password"
               required
+              disabled={loading || success}
               value={credentials.password}
               onChange={handlePasswordChange}
               placeholder="••••••••"
-              className="w-full px-4 py-3 border rounded-xl pr-12"
+              className="w-full px-4 py-3 border rounded-xl pr-12 disabled:bg-gray-100"
             />
             <button
               type="button"
               onClick={togglePassword}
-              className="absolute inset-y-0 right-3 text-slate-500"
+              disabled={loading || success}
+              className="absolute inset-y-0 right-3 text-slate-500 disabled:opacity-50"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -120,15 +157,19 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={loading || success}
-            className="w-full bg-black text-white py-3 rounded-xl flex justify-center gap-2 disabled:opacity-50"
+            className="w-full bg-black text-white py-3 rounded-xl flex justify-center items-center gap-2 disabled:opacity-50 hover:bg-gray-900 transition-colors"
           >
             {loading && <Loader2 className="animate-spin" size={18} />}
-            {success ? "Login berhasil" : "Masuk Admin"}
+            {success ? "✓ Login berhasil!" : "Masuk Admin"}
           </button>
         </form>
 
         {success && (
-          <p className="text-green-600 text-sm text-center">Mengalihkan ke dashboard...</p>
+          <div className="p-3 bg-green-100 rounded-xl">
+            <p className="text-green-700 text-sm text-center">
+              Mengalihkan ke dashboard...
+            </p>
+          </div>
         )}
       </div>
     </div>
