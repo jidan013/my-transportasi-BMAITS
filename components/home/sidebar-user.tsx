@@ -118,7 +118,7 @@ export function AppSidebar(props: React.ComponentPropsWithRef<typeof Sidebar>) {
           />
         ) : (
           <div className="p-4 text-xs text-muted-foreground text-center">
-            Mode Tamu
+            USER
           </div>
         )}
       </SidebarFooter>

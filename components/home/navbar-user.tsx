@@ -83,13 +83,13 @@ export function NavUser({
               sideOffset={4}
             >
               <DropdownMenuLabel>
-                Silakan login sebagai admin untuk akses fitur lengkap
+                Logout as Guest
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link href="/adminbma/login" className="flex items-center">
                   <IconLogin className="mr-2 h-4 w-4" />
-                  <span>Login Admin</span> 
+                  <span>Logout</span> 
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
