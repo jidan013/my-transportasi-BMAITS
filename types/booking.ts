@@ -1,23 +1,26 @@
-export type BookingStatus = "pending" | "approved" | "rejected";
-
-export interface BookingPayload {
-  nrp: string;
-  nama: string;
-  keperluan: string;
-  tanggal_peminjaman: string;
-  tanggal_kembali: string;
-  vehicle_id: number;
-}
+import { Vehicle } from "./vehicle";
 
 export interface Booking {
   id: number;
-  nrp: string;
   nama: string;
-  keperluan: string;
+  nrp: number;
+  unit_kerja: string;
+  vehicle_id: number;
   tanggal_peminjaman: string;
   tanggal_kembali: string;
-  vehicle_id: number;
-  status: BookingStatus;
+  detail_keperluan: string;
+  status_peminjaman: "menunggu" | "disetujui" | "ditolak" | "dikembalikan";
   created_at: string;
-  catatan?: string;
+  updated_at: string;
+  vehicle?: Vehicle;
+}
+
+export interface BookingPayload {
+  nama: string;
+  nrp: number;
+  unit_kerja: string;
+  vehicle_id: number;
+  tanggal_peminjaman: string; // YYYY-MM-DD
+  tanggal_kembali: string; // YYYY-MM-DD
+  detail_keperluan: string;
 }
