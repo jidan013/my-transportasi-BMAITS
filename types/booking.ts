@@ -20,7 +20,7 @@ export interface BookingPayload {
   nrp: number;
   unit_kerja: string;
   vehicle_id: number;
-  tanggal_peminjaman: string; // YYYY-MM-DD
-  tanggal_kembali: string; // YYYY-MM-DD
+  tanggal_peminjaman: string; 
+  tanggal_kembali: string; 
   detail_keperluan: string;
 }

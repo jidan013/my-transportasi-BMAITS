@@ -7,9 +7,9 @@ export interface Vehicle {
   jenis_kendaraan: string;
   warna_kendaraan: string;
   nomor_polisi: string;
-  bahan_bakar: string; // ✅ Sesuai database
+  bahan_bakar: string; 
   kapasitas_penumpang: number;
-  status_ketersediaan: "tersedia" | "dipinjam" | "maintenance"; // ✅ Sesuai enum Laravel
+  status_ketersediaan: "tersedia" | "dipinjam" | "maintenance"; 
   created_at: string;
   updated_at: string;
 }
@@ -35,7 +35,7 @@ class VehicleAPI {
   }
 
   async getVehicles(): Promise<Vehicle[]> {
-    const res = await fetch(`${this.baseUrl}/v1/vehicles`, { // ✅ Fix URL
+    const res = await fetch(`${this.baseUrl}/v1/vehicles`, { 
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -49,7 +49,7 @@ class VehicleAPI {
     }
 
     const json: VehicleAPIResponse = await res.json();
-    return json.data; // ✅ Return array dari data field
+    return json.data; 
   }
 
   async createVehicle(
@@ -65,7 +65,7 @@ class VehicleAPI {
       headers.Authorization = `Bearer ${token}`;
     }
 
-    const res = await fetch(`${this.baseUrl}/v1/vehicles`, { // ✅ Fix URL
+    const res = await fetch(`${this.baseUrl}/v1/vehicles`, { 
       method: "POST",
       headers,
       body: JSON.stringify(vehicle),
@@ -94,7 +94,7 @@ class VehicleAPI {
       headers.Authorization = `Bearer ${token}`;
     }
 
-    const res = await fetch(`${this.baseUrl}/v1/vehicles/${id}`, { // ✅ Fix URL
+    const res = await fetch(`${this.baseUrl}/v1/vehicles/${id}`, { 
       method: "PUT",
       headers,
       body: JSON.stringify(vehicle),
