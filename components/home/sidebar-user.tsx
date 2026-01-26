@@ -76,7 +76,7 @@ export function AppSidebar(props: React.ComponentPropsWithRef<typeof Sidebar>) {
       .finally(() => setLoading(false));
   }, []);
 
-  // ✅ FILTER MENU BERDASARKAN ROLE ADMIN
+  // FILTER MENU BERDASARKAN ROLE ADMIN
   const filteredNavMain = React.useMemo((): NavItem[] => {
     if (!user || user.role !== "admin") {
       // Hilangkan menu dengan role='admin'
