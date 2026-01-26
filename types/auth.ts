@@ -12,6 +12,10 @@ export interface Admin {
   id: number;
   name: string;
   email: string;
+  password: string;
+  remember_token?: string;
+  created_at?: string;
+  updated_at?: string;
   role?:string;
   avatar?: string | null;
 }

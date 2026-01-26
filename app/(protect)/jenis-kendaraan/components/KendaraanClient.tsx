@@ -74,12 +74,10 @@ export default function KendaraanPage(): JSX.Element {
 
   const badgeClass = (s: VehicleStatus): string => {
     switch (s) {
-      case "available":
+      case "tersedia":
         return "bg-green-100 text-green-700"
-      case "borrowed":
+      case "dipinjam":
         return "bg-blue-100 text-blue-700"
-      case "maintenance":
-        return "bg-yellow-100 text-yellow-700"
       default:
         return "bg-gray-100 text-gray-700"
     }
@@ -108,7 +106,7 @@ export default function KendaraanPage(): JSX.Element {
       </motion.div>
 
       {/* CHART */}
-      <section className="w-full bg-white rounded-2xl shadow p-6 mb-10">
+      <section className="min-h-[480px] bg-white rounded-2xl shadow p-6 mb-10">
         <h2 className="font-semibold mb-4">📊 Pemakaian Bulanan</h2>
         <div className="w-full h-[480px]">
           <ResponsiveContainer width="100%" height="100%">

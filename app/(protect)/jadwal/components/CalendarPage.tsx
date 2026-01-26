@@ -33,7 +33,7 @@ type Vehicle = {
 interface BookingExtendedProps {
   id: number;
   nama: string;
-  nrp: string;
+  nrp: number;
   keperluan: string;
   catatan?: string;
   plate: string;
@@ -114,7 +114,7 @@ export default function CalendarPage() {
       return {
         id: String(booking.id),
         title: vehicle?.nama ?? "Kendaraan Tidak Diketahui",
-        start: booking.tanggal_peminjaman,
+        start: booking.tanggal_peminjam,
         end: booking.tanggal_kembali,
         backgroundColor: "#003366",
         borderColor: "#003366",
@@ -124,7 +124,6 @@ export default function CalendarPage() {
           nama: booking.nama ?? "-",
           nrp: booking.nrp ?? "-",
           keperluan: booking.keperluan ?? "-",
-          catatan: booking.catatan ?? undefined,
           plate: vehicle?.plate ?? "-",
         } satisfies BookingExtendedProps,
       };

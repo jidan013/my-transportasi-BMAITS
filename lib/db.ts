@@ -9,12 +9,12 @@ export interface Vehicle {
   nomor_polisi: string;
   bahan_bakar: string; 
   kapasitas_penumpang: number;
-  status_ketersediaan: "tersedia" | "dipinjam" | "maintenance"; 
+  status_ketersediaan: "tersedia" | "dipinjam" ; 
   created_at: string;
   updated_at: string;
 }
 
-export type VehicleStatus = "tersedia" | "dipinjam" | "maintenance";
+export type VehicleStatus = "tersedia" | "dipinjam" ;
 
 interface VehicleAPIResponse {
   success: boolean;

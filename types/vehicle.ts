@@ -6,9 +6,9 @@ export interface Vehicle {
   jenis_kendaraan: string;
   warna_kendaraan: string;
   nomor_polisi: string;
-  bbm: string;
+  bahan_bakar: string;
   kapasitas_penumpang: number;
   status_ketersediaan: VehicleStatus;
   created_at: string;
-  update_at: string;
+  updated_at: string;
 }
