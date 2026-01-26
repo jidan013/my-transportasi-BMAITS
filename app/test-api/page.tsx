@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import { getVehicles } from "@/lib/services/vehicle";
 import { getApprovedBookings } from "@/lib/services/booking-service";
 
-export type VehicleStatus = "available" | "borrowed" | "maintenance";
+export type VehicleStatus = "tersedia" | "dipinjam";
 
 export interface Vehicle {
   id: number;
@@ -18,6 +18,7 @@ export interface Vehicle {
   created_at: string;
   updated_at: string;
 }
+
 
 export interface Booking {
   id: number;
@@ -158,14 +159,14 @@ export default function TestAPIPage() {
                       {vehicle.jenis_kendaraan} • {vehicle.nomor_polisi}
                     </div>
                     <div className={`text-xs font-medium mt-1 px-2 py-1 rounded-full w-fit ${
-                      vehicle.status_ketersediaan === 'available' 
+                      vehicle.status_ketersediaan === 'tersedia' 
                         ? 'bg-green-100 text-green-800' 
-                        : vehicle.status_ketersediaan === 'borrowed'
+                        : vehicle.status_ketersediaan === 'dipinjam'
                         ? 'bg-yellow-100 text-yellow-800'
                         : 'bg-red-100 text-red-800'
                     }`}>
-                      {vehicle.status_ketersediaan === 'available' ? 'Tersedia' : 
-                       vehicle.status_ketersediaan === 'borrowed' ? 'Dipinjam' : 'Maintenance'}
+                      {vehicle.status_ketersediaan ===  'tersedia' }
+                       {vehicle.status_ketersediaan ===  'dipinjam' }
                     </div>
                   </div>
                 ))}
