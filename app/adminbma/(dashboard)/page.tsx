@@ -44,7 +44,7 @@ export default function PageUser() {
 
   return (
     <LazyMotion features={domAnimation}>
-      <div className="min-h-screen font-sans bg-gradient-to-br from-blue-50 via-cyan-50 to-indigo-50 dark:bg-gray-950 transition-colors">
+      <div className="min-h-screen font-sans bg-linear-to-br from-blue-50 via-cyan-50 to-indigo-50 dark:bg-gray-950 transition-colors">
         <Header stats={stats} />
         <Hero />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 py-12 space-y-16">

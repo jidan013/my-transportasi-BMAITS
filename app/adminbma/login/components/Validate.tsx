@@ -13,7 +13,7 @@ export default function ValidationPage() {
   const isSuccess = status === "success";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-100 to-slate-200 px-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 text-center space-y-6">
         {isSuccess ? (
           <>
