@@ -1,5 +1,7 @@
 "use client"
 
+import type { Vehicle, VehicleStatus } from "@/types/vehicle"
+
 interface FormData {
   nama: string
   nrp: string
@@ -8,8 +10,6 @@ interface FormData {
   tanggal_kembali: string
   keperluan: string
 }
-
-import type { Vehicle, VehicleStatus } from "@/types/vehicle"
 
 interface Props {
   data: FormData
@@ -32,9 +32,9 @@ export default function Step2Details({
 }: Props) {
   const renderStatus = (status: VehicleStatus): string => {
     switch (status) {
-      case "available":
+      case "tersedia":
         return "✅ Tersedia"
-      case "borrowed":
+      case "dipinjam":
         return "🚗 Dipinjam"
       default:
         return status
@@ -79,9 +79,7 @@ export default function Step2Details({
         </select>
 
         {errors.vehicle_id && (
-          <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
-            <span>⚠️</span> {errors.vehicle_id}
-          </p>
+          <p className="text-red-500 text-sm mt-1">⚠️ {errors.vehicle_id}</p>
         )}
 
         {vehicles.length === 0 && !loading && (
@@ -114,9 +112,7 @@ export default function Step2Details({
         />
 
         {errors.tanggal_peminjaman && (
-          <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
-            <span>⚠️</span> {errors.tanggal_peminjaman}
-          </p>
+          <p className="text-red-500 text-sm mt-1">⚠️ {errors.tanggal_peminjaman}</p>
         )}
       </div>
 
@@ -135,10 +131,7 @@ export default function Step2Details({
           name="tanggal_kembali"
           value={data.tanggal_kembali}
           onChange={onChange}
-          min={
-            data.tanggal_peminjaman ||
-            new Date().toISOString().split("T")[0]
-          }
+          min={data.tanggal_peminjaman || new Date().toISOString().split("T")[0]}
           disabled={loading}
           className="w-full px-4 py-3 border border-gray-300 rounded-xl
                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500
@@ -146,9 +139,7 @@ export default function Step2Details({
         />
 
         {errors.tanggal_kembali && (
-          <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
-            <span>⚠️</span> {errors.tanggal_kembali}
-          </p>
+          <p className="text-red-500 text-sm mt-1">⚠️ {errors.tanggal_kembali}</p>
         )}
       </div>
 
@@ -169,33 +160,16 @@ export default function Step2Details({
           rows={4}
           maxLength={500}
           disabled={loading}
-          placeholder="Jelaskan secara detail keperluan penggunaan kendaraan (min. 10 karakter)..."
           className="w-full px-4 py-3 border border-gray-300 rounded-xl
                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500
                      transition-all resize-vertical min-h-[100px]
                      disabled:opacity-50 disabled:cursor-not-allowed"
         />
 
-        {errors.keperluan && (
-          <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
-            <span>⚠️</span> {errors.keperluan}
-          </p>
-        )}
-
         <p className="text-xs text-gray-500 mt-1">
           {data.keperluan.trim().length}/500 karakter
         </p>
       </div>
-
-      {/* Info kendaraan terpilih */}
-      {data.vehicle_id && (
-        <div className="sm:col-span-2 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-          <p className="text-sm font-medium text-blue-800">
-            Kendaraan akan otomatis dicek ketersediaannya berdasarkan
-            tanggal peminjaman
-          </p>
-        </div>
-      )}
     </div>
   )
 }

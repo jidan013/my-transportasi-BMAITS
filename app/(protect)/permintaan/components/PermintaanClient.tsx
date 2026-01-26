@@ -8,7 +8,7 @@ import {
   Car,
 } from "lucide-react";
 
-type BorrowStatus = "pending" | "approved" | "rejected";
+type BorrowStatus = "setuju" | "tolak" | "pending";
 
 interface BorrowRequest {
   id: number;
@@ -40,7 +40,7 @@ const dummyRequests: BorrowRequest[] = [
     tanggalPinjam: "2025-01-15",
     tanggalKembali: "2025-01-16",
     keperluan: "Kunjungan kerja",
-    status: "approved",
+    status: "pending",
   },
 ];
 
@@ -57,14 +57,14 @@ export default function PermintaanClient() {
 
   const statusBadge = (status: BorrowStatus) => {
     switch (status) {
-      case "approved":
+      case "setuju":
         return (
           <span className="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-full bg-emerald-100 text-emerald-700">
             <CheckCircle className="w-3 h-3" />
             Disetujui
           </span>
         );
-      case "rejected":
+      case "tolak":
         return (
           <span className="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-full bg-red-100 text-red-700">
             <XCircle className="w-3 h-3" />
@@ -144,7 +144,7 @@ export default function PermintaanClient() {
                     <div className="flex justify-center gap-2">
                       <button
                         onClick={() =>
-                          updateStatus(item.id, "approved")
+                          updateStatus(item.id, "setuju")
                         }
                         className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition"
                       >
@@ -154,7 +154,7 @@ export default function PermintaanClient() {
 
                       <button
                         onClick={() =>
-                          updateStatus(item.id, "rejected")
+                          updateStatus(item.id, "tolak")
                         }
                         className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-red-600 text-white hover:bg-red-700 transition"
                       >

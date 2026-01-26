@@ -1,4 +1,4 @@
-export type VehicleStatus = "available" | "borrowed" | "maintenance";
+export type VehicleStatus = "tersedia" | "dipinjam";
 
 export interface Vehicle {
   id: number;
