@@ -17,7 +17,7 @@ export interface Booking {
 
 export interface BookingPayload {
   nama: string;
-  nrp: number;
+  nrp: string;
   unit_kerja: string;
   vehicle_id: number;
   tanggal_peminjaman: string; 

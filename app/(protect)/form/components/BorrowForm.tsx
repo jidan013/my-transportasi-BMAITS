@@ -173,7 +173,8 @@ const handleSubmit = async (): Promise<void> => {
     const payload: BookingPayload = {
       nrp: formData.nrp.trim(),
       nama: formData.nama.trim(),
-      keperluan: formData.keperluan.trim(),
+      unit_kerja: formData.unit.trim(),
+      detail_keperluan: formData.keperluan.trim(),
       tanggal_peminjaman: formData.tanggal_peminjaman,
       tanggal_kembali: formData.tanggal_kembali,
       vehicle_id: vehicleId,

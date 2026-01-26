@@ -36,8 +36,6 @@ export default function Step2Details({
         return "✅ Tersedia"
       case "borrowed":
         return "🚗 Dipinjam"
-      case "maintenance":
-        return "🛠️ Perawatan"
       default:
         return status
     }
