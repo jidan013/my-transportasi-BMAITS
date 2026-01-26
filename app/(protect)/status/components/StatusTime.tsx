@@ -2,7 +2,6 @@ import {
   IconClock,
   IconFileCheck,
   IconCheck,
-  IconMail,
 } from "@tabler/icons-react";
 import type { FC, ComponentType } from "react";
 

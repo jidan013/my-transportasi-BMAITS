@@ -1,311 +1,256 @@
-"use client";
+"use client"
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
-import idLocale from "@fullcalendar/core/locales/id";
-import type { EventClickArg, EventInput } from "@fullcalendar/core";
-import { Loader2, RefreshCw, X } from "lucide-react";
+import type { Vehicle, VehicleStatus } from "@/types/vehicle"
 
-import { getApprovedBookings } from "@/lib/services/booking-service";
-import type { Booking } from "@/types/booking";
-
-/* =========================
-   TYPES
-========================= */
-
-interface BookingApiResponse {
-  data: Booking[];
+interface FormData {
+  nama: string
+  nrp: string
+  vehicle_id: string
+  tanggal_peminjaman: string
+  tanggal_kembali: string
+  keperluan: string
 }
 
-interface BookingDetailData {
-  nama: string;
-  nrp: string;
-  unit_kerja: string;
-  keperluan: string;
-  plate: string;
+interface Props {
+  data: FormData
+  errors: Record<string, string>
+  onChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+  >
+  onDatesChange: (dates: { start: string; end: string }) => void
+  formId: string
+  availableVehicles: Vehicle[]
+  loading: boolean
+  loadingAvailable: boolean
 }
 
-interface SelectedEvent {
-  title: string;
-  start: string;
-  end: string;
-  data: BookingDetailData;
-}
-
-/* =========================
-   TYPE GUARDS
-========================= */
-
-function isBookingArray(value: unknown): value is Booking[] {
-  return Array.isArray(value);
-}
-
-function isBookingApiResponse(value: unknown): value is BookingApiResponse {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "data" in value &&
-    Array.isArray((value as BookingApiResponse).data)
-  );
-}
-
-/* =========================
-   PAGE
-========================= */
-
-export default function CalendarPage() {
-  const calendarRef = useRef<FullCalendar | null>(null);
-
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [eventDataMap, setEventDataMap] = useState<
-    Record<string, BookingDetailData>
-  >({});
-  const [selectedEvent, setSelectedEvent] = useState<SelectedEvent | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  /* =========================
-     FETCH (TYPE SAFE)
-  ========================= */
-
-  const fetchBookings = useCallback(async (): Promise<void> => {
-  try {
-    setLoading(true);
-    setError(null);
-
-    const response = await getApprovedBookings();
-
-    let normalized: Booking[] = [];
-
-    if (Array.isArray(response)) {
-      normalized = response;
-    } else if (
-      response &&
-      typeof response === "object" &&
-      "data" in response &&
-      Array.isArray((response as unknown as BookingApiResponse).data)
-    ) {
-      normalized = (response as BookingApiResponse).data;
-    } else {
-      throw new Error("Invalid booking response format");
+export default function Step2Details({
+  data,
+  errors,
+  onChange,
+  onDatesChange,
+  formId,
+  availableVehicles,
+  loading,
+  loadingAvailable,
+}: Props) {
+  const renderStatus = (status: VehicleStatus): string => {
+    switch (status) {
+      case "tersedia":
+        return "✅ Tersedia"
+      case "dipinjam":
+        return "🚗 Dipinjam"
+      default:
+        return status
     }
-
-      setBookings(normalized);
-
-      // Build map untuk detail event (hindari extendedProps typing issue)
-      const map: Record<string, BookingDetailData> = {};
-      normalized.forEach((b) => {
-        const id = String(b.id);
-        map[id] = {
-          nama: b.nama,
-          nrp: String(b.nrp),
-          unit_kerja: b.unit_kerja,
-          keperluan: b.keperluan,
-          plate: b.vehicle?.nomor_polisi ?? "-",
-        };
-      });
-
-      setEventDataMap(map);
-
-      calendarRef.current?.getApi().refetchEvents();
-    } catch (err) {
-      console.error("Fetch booking failed:", err);
-      setBookings([]);
-      setEventDataMap({});
-      setError("Gagal memuat jadwal kendaraan");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchBookings();
-  }, [fetchBookings]);
-
-  /* =========================
-     EVENTS
-  ========================= */
-
-  const events: EventInput[] = useMemo(() => {
-    return bookings.map((b): EventInput => ({
-      id: String(b.id),
-      title: b.vehicle?.nama_kendaraan ?? "Kendaraan",
-      start: b.tanggal_peminjam,
-      end: b.tanggal_kembali,
-      backgroundColor: "#003366",
-      borderColor: "#003366",
-      textColor: "#ffffff",
-    }));
-  }, [bookings]);
-
-  /* =========================
-     EVENT CLICK
-  ========================= */
-
-  const handleEventClick = useCallback(
-    (info: EventClickArg): void => {
-      const eventId = info.event.id?.toString() ?? "";
-      const detail = eventDataMap[eventId];
-
-      if (!detail) {
-        console.warn("Event data not found for id:", eventId);
-        return;
-      }
-
-      const start =
-        info.event.start?.toLocaleDateString("id-ID", {
-          dateStyle: "full",
-        }) ?? "-";
-
-      const end = info.event.end
-        ? new Date(info.event.end.getTime() - 86400000).toLocaleDateString(
-            "id-ID",
-            { dateStyle: "full" }
-          )
-        : start;
-
-      setSelectedEvent({
-        title: info.event.title || "Kendaraan",
-        start,
-        end,
-        data: detail,
-      });
-    },
-    [eventDataMap]
-  );
-
-  /* =========================
-     LOADING
-  ========================= */
-
-  if (loading && bookings.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-[#003366]" />
-      </div>
-    );
   }
 
-  /* =========================
-     RENDER
-  ========================= */
+  // Handler khusus tanggal pinjam - trigger API
+  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const startDate = e.target.value
+    onChange(e)
+    
+    // Trigger getAvailableVehicles hanya jika tanggal pinjam diisi
+    if (startDate) {
+      onDatesChange({ 
+        start: startDate, 
+        end: data.tanggal_kembali || startDate // default hari yang sama
+      })
+    }
+  }
+
+  // Handler tanggal kembali - tidak trigger API
+  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(e)
+  }
 
   return (
-    <div className="min-h-screen bg-slate-100 p-6">
-      {error && (
-        <div className="mb-6 bg-red-50 border border-red-200 p-4 rounded-xl text-red-700">
-          {error}
-        </div>
-      )}
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      {/* Kendaraan */}
+      <div>
+        <label
+          htmlFor={`${formId}-vehicle`}
+          className="block text-sm font-semibold mb-2 text-gray-700"
+        >
+          Pilih Kendaraan <span className="text-red-500">*</span>
+        </label>
 
-      <div className="bg-white p-6 rounded-3xl shadow">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-black text-[#003366]">
-            Kalender Kendaraan
-          </h1>
+        <select
+          id={`${formId}-vehicle`}
+          name="vehicle_id"
+          value={data.vehicle_id}
+          onChange={onChange}
+          disabled={loading || loadingAvailable || availableVehicles.length === 0}
+          className="w-full px-4 py-3 border border-gray-300 rounded-xl
+                     focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                     transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <option value="">
+            {loadingAvailable 
+              ? "-- Memuat kendaraan tersedia..." 
+              : availableVehicles.length === 0 && !loadingAvailable
+              ? "-- Tidak ada kendaraan tersedia --"
+              : "-- Pilih Kendaraan Tersedia --"
+            }
+          </option>
 
-          <button
-            onClick={fetchBookings}
-            disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-[#003366] text-white rounded-xl hover:bg-[#002855] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {loading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <RefreshCw className="h-4 w-4" />
-            )}
-            Refresh
-          </button>
-        </div>
+          {availableVehicles.map((vehicle) => (
+            <option key={vehicle.id} value={vehicle.id.toString()}>
+              {vehicle.nama_kendaraan} ({vehicle.nomor_polisi}) –{" "}
+              {vehicle.jenis_kendaraan} |{" "}
+              {renderStatus(vehicle.status_ketersediaan)}
+            </option>
+          ))}
+        </select>
 
-        <FullCalendar
-          ref={calendarRef}
-          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-          initialView="dayGridMonth"
-          locale="id"
-          locales={[idLocale]}
-          events={events}
-          eventClick={handleEventClick}
-          height={650}
-          headerToolbar={{
-            left: "prev,next today",
-            center: "title",
-            right: "dayGridMonth,timeGridWeek,timeGridDay",
-          }}
-          buttonText={{
-            today: "Hari Ini",
-            month: "Bulan",
-            week: "Minggu",
-            day: "Hari",
-          }}
-          noEventsText="Tidak ada jadwal"
-        />
+        {errors.vehicle_id && (
+          <p className="text-red-500 text-sm mt-1">⚠️ {errors.vehicle_id}</p>
+        )}
+
+        {availableVehicles.length === 0 && !loadingAvailable && !loading && (
+          <p className="text-sm text-gray-500 mt-1">
+            Tidak ada kendaraan tersedia untuk tanggal tersebut
+          </p>
+        )}
       </div>
 
-      {/* =========================
-          MODAL
-      ========================= */}
-      {selectedEvent && (
-        <div
-          className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
-          onClick={(e) =>
-            e.target === e.currentTarget && setSelectedEvent(null)
-          }
+      {/* Tanggal Pinjam */}
+      <div>
+        <label
+          htmlFor={`${formId}-start`}
+          className="block text-sm font-semibold mb-2 text-gray-700"
         >
-          <div className="bg-white p-8 rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-start mb-6">
-              <h2 className="text-2xl font-bold text-[#003366]">
-                {selectedEvent.title}
-              </h2>
-              <button
-                onClick={() => setSelectedEvent(null)}
-                className="text-gray-500 hover:text-gray-700 p-1 -m-1 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
+          Tanggal Pinjam <span className="text-red-500">*</span>
+        </label>
 
-            <div className="space-y-3 mb-6">
-              <p>
-                <span className="font-semibold">Nama:</span>{" "}
-                {selectedEvent.data.nama}
-              </p>
-              <p>
-                <span className="font-semibold">NRP:</span>{" "}
-                {selectedEvent.data.nrp}
-              </p>
-              <p>
-                <span className="font-semibold">Unit Kerja:</span>{" "}
-                {selectedEvent.data.unit_kerja}
-              </p>
-              <p>
-                <span className="font-semibold">Plat:</span>{" "}
-                {selectedEvent.data.plate}
-              </p>
-              <p>
-                <span className="font-semibold">Keperluan:</span>{" "}
-                {selectedEvent.data.keperluan}
-              </p>
-            </div>
+        <input
+          id={`${formId}-start`}
+          type="date"
+          name="tanggal_peminjaman"
+          value={data.tanggal_peminjaman}
+          onChange={handleStartDateChange}
+          min={new Date().toISOString().split("T")[0]}
+          disabled={loading}
+          className="w-full px-4 py-3 border border-gray-300 rounded-xl
+                     focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                     transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        />
 
-            <p className="font-semibold text-green-700 bg-green-50 p-3 rounded-xl">
-              {selectedEvent.start}
-              {selectedEvent.end !== selectedEvent.start &&
-                ` → ${selectedEvent.end}`}
-            </p>
+        {errors.tanggal_peminjaman && (
+          <p className="text-red-500 text-sm mt-1">⚠️ {errors.tanggal_peminjaman}</p>
+        )}
+      </div>
 
-            <button
-              onClick={() => setSelectedEvent(null)}
-              className="mt-6 w-full bg-[#003366] text-white py-3 rounded-xl hover:bg-[#002855] transition-colors font-medium"
-            >
-              Tutup
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Tanggal Kembali */}
+      <div>
+        <label
+          htmlFor={`${formId}-end`}
+          className="block text-sm font-semibold mb-2 text-gray-700"
+        >
+          Tanggal Kembali <span className="text-red-500">*</span>
+        </label>
+
+        <input
+          id={`${formId}-end`}
+          type="date"
+          name="tanggal_kembali"
+          value={data.tanggal_kembali}
+          onChange={handleEndDateChange}
+          min={data.tanggal_peminjaman || new Date().toISOString().split("T")[0]}
+          disabled={loading}
+          className="w-full px-4 py-3 border border-gray-300 rounded-xl
+                     focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                     transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        />
+
+        {errors.tanggal_kembali && (
+          <p className="text-red-500 text-sm mt-1">⚠️ {errors.tanggal_kembali}</p>
+        )}
+      </div>
+
+      {/* Nama */}
+      <div>
+        <label
+          htmlFor={`${formId}-nama`}
+          className="block text-sm font-semibold mb-2 text-gray-700"
+        >
+          Nama <span className="text-red-500">*</span>
+        </label>
+
+        <input
+          id={`${formId}-nama`}
+          type="text"
+          name="nama"
+          value={data.nama}
+          onChange={onChange}
+          disabled={loading}
+          className="w-full px-4 py-3 border border-gray-300 rounded-xl
+                     focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                     transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        />
+
+        {errors.nama && (
+          <p className="text-red-500 text-sm mt-1">⚠️ {errors.nama}</p>
+        )}
+      </div>
+
+      {/* NRP */}
+      <div>
+        <label
+          htmlFor={`${formId}-nrp`}
+          className="block text-sm font-semibold mb-2 text-gray-700"
+        >
+          NRP <span className="text-red-500">*</span>
+        </label>
+
+        <input
+          id={`${formId}-nrp`}
+          type="text"
+          name="nrp"
+          value={data.nrp}
+          onChange={onChange}
+          disabled={loading}
+          className="w-full px-4 py-3 border border-gray-300 rounded-xl
+                     focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                     transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        />
+
+        {errors.nrp && (
+          <p className="text-red-500 text-sm mt-1">⚠️ {errors.nrp}</p>
+        )}
+      </div>
+
+      {/* Keperluan */}
+      <div className="sm:col-span-2">
+        <label
+          htmlFor={`${formId}-purpose`}
+          className="block text-sm font-semibold mb-2 text-gray-700"
+        >
+          Keperluan Peminjaman <span className="text-red-500">*</span>
+        </label>
+
+        <textarea
+          id={`${formId}-purpose`}
+          name="keperluan"
+          value={data.keperluan}
+          onChange={onChange}
+          rows={4}
+          maxLength={500}
+          disabled={loading}
+          className="w-full px-4 py-3 border border-gray-300 rounded-xl
+                     focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                     transition-all resize-vertical min-h-25
+                     disabled:opacity-50 disabled:cursor-not-allowed"
+        />
+
+        <p className="text-xs text-gray-500 mt-1">
+          {data.keperluan.trim().length}/500 karakter
+        </p>
+
+        {errors.keperluan && (
+          <p className="text-red-500 text-sm mt-1">⚠️ {errors.keperluan}</p>
+        )}
+      </div>
     </div>
-  );
+  )
 }
