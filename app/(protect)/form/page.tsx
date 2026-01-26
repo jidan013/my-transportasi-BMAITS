@@ -1,4 +1,4 @@
-import BorrowForm from "@/app/protect/form/components/BorrowForm";
+import BorrowForm from "@/app/(protect)/form/components/BorrowForm";
 
 export default function PeminjamanPage() {
   return (
