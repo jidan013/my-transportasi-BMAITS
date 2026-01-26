@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useMemo, useState, useRef } from "react";
-import { Download, Search, Filter, Bus, Car, Truck, Users } from "lucide-react";
+import React, { useMemo, useState } from "react";
+import { Download, Search, Bus, Car, Truck, Users } from "lucide-react";
 import Footer from "@/components/layouts/Footer";
 
 export interface TarifObject {
@@ -44,12 +44,6 @@ const ALL_ITEMS: VehicleItem[] = [
 
 const CATEGORIES = ["All", "Exclusive", "Operasional", "Angkutan Barang"];
 const FILTERS = ["All", "B-Dalam", "B-Luar", "C-Dalam", "C-Luar"];
-
-interface TarifItem {
-  kategori: string;
-  nama: string;
-  tarif: number;
-}
 
 
 function formatIDR(value: number): string {
@@ -225,7 +219,7 @@ export default function Page() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-900 dark:to-gray-800 py-8 px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-linear-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-900 dark:to-gray-800 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 md:p-8 mb-8">

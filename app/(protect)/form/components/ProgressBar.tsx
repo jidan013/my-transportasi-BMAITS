@@ -17,7 +17,7 @@ export default function ProgressBar({ currentStep, totalSteps }: Props) {
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}
           transition={{ duration: 0.5 }}
-          className="h-full bg-gradient-to-r from-[#00AEEF] to-[#002D72]"
+          className="h-full bg-linear-to-r from-[#00AEEF] to-[#002D72]"
         />
       </div>
       <div className="text-sm text-gray-600 dark:text-gray-300 mt-2 text-right font-medium">

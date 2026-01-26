@@ -127,7 +127,7 @@ export default function TestAPIPage() {
           <button
             onClick={testVehicles}
             disabled={loadingVehicles}
-            className="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
+            className="w-full px-6 py-3 bg-linear-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
             aria-label="Test API Kendaraan"
           >
             {loadingVehicles ? (
@@ -191,7 +191,7 @@ export default function TestAPIPage() {
           <button
             onClick={testBookings}
             disabled={loadingBookings}
-            className="w-full px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-4 focus:ring-green-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
+            className="w-full px-6 py-3 bg-linear-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-4 focus:ring-green-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
             aria-label="Test API Booking Approved"
           >
             {loadingBookings ? (
@@ -248,9 +248,9 @@ export default function TestAPIPage() {
       </div>
 
       {/* Console Instructions */}
-      <div className="p-8 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl">
+      <div className="p-8 bg-linear-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl">
         <div className="flex items-start gap-4 mb-6">
-          <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center flex-shrink-0">
+          <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center shrink-0">
             <span className="text-white font-bold text-lg">📋</span>
           </div>
           <div>

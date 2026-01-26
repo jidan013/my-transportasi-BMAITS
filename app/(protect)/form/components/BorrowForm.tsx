@@ -298,7 +298,7 @@ const handleSubmit = async (): Promise<void> => {
             type="button"
             onClick={handleNext}
             disabled={loading}
-            className="px-8 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold flex items-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:shadow-none transition-all hover:-translate-y-0.5"
+            className="px-8 py-3 rounded-xl bg-linear-to-r from-blue-600 to-blue-700 text-white font-bold flex items-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:shadow-none transition-all hover:-translate-y-0.5"
           >
             {loading ? (
               <>
@@ -324,7 +324,7 @@ const handleSubmit = async (): Promise<void> => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.3 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-4 rounded-2xl flex items-center gap-3 shadow-2xl z-50 border border-white/20 backdrop-blur-sm"
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-linear-to-r from-green-600 to-green-700 text-white px-8 py-4 rounded-2xl flex items-center gap-3 shadow-2xl z-50 border border-white/20 backdrop-blur-sm"
           >
             <IconCircleCheckFilled size={24} />
             <span className="font-semibold">Peminjaman berhasil diajukan!</span>

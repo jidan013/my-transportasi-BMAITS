@@ -162,7 +162,7 @@ export default function Step2Details({
           disabled={loading}
           className="w-full px-4 py-3 border border-gray-300 rounded-xl
                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                     transition-all resize-vertical min-h-[100px]
+                     transition-all resize-vertical min-h-25
                      disabled:opacity-50 disabled:cursor-not-allowed"
         />
 
