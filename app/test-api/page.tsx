@@ -12,11 +12,11 @@ export interface Vehicle {
   jenis_kendaraan: string;
   warna_kendaraan: string;
   nomor_polisi: string;
-  bbm: string;
+  bahan_bakar: string;
   kapasitas_penumpang: number;
   status_ketersediaan: VehicleStatus;
   created_at: string;
-  update_at: string;
+  updated_at: string;
 }
 
 export interface Booking {
@@ -25,10 +25,10 @@ export interface Booking {
   nrp: number;
   unit_kerja: string;
   vehicle_id: number;
-  tanggal_peminjaman: string;
+  tanggal_peminjam: string;
   tanggal_kembali: string;
-  detail_keperluan: string;
-  status_peminjaman: "menunggu" | "disetujui" | "ditolak" | "dikembalikan";
+  keperluan: string;
+  status_pengajuan: "menunggu" | "disetujui" | "ditolak" | "dikembalikan";
   created_at: string;
   updated_at: string;
   vehicle?: Vehicle;
@@ -87,9 +87,9 @@ export default function TestAPIPage() {
         ID: b.id,
         Nama: b.nama,
         NRP: b.nrp,
-        Status: b.status_peminjaman,
+        Status: b.status_pengajuan,
         Vehicle: b.vehicle_id,
-        Mulai: b.tanggal_peminjaman.slice(0, 10)
+        Mulai: b.tanggal_peminjam.slice(0, 10)
       })));
       
       setBookingsData(data);
@@ -223,7 +223,7 @@ export default function TestAPIPage() {
                     </div>
                     <div className="flex flex-col sm:flex-row gap-2 items-end sm:items-center">
                       <div className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-mono">
-                        {new Date(booking.tanggal_peminjaman).toLocaleDateString('id-ID')}
+                        {new Date(booking.tanggal_peminjam).toLocaleDateString('id-ID')}
                       </div>
                       <span className="text-xs text-gray-500">→</span>
                       <div className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-mono">

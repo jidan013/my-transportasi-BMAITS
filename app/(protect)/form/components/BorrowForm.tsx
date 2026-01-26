@@ -108,7 +108,7 @@ export default function BorrowForm() {
   const validateStep1 = (): boolean => {
     const err: Record<string, string> = {};
     if (!formData.nama.trim()) err.nama = "Nama lengkap wajib diisi";
-    if (!/^\d{8,10}$/.test(formData.nrp)) err.nrp = "NRP harus 8-10 digit angka";
+    if (!/^\d{8,18}$/.test(formData.nrp)) err.nrp = "NRP harus 8-18 digit angka";
     setErrors(err);
     return Object.keys(err).length === 0;
   };

@@ -77,7 +77,7 @@ export default function Step1Identity({
             <span>⚠️</span> {errors.nrp}
           </p>
         )}
-        <p className="text-xs text-gray-500 mt-1">Format: 8-10 digit angka</p>
+        <p className="text-xs text-gray-500 mt-1">Format: 8-18 digit angka</p>
       </div>
 
       <div className="sm:col-span-2">
