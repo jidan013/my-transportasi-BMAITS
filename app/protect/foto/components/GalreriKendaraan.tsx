@@ -263,7 +263,7 @@ export default function GaleriKendaraan() {
                 className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl flex flex-col h-full group"
                 onClick={() => setSelected(k)}
               >
-                <div className="relative h-64 w-full bg-gray-200 flex-shrink-0 overflow-hidden group-hover:brightness-110">
+                <div className="relative h-64 w-full bg-gray-200 shrink-0 overflow-hidden group-hover:brightness-110">
                   <Image
                     src={resolveImage(k.plat)}
                     alt={k.nama}
@@ -312,7 +312,7 @@ export default function GaleriKendaraan() {
       {/* Modal Detail */}
       {selected && (
         <div
-          className="fixed inset-0 bg-black/95 z-[1000] flex items-center justify-center p-4 animate-in fade-in zoom-in duration-200"
+          className="fixed inset-0 bg-black/95 z-1000 flex items-center justify-center p-4 animate-in fade-in zoom-in duration-200"
           onClick={() => setSelected(null)}
         >
           <div 
@@ -320,7 +320,7 @@ export default function GaleriKendaraan() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header dengan Close Button */}
-            <div className="relative h-96 w-full flex-shrink-0 overflow-hidden rounded-t-3xl">
+            <div className="relative h-96 w-full shrink-0 overflow-hidden rounded-t-3xl">
               <Image
                 src={resolveImage(selected.plat)}
                 alt={selected.nama}
@@ -339,13 +339,13 @@ export default function GaleriKendaraan() {
 
             {/* Info Section */}
             <div className="p-8 pb-12">
-              <h2 className="text-3xl font-black text-gray-900 mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <h2 className="text-3xl font-black mb-4 bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 {selected.nama}
               </h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div className="space-y-3">
-                  <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl">
+                  <div className="flex items-center gap-3 p-4 bg-linear-to-r from-blue-50 to-indigo-50 rounded-2xl">
                     <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
                       <selected.icon size={24} className="text-blue-600" />
                     </div>
@@ -355,19 +355,19 @@ export default function GaleriKendaraan() {
                     </div>
                   </div>
                   
-                  <div className="p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl">
+                  <div className="p-4 bg-linear-to-r from-emerald-50 to-teal-50 rounded-2xl">
                     <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-1">Kapasitas</p>
                     <p className="text-2xl font-black text-emerald-700">{selected.kapasitas}</p>
                   </div>
                 </div>
 
                 <div className="space-y-3">
-                  <div className="p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl">
+                  <div className="p-4 bg-linear-to-r from-orange-50 to-amber-50 rounded-2xl">
                     <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-1">Nomor Plat</p>
                     <p className="text-2xl font-black text-gray-900">{selected.plat}</p>
                   </div>
                   
-                  <div className="p-4 bg-gradient-to-r from-purple-50 to-violet-50 rounded-2xl">
+                  <div className="p-4 bg-linear-to-r from-purple-50 to-violet-50 rounded-2xl">
                     <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-1">Warna</p>
                     <p className="text-xl font-bold text-gray-900 capitalize">{selected.warna}</p>
                   </div>
@@ -377,12 +377,12 @@ export default function GaleriKendaraan() {
               <div className="flex flex-wrap gap-3 pt-6 border-t border-gray-100">
                 <span className={`px-6 py-3 rounded-2xl font-bold text-sm uppercase shadow-lg transition-all duration-200 ${
                   selected.status === 'available'
-                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 hover:shadow-xl hover:-translate-y-1'
-                    : 'bg-gradient-to-r from-red-500 to-rose-600 text-white hover:from-red-600 hover:to-rose-700 hover:shadow-xl hover:-translate-y-1'
+                    ? 'bg-linear-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 hover:shadow-xl hover:-translate-y-1'
+                    : 'bg-linear-to-r from-red-500 to-rose-600 text-white hover:from-red-600 hover:to-rose-700 hover:shadow-xl hover:-translate-y-1'
                 }`}>
                   {selected.status === 'available' ? '✅ Tersedia' : '❌ Tidak Tersedia'}
                 </span>
-                <span className="px-6 py-3 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 font-bold text-sm rounded-2xl shadow-md hover:shadow-lg transition-all duration-200">
+                <span className="px-6 py-3 bg-linear-to-r from-gray-100 to-gray-200 text-gray-800 font-bold text-sm rounded-2xl shadow-md hover:shadow-lg transition-all duration-200">
                   BBM: {selected.bbm}
                 </span>
               </div>
