@@ -1,256 +1,169 @@
-"use client"
+"use client";
 
-import type { Vehicle, VehicleStatus } from "@/types/vehicle"
+import { useEffect, useState } from "react";
+import { getBookingSchedule } from "@/lib/services/booking-service";
+import type { Booking } from "@/types/booking";
 
-interface FormData {
-  nama: string
-  nrp: string
-  vehicle_id: string
-  tanggal_peminjaman: string
-  tanggal_kembali: string
-  keperluan: string
-}
+export default function KalenderPage() {
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(false);
 
-interface Props {
-  data: FormData
-  errors: Record<string, string>
-  onChange: React.ChangeEventHandler<
-    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  >
-  onDatesChange: (dates: { start: string; end: string }) => void
-  formId: string
-  availableVehicles: Vehicle[]
-  loading: boolean
-  loadingAvailable: boolean
-}
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
 
-export default function Step2Details({
-  data,
-  errors,
-  onChange,
-  onDatesChange,
-  formId,
-  availableVehicles,
-  loading,
-  loadingAvailable,
-}: Props) {
-  const renderStatus = (status: VehicleStatus): string => {
-    switch (status) {
-      case "tersedia":
-        return "✅ Tersedia"
-      case "dipinjam":
-        return "🚗 Dipinjam"
-      default:
-        return status
-    }
-  }
+  /* ================= FETCH SCHEDULE ================= */
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
 
-  // Handler khusus tanggal pinjam - trigger API
-  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const startDate = e.target.value
-    onChange(e)
-    
-    // Trigger getAvailableVehicles hanya jika tanggal pinjam diisi
-    if (startDate) {
-      onDatesChange({ 
-        start: startDate, 
-        end: data.tanggal_kembali || startDate // default hari yang sama
-      })
-    }
-  }
+      const start = new Date(year, month, 1)
+        .toISOString()
+        .split("T")[0];
 
-  // Handler tanggal kembali - tidak trigger API
-  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(e)
-  }
+      const end = new Date(year, month + 1, 0)
+        .toISOString()
+        .split("T")[0];
+
+      const res = await getBookingSchedule({
+        start_date: start,
+        end_date: end,
+      });
+
+      setBookings(
+        res.filter((b) => b.status_pengajuan === "disetujui")
+      );
+
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [year, month]);
+
+  /* ================= DATE HELPERS ================= */
+  const startDay = new Date(year, month, 1).getDay() || 7; // Senin = 1
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const prevMonthDays = new Date(year, month, 0).getDate();
+
+  const isBooked = (date: string) =>
+    bookings.some(
+      (b) =>
+        date >= b.tanggal_peminjam &&
+        date <= b.tanggal_kembali
+    );
+
+  const todayStr = new Date().toISOString().split("T")[0];
+
+  /* ================= NAVIGATION ================= */
+  const prevMonth = () =>
+    setCurrentDate(new Date(year, month - 1, 1));
+  const nextMonth = () =>
+    setCurrentDate(new Date(year, month + 1, 1));
+  const today = () => setCurrentDate(new Date());
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-      {/* Kendaraan */}
-      <div>
-        <label
-          htmlFor={`${formId}-vehicle`}
-          className="block text-sm font-semibold mb-2 text-gray-700"
+    <div className="">
+      {/* HEADER */}
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Kalender Kendaraan</h1>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 bg-blue-700 text-white rounded-lg text-sm"
         >
-          Pilih Kendaraan <span className="text-red-500">*</span>
-        </label>
+          🔄 Refresh
+        </button>
+      </div>
 
-        <select
-          id={`${formId}-vehicle`}
-          name="vehicle_id"
-          value={data.vehicle_id}
-          onChange={onChange}
-          disabled={loading || loadingAvailable || availableVehicles.length === 0}
-          className="w-full px-4 py-3 border border-gray-300 rounded-xl
-                     focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                     transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+      {/* CONTROLS */}
+      <div className="flex items-center gap-2 mb-4">
+        <button onClick={prevMonth} className="px-3 py-1 border rounded">
+          ◀
+        </button>
+        <button onClick={nextMonth} className="px-3 py-1 border rounded">
+          ▶
+        </button>
+        <button
+          onClick={today}
+          className="px-3 py-1 bg-gray-600 text-white rounded"
         >
-          <option value="">
-            {loadingAvailable 
-              ? "-- Memuat kendaraan tersedia..." 
-              : availableVehicles.length === 0 && !loadingAvailable
-              ? "-- Tidak ada kendaraan tersedia --"
-              : "-- Pilih Kendaraan Tersedia --"
-            }
-          </option>
+          Hari Ini
+        </button>
 
-          {availableVehicles.map((vehicle) => (
-            <option key={vehicle.id} value={vehicle.id.toString()}>
-              {vehicle.nama_kendaraan} ({vehicle.nomor_polisi}) –{" "}
-              {vehicle.jenis_kendaraan} |{" "}
-              {renderStatus(vehicle.status_ketersediaan)}
-            </option>
+        <h2 className="ml-4 text-xl font-semibold">
+          {currentDate.toLocaleString("id-ID", {
+            month: "long",
+            year: "numeric",
+          })}
+        </h2>
+
+        <div className="ml-auto flex gap-2">
+          <button className="px-3 py-1 bg-blue-600 text-white rounded">
+            Bulan
+          </button>
+          <button className="px-3 py-1 border rounded">Minggu</button>
+          <button className="px-3 py-1 border rounded">Hari</button>
+        </div>
+      </div>
+
+      {/* CALENDAR */}
+      <div className="border rounded-xl overflow-hidden bg-white">
+        <div className="grid grid-cols-7 border-b">
+          {["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"].map((d) => (
+            <div
+              key={d}
+              className="p-2 text-center font-semibold border-r last:border-r-0"
+            >
+              {d}
+            </div>
           ))}
-        </select>
+        </div>
 
-        {errors.vehicle_id && (
-          <p className="text-red-500 text-sm mt-1">⚠️ {errors.vehicle_id}</p>
-        )}
+        <div className="grid grid-cols-7">
+          {/* PREV MONTH */}
+          {Array.from({ length: startDay - 1 }).map((_, i) => (
+            <div
+              key={`prev-${i}`}
+              className="h-24 p-2 text-gray-400 border"
+            >
+              {prevMonthDays - (startDay - 2 - i)}
+            </div>
+          ))}
 
-        {availableVehicles.length === 0 && !loadingAvailable && !loading && (
-          <p className="text-sm text-gray-500 mt-1">
-            Tidak ada kendaraan tersedia untuk tanggal tersebut
-          </p>
-        )}
+          {/* CURRENT MONTH */}
+          {Array.from({ length: daysInMonth }).map((_, i) => {
+            const day = i + 1;
+            const dateStr = `${year}-${String(month + 1).padStart(
+              2,
+              "0"
+            )}-${String(day).padStart(2, "0")}`;
+
+            const booked = isBooked(dateStr);
+
+            return (
+              <div
+                key={day}
+                className={`h-24 p-2 border relative ${
+                  dateStr === todayStr
+                    ? "bg-yellow-50"
+                    : ""
+                }`}
+              >
+                <div className="font-semibold">{day}</div>
+
+                {booked && (
+                  <div className="absolute bottom-2 left-2 right-2 bg-yellow-200 text-xs rounded px-2 py-1">
+                    Dipinjam
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Tanggal Pinjam */}
-      <div>
-        <label
-          htmlFor={`${formId}-start`}
-          className="block text-sm font-semibold mb-2 text-gray-700"
-        >
-          Tanggal Pinjam <span className="text-red-500">*</span>
-        </label>
-
-        <input
-          id={`${formId}-start`}
-          type="date"
-          name="tanggal_peminjaman"
-          value={data.tanggal_peminjaman}
-          onChange={handleStartDateChange}
-          min={new Date().toISOString().split("T")[0]}
-          disabled={loading}
-          className="w-full px-4 py-3 border border-gray-300 rounded-xl
-                     focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                     transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-        />
-
-        {errors.tanggal_peminjaman && (
-          <p className="text-red-500 text-sm mt-1">⚠️ {errors.tanggal_peminjaman}</p>
-        )}
-      </div>
-
-      {/* Tanggal Kembali */}
-      <div>
-        <label
-          htmlFor={`${formId}-end`}
-          className="block text-sm font-semibold mb-2 text-gray-700"
-        >
-          Tanggal Kembali <span className="text-red-500">*</span>
-        </label>
-
-        <input
-          id={`${formId}-end`}
-          type="date"
-          name="tanggal_kembali"
-          value={data.tanggal_kembali}
-          onChange={handleEndDateChange}
-          min={data.tanggal_peminjaman || new Date().toISOString().split("T")[0]}
-          disabled={loading}
-          className="w-full px-4 py-3 border border-gray-300 rounded-xl
-                     focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                     transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-        />
-
-        {errors.tanggal_kembali && (
-          <p className="text-red-500 text-sm mt-1">⚠️ {errors.tanggal_kembali}</p>
-        )}
-      </div>
-
-      {/* Nama */}
-      <div>
-        <label
-          htmlFor={`${formId}-nama`}
-          className="block text-sm font-semibold mb-2 text-gray-700"
-        >
-          Nama <span className="text-red-500">*</span>
-        </label>
-
-        <input
-          id={`${formId}-nama`}
-          type="text"
-          name="nama"
-          value={data.nama}
-          onChange={onChange}
-          disabled={loading}
-          className="w-full px-4 py-3 border border-gray-300 rounded-xl
-                     focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                     transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-        />
-
-        {errors.nama && (
-          <p className="text-red-500 text-sm mt-1">⚠️ {errors.nama}</p>
-        )}
-      </div>
-
-      {/* NRP */}
-      <div>
-        <label
-          htmlFor={`${formId}-nrp`}
-          className="block text-sm font-semibold mb-2 text-gray-700"
-        >
-          NRP <span className="text-red-500">*</span>
-        </label>
-
-        <input
-          id={`${formId}-nrp`}
-          type="text"
-          name="nrp"
-          value={data.nrp}
-          onChange={onChange}
-          disabled={loading}
-          className="w-full px-4 py-3 border border-gray-300 rounded-xl
-                     focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                     transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-        />
-
-        {errors.nrp && (
-          <p className="text-red-500 text-sm mt-1">⚠️ {errors.nrp}</p>
-        )}
-      </div>
-
-      {/* Keperluan */}
-      <div className="sm:col-span-2">
-        <label
-          htmlFor={`${formId}-purpose`}
-          className="block text-sm font-semibold mb-2 text-gray-700"
-        >
-          Keperluan Peminjaman <span className="text-red-500">*</span>
-        </label>
-
-        <textarea
-          id={`${formId}-purpose`}
-          name="keperluan"
-          value={data.keperluan}
-          onChange={onChange}
-          rows={4}
-          maxLength={500}
-          disabled={loading}
-          className="w-full px-4 py-3 border border-gray-300 rounded-xl
-                     focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                     transition-all resize-vertical min-h-25
-                     disabled:opacity-50 disabled:cursor-not-allowed"
-        />
-
-        <p className="text-xs text-gray-500 mt-1">
-          {data.keperluan.trim().length}/500 karakter
-        </p>
-
-        {errors.keperluan && (
-          <p className="text-red-500 text-sm mt-1">⚠️ {errors.keperluan}</p>
-        )}
-      </div>
+      {loading && (
+        <p className="mt-4 text-gray-500">Memuat jadwal…</p>
+      )}
     </div>
-  )
+  );
 }
