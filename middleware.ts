@@ -1,75 +1,73 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-/* =====================
-   ADMIN ROUTES
-===================== */
-const ADMIN_ROUTES = [
-  // "/permintaan",
-  // "/laporan",
-  "/adminbma/dashboard",
-];
 
-/* =====================
-   HELPERS
-===================== */
+const ADMIN_ROUTES = ["/adminbma/dashboard", "/laporan", "/permintaan"];
+
 function isAdminRoute(pathname: string): boolean {
   return ADMIN_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(route + "/")
   );
 }
 
-function getRoleFromToken(token: string): string | null {
-  try {
-    const payload = JSON.parse(
-      Buffer.from(token.split(".")[1], "base64").toString()
-    );
-    return payload?.role ?? null;
-  } catch {
-    return null;
-  }
-}
 
-/* =====================
-   MIDDLEWARE
-===================== */
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Hanya jaga route admin
+  // Bukan route admin → lanjut
   if (!isAdminRoute(pathname)) {
     return NextResponse.next();
   }
 
-  // Ambil token dari cookies (sesuaikan nama cookie yang dipakai backend)
-  const token =
-    req.cookies.get("token")?.value ||
-    req.cookies.get("access_token")?.value ||
-    req.cookies.get("auth_token")?.value;
+  try {
+    const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL;
 
-  // Tidak ada token → redirect ke "/"
-  if (!token) {
-    return NextResponse.redirect(new URL("/", req.url));
+    if (!apiUrl) {
+      console.error("API_URL not defined");
+      return NextResponse.redirect(
+        new URL("/adminbma/login", req.url)
+      );
+    }
+
+    const res = await fetch(`${apiUrl}/v1/adminbma/me`, {
+      method: "GET",
+      headers: {
+        Cookie: req.headers.get("cookie") ?? "",
+        Accept: "application/json",
+      },
+      credentials: "include",
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      return NextResponse.redirect(
+        new URL("/adminbma/login", req.url)
+      );
+    }
+
+    const user = await res.json();
+
+    if (user?.role !== "admin") {
+      return NextResponse.redirect(
+        new URL("/", req.url)
+      );
+    }
+
+  
+    return NextResponse.next();
+  } catch (error) {
+    console.error("Middleware auth error:", error);
+
+    return NextResponse.redirect(
+      new URL("/adminbma/login", req.url)
+    );
   }
-
-  const role = getRoleFromToken(token);
-
-  // Role bukan admin → redirect ke "/"
-  if (role !== "admin") {
-    return NextResponse.redirect(new URL("/", req.url));
-  }
-
-  // Lolos semua cek → lanjut
-  return NextResponse.next();
 }
 
-/* =====================
-   MATCHER
-===================== */
 export const config = {
   matcher: [
-    "/permintaan/:path*",
-    "/laporan/:path*",
     "/adminbma/dashboard/:path*",
+    "/laporan/:path*",
+    "/permintaan/:path*",
   ],
 };

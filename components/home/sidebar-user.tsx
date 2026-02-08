@@ -2,9 +2,16 @@
 
 import * as React from "react";
 import {
-  IconCalendar, IconCar, IconDashboard, IconDatabase, 
-  IconFile, IconHistory, IconReport, IconHelp, 
-  IconCurrencyDollar, IconPhoto,
+  IconCalendar,
+  IconCar,
+  IconDashboard,
+  IconDatabase,
+  IconFile,
+  IconHistory,
+  IconReport,
+  IconHelp,
+  IconCurrencyDollar,
+  IconPhoto,
 } from "@tabler/icons-react";
 
 import type { Admin } from "@/types/auth";
@@ -16,28 +23,32 @@ import { NavSecondary } from "@/components/home/navbar-second";
 import { NavUser } from "@/components/home/navbar-user";
 
 import {
-  Sidebar, SidebarContent, SidebarFooter, 
-  SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
 import Image from "next/image";
-import Logo from "@/public/Logo.png";
 import Link from "next/link";
-import { getAdminMe } from "@/lib/services/auth-service";
+import api from "@/lib/axios";
 
-/* =====================
-   NAV CONFIG - DENGAN ROLE
-===================== */
-export const NAV_MAIN: (NavItem & { role?: 'admin' })[] = [
+
+const NAV_MAIN: (NavItem & { adminOnly?: boolean })[] = [
   { title: "Dashboard", url: "/", icon: IconDashboard },
   { title: "Jadwal Kendaraan", url: "/jadwal", icon: IconCalendar },
   { title: "Form Peminjaman", url: "/form", icon: IconFile },
   { title: "Status Peminjaman", url: "/status", icon: IconHistory },
-  { title: "Permintaan", url: "/permintaan", icon: IconDatabase, },
-  { title: "Laporan Peminjaman", url: "/laporan", icon: IconReport, },
+
+  
+  { title: "Permintaan", url: "/permintaan", icon: IconDatabase, adminOnly: true },
+  { title: "Laporan Peminjaman", url: "/laporan", icon: IconReport, adminOnly: true },
 ];
 
-export const DOCUMENTS: DocumentItem[] = [
+const DOCUMENTS: DocumentItem[] = [
   { name: "SOP Kendaraan", url: "/sop", icon: IconReport },
   { name: "Foto Kendaraan", url: "/foto", icon: IconPhoto },
   { name: "Jenis Kendaraan", url: "/jenis-kendaraan", icon: IconCar },
@@ -45,46 +56,29 @@ export const DOCUMENTS: DocumentItem[] = [
   { name: "Kontak Admin", url: "/kontak", icon: IconHelp },
 ];
 
-/* =====================
-   COMPONENT
-===================== */
-export function AppSidebar(props: React.ComponentPropsWithRef<typeof Sidebar>) {
+export default function AppSidebar(
+  props: React.ComponentPropsWithRef<typeof Sidebar>
+) {
   const [user, setUser] = React.useState<Admin | null>(null);
   const [loading, setLoading] = React.useState(true);
 
+
   React.useEffect(() => {
-    const token = localStorage.getItem("admin_token");
-    
-    if (!token) {
-      setLoading(false);
-      return;
-    }
-
-    getAdminMe()
-      .then(setUser)
-      .catch((err) => {
-        console.error("Failed to fetch admin:", err);
-
-        if (err.response?.status === 401) {
-          localStorage.removeItem("admin_token");
-          localStorage.removeItem("admin_user");
-          document.cookie = "admin_token=; path=/; max-age=0";
-          window.location.href = "/adminbma/login";
-        }
-        setUser(null);
-      })
+    api
+      .get<Admin>("/v1/adminbma/me")
+      .then((res) => setUser(res.data))
+      .catch(() => setUser(null))
       .finally(() => setLoading(false));
   }, []);
 
-  // FILTER MENU BERDASARKAN ROLE ADMIN
-  const filteredNavMain = React.useMemo((): NavItem[] => {
-    if (!user || user.role !== "admin") {
-      return NAV_MAIN.filter(item => !item.role || item.role !== 'admin');
-    }
-    return NAV_MAIN;
-  }, [user]);
-
   if (loading) return null;
+
+  const filteredNavMain = NAV_MAIN.filter((item) => {
+    if (item.adminOnly) {
+      return !!user && user.role === "admin";
+    }
+    return true;
+  });
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -93,7 +87,7 @@ export function AppSidebar(props: React.ComponentPropsWithRef<typeof Sidebar>) {
           <SidebarMenuItem>
             <Link href="/">
               <SidebarMenuButton>
-                <Image src={Logo} alt="Logo" width={220} height={48} priority />
+                <Image src="/Logo.png" alt="Logo" width={220} height={48} priority />
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
@@ -108,20 +102,13 @@ export function AppSidebar(props: React.ComponentPropsWithRef<typeof Sidebar>) {
 
       <SidebarFooter>
         {user ? (
-          <NavUser
-            user={{
-              name: user.name,
-              email: user.email,
-            }}
-          />
+          <NavUser user={{ name: user.name, email: user.email }} />
         ) : (
           <div className="p-4 text-xs text-muted-foreground text-center">
-            USER
+            Guest
           </div>
         )}
       </SidebarFooter>
     </Sidebar>
   );
 }
-
-export default AppSidebar;
