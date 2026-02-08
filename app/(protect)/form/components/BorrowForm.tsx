@@ -232,9 +232,9 @@ export default function BorrowForm() {
 
   return (
     <div className="max-w-4xl mx-auto p-6 border-2 border-gray-500 rounded-3xl bg-white shadow-2xl">
-      <h1 className="text-3xl font-bold mb-8 text-gray-800">
+      {/* <h1 className="text-3xl font-bold mb-8 text-gray-800">
         Peminjaman Kendaraan
-      </h1>
+      </h1> */}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>

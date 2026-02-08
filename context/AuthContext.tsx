@@ -33,7 +33,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // ✅ Transform Admin → User dengan validasi UserRole
   const transformAdminToUser = (admin: Admin): User => {
     // Validasi role sesuai UserRole union type
     const role: UserRole = (admin.role as UserRole) || 'admin';
@@ -47,7 +46,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       name: admin.name,
       email: admin.email,
       role: role as UserRole,
-      avatar: admin.avatar
     };
   };
 

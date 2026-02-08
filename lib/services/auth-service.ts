@@ -2,7 +2,6 @@ import api from "@/lib/axios";
 import { LoginPayload, LoginResponse, Admin } from "@/types/auth";
 
 export const loginAdmin = async (payload: LoginPayload) => {
-  // const res = await api.post<LoginResponse>("/v1/adminbma/login", payload);
   const res = await api.post<LoginResponse>("/v1/adminbma/login", payload);
   return res.data;
 };

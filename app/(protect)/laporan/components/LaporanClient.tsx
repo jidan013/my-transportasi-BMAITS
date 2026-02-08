@@ -315,7 +315,7 @@ export default function LaporanPage() {
 
         <Card className="border-0 shadow-lg hover:shadow-xl transition-all bg-linear-to-br from-green-500/10 to-green-500/5">
           <CardHeader className="pb-3">
-            <div className="flex items-center gap-2 text-sm font-medium text-green-600 font-semibold">
+            <div className="flex items-center gap-2 text-sm font-semibold text-green-600 font-semibold">
               <IconCar className="h-4 w-4" />
               Disetujui
             </div>
@@ -329,7 +329,7 @@ export default function LaporanPage() {
 
         <Card className="border-0 shadow-lg hover:shadow-xl transition-all bg-linear-to-br from-yellow-500/10 to-yellow-500/5">
           <CardHeader className="pb-3">
-            <div className="flex items-center gap-2 text-sm font-medium text-yellow-600 font-semibold">
+            <div className="flex items-center gap-2 text-sm font-semibold text-yellow-600 font-semibold">
               <IconClock className="h-4 w-4" />
               Menunggu
             </div>
@@ -343,7 +343,7 @@ export default function LaporanPage() {
 
         <Card className="border-0 shadow-lg hover:shadow-xl transition-all bg-linear-to-br from-destructive/10 to-destructive/5">
           <CardHeader className="pb-3">
-            <div className="flex items-center gap-2 text-sm font-medium text-destructive font-semibold">
+            <div className="flex items-center gap-2 text-sm font-semibold text-destructive font-semibold">
               <IconUsers className="h-4 w-4" />
               Ditolak
             </div>

@@ -5,7 +5,6 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
-  avatar?: string | null;
 }
 
 export interface Admin {
@@ -17,7 +16,6 @@ export interface Admin {
   created_at?: string;
   updated_at?: string;
   role?:string;
-  avatar?: string | null;
 }
 
 export interface LoginPayload {

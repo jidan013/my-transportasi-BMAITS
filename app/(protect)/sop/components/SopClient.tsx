@@ -59,7 +59,7 @@ function SmoothTrigger({
   return (
     <div
       className={`flex justify-between items-center rounded-xl px-6 py-5 transition-all duration-300 shadow-sm ${isOpen
-          ? "bg-gradient-to-r from-blue-50 to-white border border-blue-200"
+          ? "bg-linear-to-r from-blue-50 to-white border border-blue-200"
           : "bg-white hover:bg-blue-50 border border-gray-200"
         }`}
     >
@@ -84,7 +84,7 @@ export default function SopAccordionPage() {
   const renderTrigger = (id: string, label: string, icon: LucideIcon) => (
     <AccordionTrigger
       onClick={() => setOpenItem(openItem === id ? null : id)}
-      className="w-full !no-underline !p-0 bg-transparent focus-visible:ring-0 focus-visible:outline-none"
+      className="w-full no-underline p-0 bg-transparent focus-visible:ring-0 focus-visible:outline-none"
     >
       <SmoothTrigger icon={icon} isOpen={openItem === id}>
         {label}
@@ -93,7 +93,7 @@ export default function SopAccordionPage() {
   )
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-gray-50 py-16 px-6">
+    <main className="min-h-screen bg-linear-to-b from-blue-50 via-white to-gray-50 py-16 px-6">
       {/* HEADER */}
       <motion.header
         initial={{ opacity: 0, y: -25 }}
@@ -110,7 +110,7 @@ export default function SopAccordionPage() {
         <p className="text-gray-500 mt-2 text-sm">
           Nomor: 7.2.4.3.2/IT2.II.3/2020 — Biro Manajemen Aset ITS
         </p>
-        <div className="h-[3px] w-24 bg-blue-600 mx-auto mt-6 rounded-full" />
+        <div className="h-0.75 w-24 bg-blue-600 mx-auto mt-6 rounded-full" />
       </motion.header>
 
       {/* ACCORDION */}
@@ -193,7 +193,7 @@ export default function SopAccordionPage() {
             {renderTrigger("item-5", "5. Rincian Prosedur", ClipboardList)}
             <MotionContent isOpen={openItem === "item-5"}>
               <table className="min-w-full border border-gray-200 text-sm bg-white rounded-lg overflow-hidden shadow-sm">
-                <thead className="bg-gradient-to-r from-blue-100 to-blue-50 text-gray-700 font-semibold">
+                <thead className="bg-linear-to-r from-blue-100 to-blue-50 text-gray-700 font-semibold">
                   <tr>
                     <th className="border px-3 py-2 text-left w-10">No</th>
                     <th className="border px-3 py-2 text-left w-52">Penanggung Jawab</th>
@@ -271,7 +271,7 @@ export default function SopAccordionPage() {
         transition={{ delay: 0.6, duration: 1 }}
         className="text-center text-gray-500 mt-16 text-sm"
       >
-        <div className="h-[2px] w-24 bg-blue-600 mx-auto mb-4 rounded-full" />
+        <div className="h-0.5 w-24 bg-blue-600 mx-auto mb-4 rounded-full" />
         <p className="font-medium">Subbagian Layanan Transportasi</p>
         <p>Biro Manajemen Aset – Institut Teknologi Sepuluh Nopember (ITS)</p>
         <p className="mt-1 text-gray-400 italic">

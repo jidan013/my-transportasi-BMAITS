@@ -22,7 +22,6 @@ Api.interceptors.request.use(
   }
 );
 
-// ✅ Response interceptor - handle errors
 Api.interceptors.response.use(
   (response) => response,
   (error) => {
