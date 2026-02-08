@@ -299,7 +299,7 @@ export default function LaporanPage() {
 
       {/* === DASHBOARD METRICS === */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="border-0 shadow-lg hover:shadow-xl transition-all bg-gradient-to-br from-primary/10 to-primary/5">
+        <Card className="border-0 shadow-lg hover:shadow-xl transition-all bg-linear-to-br from-primary/10 to-primary/5">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <IconFileReport className="h-4 w-4" />
@@ -313,7 +313,7 @@ export default function LaporanPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-lg hover:shadow-xl transition-all bg-gradient-to-br from-green-500/10 to-green-500/5">
+        <Card className="border-0 shadow-lg hover:shadow-xl transition-all bg-linear-to-br from-green-500/10 to-green-500/5">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2 text-sm font-medium text-green-600 font-semibold">
               <IconCar className="h-4 w-4" />
@@ -327,7 +327,7 @@ export default function LaporanPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-lg hover:shadow-xl transition-all bg-gradient-to-br from-yellow-500/10 to-yellow-500/5">
+        <Card className="border-0 shadow-lg hover:shadow-xl transition-all bg-linear-to-br from-yellow-500/10 to-yellow-500/5">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2 text-sm font-medium text-yellow-600 font-semibold">
               <IconClock className="h-4 w-4" />
@@ -341,7 +341,7 @@ export default function LaporanPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-lg hover:shadow-xl transition-all bg-gradient-to-br from-destructive/10 to-destructive/5">
+        <Card className="border-0 shadow-lg hover:shadow-xl transition-all bg-linear-to-br from-destructive/10 to-destructive/5">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2 text-sm font-medium text-destructive font-semibold">
               <IconUsers className="h-4 w-4" />

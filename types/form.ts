@@ -4,7 +4,8 @@ import type { Vehicle } from './vehicle';
 export interface FormData {
   nama: string;
   nrp: string;
-  vehicle_id: string;  // string untuk <select>
+  unit_kerja: string;
+  vehicle_id: string;
   tanggal_peminjaman: string;
   tanggal_kembali: string;
   keperluan: string;

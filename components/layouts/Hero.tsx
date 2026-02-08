@@ -67,19 +67,19 @@ export default function Hero() {
           Ajukan peminjaman kendaraan dinas dengan mudah, cepat, dan transparan.
         </p>
 
-        {/* CTA Buttons */}
+        {/* CTA Buttons
         <div className="flex flex-col sm:flex-row gap-5 justify-center items-center animate-fade-up animation-delay-700">
           <Link
             href="/jadwal"
             className="group relative inline-flex items-center gap-3 px-9 py-4 bg-white text-[#001f5b] font-bold text-lg rounded-2xl shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 hover:-translate-y-1 active:scale-95"
           >
             <IconPlus className="w-6 h-6 transition-transform duration-500 group-hover:rotate-90" />
-            <span>Ajukan Peminjaman</span>
+            <span>Lihat Jadwal Kendaraan</span>
 
             {/* Hover Effect Overlay */}
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+            {/* <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
           </Link>
-        </div>
+        </div> */} 
 
         {/* Scroll Hint */}
         <p className="mt-16 text-white/60 text-sm animate-pulse">

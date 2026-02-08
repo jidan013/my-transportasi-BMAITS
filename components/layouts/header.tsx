@@ -34,7 +34,7 @@ export default function Header({ stats }: HeaderProps) {
 
   return (
     <motion.header
-      initial={false} // ⬅️ PENTING: cegah animasi ulang saat refresh
+      initial={false} 
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
       className="sticky top-0 z-50 bg-white/95 dark:bg-gray-900/95
@@ -46,7 +46,7 @@ export default function Header({ stats }: HeaderProps) {
           {items.map((item, i) => (
             <motion.div
               key={`${uid}-stat-${i}`}
-              initial={false} // ⬅️ cegah re-animate
+              initial={false}
               animate={{ opacity: 1 }}
               transition={{ delay: i * 0.05 }}
               className="flex items-center gap-2"
