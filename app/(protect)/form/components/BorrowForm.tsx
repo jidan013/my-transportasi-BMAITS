@@ -261,7 +261,7 @@ export default function BorrowForm() {
 
         <div className="sm:col-span-2">
           <label className="block font-semibold text-sm mb-2">
-            Unit Kerja *
+            Unit / Departemen *
           </label>
           {errors.unit_kerja && (
             <p className="text-red-500 text-xs">{errors.unit_kerja}</p>
@@ -272,7 +272,7 @@ export default function BorrowForm() {
             onChange={handleChange}
             className="w-full px-4 py-3 border rounded-xl"
           >
-            <option value="">Pilih Unit Kerja</option>
+            <option value="">Pilih Unit / Departemen</option>
             <optgroup label="Direktorat">
               {UNIT_KERJA_ITS.direktorat.map((item) => (
                 <option key={item} value={item}>
@@ -318,7 +318,7 @@ export default function BorrowForm() {
 
         <div className="sm:col-span-2">
           <label className="block font-semibold text-sm mb-2">
-            Kendaraan *
+            Jenis Kendaraan *
           </label>
           {errors.vehicle_id && (
             <p className="text-red-500 text-xs">{errors.vehicle_id}</p>
@@ -333,7 +333,7 @@ export default function BorrowForm() {
             <option value="">
               {loadingAvailable
                 ? "Memuat kendaraan..."
-                : "Pilih kendaraan"}
+                : "Pilih jenis kendaraan"}
             </option>
             {availableVehicles.map((v) => (
               <option key={v.id} value={v.id}>
