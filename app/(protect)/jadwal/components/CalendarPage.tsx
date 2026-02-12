@@ -2,15 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { getBookingSchedule } from "@/lib/services/booking-service";
-import type { Booking } from "@/types/booking"; // pastikan path sesuai
+import type { Booking } from "@/types/booking"; 
 import { CalendarDays, ChevronLeft, ChevronRight, Loader2, Clock, Users, Building, FileText } from "lucide-react";
 import { format, startOfWeek, endOfWeek, addDays, isSameDay, isWithinInterval, parseISO } from "date-fns";
 import { id } from "date-fns/locale";
 
-// Warna ITS resmi (berdasarkan brand assets: Congress Blue #20417F sebagai navy utama)
-const ITS_PRIMARY = "#20417F";
-const ITS_GRADIENT = "linear-gradient(to right, #20417F, #3a5ca3)";
-const ITS_LIGHT_BG = "#f0f5ff";
+const ITS_linear = "linear-linear(to right, #20417F, #3a5ca3)";
 
 type ViewMode = "month" | "week" | "day";
 
@@ -93,13 +90,13 @@ export default function KalenderPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/40">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 via-white to-blue-50/40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
         {/* Header */}
         <div className="mb-12 text-center md:text-left">
           <h1
             className="text-3xl md:text-3xl lg:text-3xl font-extrabold tracking-tight bg-clip-text text-transparent"
-            style={{ backgroundImage: ITS_GRADIENT }}
+            style={{ backgroundImage: ITS_linear }}
           >
             Kalender Peminjaman Kendaraan
           </h1>
@@ -128,7 +125,7 @@ export default function KalenderPage() {
             <button
               onClick={goToday}
               className="flex items-center gap-2.5 px-6 py-3.5 rounded-2xl font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 active:scale-95"
-              style={{ backgroundImage: ITS_GRADIENT }}
+              style={{ backgroundImage: ITS_linear }}
             >
               <CalendarDays className="w-5 h-5" />
               Hari Ini
@@ -146,7 +143,7 @@ export default function KalenderPage() {
                   px-6 py-3 rounded-xl font-medium transition-all duration-300 relative
                   ${viewMode === mode ? "text-white shadow-lg scale-105" : "text-gray-700 hover:text-gray-900 hover:bg-gray-100/60"}
                 `}
-                style={viewMode === mode ? { backgroundImage: ITS_GRADIENT } : {}}
+                style={viewMode === mode ? { backgroundImage: ITS_linear } : {}}
               >
                 {mode === "month" ? "Bulan" : mode === "week" ? "Minggu" : "Hari"}
                 {viewMode === mode && (
@@ -161,7 +158,7 @@ export default function KalenderPage() {
         <div className="transition-all duration-500">
           {viewMode === "month" && (
             <div className="bg-white rounded-3xl shadow-2xl border border-gray-100/80 overflow-hidden">
-              <div className="grid grid-cols-7" style={{ backgroundImage: ITS_GRADIENT }}>
+              <div className="grid grid-cols-7" style={{ backgroundImage: ITS_linear }}>
                 {["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"].map((d) => (
                   <div key={d} className="py-6 text-center font-semibold text-white text-base border-r border-blue-900/30 last:border-r-0">
                     {d}
@@ -176,7 +173,7 @@ export default function KalenderPage() {
                   return (
                     <div
                       key={`prev-${i}`}
-                      className="min-h-[120px] lg:min-h-[180px] p-4 border-b border-r border-gray-100 bg-gray-50/50 text-gray-400 text-sm font-medium cursor-pointer hover:bg-gray-100/70"
+                      className="min-h-30 lg:min-h-45 p-4 border-b border-r border-gray-100 bg-gray-50/50 text-gray-400 text-sm font-medium cursor-pointer hover:bg-gray-100/70"
                       onClick={() => handleDayClick(new Date(year, month - 1, day))}
                     >
                       {day}
@@ -196,9 +193,9 @@ export default function KalenderPage() {
                     <div
                       key={day}
                       className={`
-                        group relative min-h-[120px] lg:min-h-[180px] p-5 border-b border-r border-gray-100 
+                        group relative min-h-30 lg:min-h-45 p-5 border-b border-r border-gray-100 
                         transition-all duration-300 hover:shadow-2xl hover:scale-[1.03] cursor-pointer
-                        ${isToday ? "bg-gradient-to-br from-blue-50 to-white" : "hover:bg-blue-50/30"}
+                        ${isToday ? "bg-linear-to-br from-blue-50 to-white" : "hover:bg-blue-50/30"}
                         ${bookedCount > 0 ? "bg-amber-50/40" : ""}
                       `}
                       onClick={() => handleDayClick(date)}
@@ -216,14 +213,14 @@ export default function KalenderPage() {
 
                       {bookedCount > 0 && (
                         <div className="absolute bottom-5 left-5 right-5">
-                          <span className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-sm font-semibold px-4 py-2 rounded-full shadow-md">
+                          <span className="inline-flex items-center gap-2 bg-linear-to-r from-amber-500 to-amber-600 text-white text-sm font-semibold px-4 py-2 rounded-full shadow-md">
                             <span className="w-2.5 h-2.5 rounded-full bg-white animate-pulse" />
                             DIPINJAM
                           </span>
                         </div>
                       )}
 
-                      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                      <div className="absolute inset-0 bg-linear-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                     </div>
                   );
                 })}
@@ -232,7 +229,7 @@ export default function KalenderPage() {
                 {Array.from({ length: (7 - ((firstDay - 1 + daysInMonth) % 7)) % 7 }).map((_, i) => (
                   <div
                     key={`next-${i}`}
-                    className="min-h-[120px] lg:min-h-[180px] p-4 border-b border-r border-gray-100 bg-gray-50/50 text-gray-400 text-sm font-medium cursor-pointer hover:bg-gray-100/70"
+                    className="min-h-30 lg:min-h-45 p-4 border-b border-r border-gray-100 bg-gray-50/50 text-gray-400 text-sm font-medium cursor-pointer hover:bg-gray-100/70"
                     onClick={() => handleDayClick(new Date(year, month + 1, i + 1))}
                   >
                     {i + 1}
@@ -244,7 +241,7 @@ export default function KalenderPage() {
 
           {viewMode === "week" && (
             <div className="bg-white rounded-3xl shadow-2xl border border-gray-100/80 overflow-hidden">
-              <div className="grid grid-cols-7" style={{ backgroundImage: ITS_GRADIENT }}>
+              <div className="grid grid-cols-7" style={{ backgroundImage: ITS_linear }}>
                 {weekDays.map((date) => (
                   <div
                     key={formatDate(date)}
@@ -265,9 +262,9 @@ export default function KalenderPage() {
                     <div
                       key={dateStr}
                       className={`
-                        group relative min-h-[220px] lg:min-h-[320px] p-5 border-r border-gray-100 last:border-r-0
+                        group relative min-h-55 lg:min-h-80 p-5 border-r border-gray-100 last:border-r-0
                         transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] cursor-pointer
-                        ${isToday ? "bg-gradient-to-br from-blue-50 to-white" : "hover:bg-blue-50/30"}
+                        ${isToday ? "bg-linear-to-br from-blue-50 to-white" : "hover:bg-blue-50/30"}
                         ${dayBookings.length > 0 ? "bg-amber-50/40" : ""}
                       `}
                       onClick={() => handleDayClick(date)}
@@ -295,7 +292,7 @@ export default function KalenderPage() {
                         <div className="text-center text-gray-500 mt-16 font-medium">Tersedia</div>
                       )}
 
-                      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                      <div className="absolute inset-0 bg-linear-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                     </div>
                   );
                 })}
@@ -320,7 +317,7 @@ export default function KalenderPage() {
                   {dayBookings.map((b, idx) => (
                     <div
                       key={idx}
-                      className="bg-gradient-to-r from-amber-50 to-white p-7 rounded-2xl shadow-md border border-amber-100 hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"
+                      className="bg-linear-to-r from-amber-50 to-white p-7 rounded-2xl shadow-md border border-amber-100 hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"
                     >
                       <div className="flex items-center gap-4 mb-5">
                         <Users className="w-7 h-7 text-amber-700" />
