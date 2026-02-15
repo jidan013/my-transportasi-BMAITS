@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import axios from "axios";
 import {
   submitBooking,
   getAvailableVehicles,
@@ -42,17 +41,12 @@ const UNIT_KERJA_ITS = {
 
 interface BorrowFormData {
   nama: string;
-  nrp: string;
+  nrp: number;
   unit_kerja: string;
   vehicle_id: string;
-  tanggal_peminjaman: string;
+  tanggal_pinjam: string;
   tanggal_kembali: string;
   keperluan: string;
-}
-
-interface ApiErrorResponse {
-  message?: string;
-  errors?: Record<string, string[]>;
 }
 
 /* ================= COMPONENT ================= */
@@ -67,15 +61,15 @@ export default function BorrowForm() {
 
   const [formData, setFormData] = useState<BorrowFormData>({
     nama: "",
-    nrp: "",
+    nrp: 0,
     unit_kerja: "",
     vehicle_id: "",
-    tanggal_peminjaman: "",
+    tanggal_pinjam: "",
     tanggal_kembali: "",
     keperluan: "",
   });
 
-  /* ================= HANDLERS ================= */
+  /* ================= HANDLER ================= */
 
   const handleChange = useCallback(
     (
@@ -85,7 +79,10 @@ export default function BorrowForm() {
     ) => {
       const { name, value } = e.target;
 
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({
+        ...prev,
+        [name]: name === "nrp" ? Number(value) || 0 : value,
+      }));
 
       setErrors((prev) => {
         const next = { ...prev };
@@ -96,69 +93,35 @@ export default function BorrowForm() {
     []
   );
 
-  /* ================= FETCH VEHICLES ================= */
+  /* ================= FETCH AVAILABLE VEHICLES ================= */
 
   const fetchVehicles = useCallback(async () => {
-    const { tanggal_peminjaman, tanggal_kembali } = formData;
+    const { tanggal_pinjam, tanggal_kembali } = formData;
 
-    if (!tanggal_peminjaman || !tanggal_kembali) {
+    if (!tanggal_pinjam || !tanggal_kembali) {
       setAvailableVehicles([]);
-      return;
-    }
-
-    const start = new Date(tanggal_peminjaman);
-    const end = new Date(tanggal_kembali);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    if (start < today || end <= start) {
-      setAvailableVehicles([]);
-      setErrors((prev) => ({
-        ...prev,
-        vehicle_id:
-          start < today
-            ? "Tanggal pinjam harus hari ini atau setelahnya"
-            : "Tanggal kembali harus setelah tanggal pinjam",
-      }));
       return;
     }
 
     setLoadingAvailable(true);
-    setErrors((prev) => {
-      const next = { ...prev };
-      delete next.vehicle_id;
-      return next;
-    });
 
     try {
       const vehicles = await getAvailableVehicles({
-        tanggal_peminjaman,
+        tanggal_pinjam,
         tanggal_kembali,
       });
 
-      setAvailableVehicles(vehicles ?? []);
-    } catch (error: unknown) {
-      if (axios.isAxiosError<ApiErrorResponse>(error)) {
-        setErrors((prev) => ({
-          ...prev,
-          vehicle_id:
-            error.response?.status === 422
-              ? "Tidak ada kendaraan tersedia pada tanggal tersebut"
-              : error.response?.data?.message ??
-                "Gagal memuat kendaraan tersedia",
-        }));
-      } else {
-        setErrors((prev) => ({
-          ...prev,
-          vehicle_id: "Terjadi kesalahan tidak terduga",
-        }));
-      }
-
+      setAvailableVehicles(vehicles);
+    } catch {
       setAvailableVehicles([]);
+      setErrors((prev) => ({
+        ...prev,
+        vehicle_id: "Gagal memuat kendaraan tersedia",
+      }));
     } finally {
       setLoadingAvailable(false);
     }
-  }, [formData.tanggal_peminjaman, formData.tanggal_kembali]);
+  }, [formData.tanggal_pinjam, formData.tanggal_kembali]);
 
   useEffect(() => {
     fetchVehicles();
@@ -170,14 +133,11 @@ export default function BorrowForm() {
     const newErrors: Partial<Record<keyof BorrowFormData, string>> = {};
 
     if (!formData.nama.trim()) newErrors.nama = "Nama wajib diisi";
-    if (!formData.nrp.trim()) newErrors.nrp = "NRP wajib diisi";
-    if (!/^\d+$/.test(formData.nrp))
-      newErrors.nrp = "NRP harus berupa angka";
-    if (!formData.unit_kerja)
-      newErrors.unit_kerja = "Unit kerja wajib dipilih";
+    if (!formData.nrp) newErrors.nrp = "NRP wajib berupa angka";
+    if (!formData.unit_kerja) newErrors.unit_kerja = "Unit kerja wajib dipilih";
     if (!formData.vehicle_id) newErrors.vehicle_id = "Pilih kendaraan";
-    if (!formData.tanggal_peminjaman)
-      newErrors.tanggal_peminjaman = "Tanggal pinjam wajib";
+    if (!formData.tanggal_pinjam)
+      newErrors.tanggal_pinjam = "Tanggal pinjam wajib";
     if (!formData.tanggal_kembali)
       newErrors.tanggal_kembali = "Tanggal kembali wajib";
     if (!formData.keperluan.trim())
@@ -191,50 +151,41 @@ export default function BorrowForm() {
     try {
       const payload: BookingPayload = {
         nama: formData.nama.trim(),
-        nrp: formData.nrp.trim(),
+        nrp: formData.nrp,
         unit_kerja: formData.unit_kerja,
         vehicle_id: Number(formData.vehicle_id),
-        tanggal_peminjaman: formData.tanggal_peminjaman,
+        tanggal_pinjam: formData.tanggal_pinjam,
         tanggal_kembali: formData.tanggal_kembali,
-        detail_keperluan: formData.keperluan.trim(),
+        keperluan: formData.keperluan.trim(),
       };
 
       await submitBooking(payload);
+
       alert("✅ Booking berhasil diajukan!");
 
       setFormData({
         nama: "",
-        nrp: "",
+        nrp: 0,
         unit_kerja: "",
         vehicle_id: "",
-        tanggal_peminjaman: "",
+        tanggal_pinjam: "",
         tanggal_kembali: "",
         keperluan: "",
       });
 
       setAvailableVehicles([]);
       setErrors({});
-    } catch (error: unknown) {
-      if (axios.isAxiosError<ApiErrorResponse>(error)) {
-        alert(
-          error.response?.data?.message ??
-            "❌ Gagal mengajukan peminjaman"
-        );
-      } else {
-        alert("❌ Terjadi kesalahan sistem");
-      }
+    } catch (err: unknown) {
+      alert("❌ Gagal mengajukan peminjaman");
     } finally {
       setLoading(false);
     }
   }, [formData]);
 
-  /* ================= UI ================= */
+  /* ================= UI (TIDAK DIUBAH) ================= */
 
   return (
-    <div className="max-w-4xl mx-auto p-6 border-2 border-gray-500 rounded-3xl bg-white shadow-2xl">
-      {/* <h1 className="text-3xl font-bold mb-8 text-gray-800">
-        Peminjaman Kendaraan
-      </h1> */}
+       <div className="max-w-4xl mx-auto p-6 border-2 border-gray-300 rounded-3xl bg-white shadow-2xl">
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
@@ -296,8 +247,8 @@ export default function BorrowForm() {
           </label>
           <input
             type="date"
-            name="tanggal_peminjaman"
-            value={formData.tanggal_peminjaman}
+            name="tanggal_pinjam"
+            value={formData.tanggal_pinjam}
             onChange={handleChange}
             className="w-full px-4 py-3 border rounded-xl"
           />

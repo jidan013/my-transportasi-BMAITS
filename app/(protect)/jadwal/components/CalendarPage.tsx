@@ -2,89 +2,142 @@
 
 import { useEffect, useState } from "react";
 import { getBookingSchedule } from "@/lib/services/booking-service";
-import type { Booking } from "@/types/booking"; 
-import { CalendarDays, ChevronLeft, ChevronRight, Loader2, Clock, Users, Building, FileText } from "lucide-react";
-import { format, startOfWeek, endOfWeek, addDays, isSameDay, isWithinInterval, parseISO } from "date-fns";
+import type { Booking } from "@/types/booking";
+import {
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+  Clock,
+  Users,
+  Building,
+  FileText,
+} from "lucide-react";
+import {
+  format,
+  startOfWeek,
+  endOfWeek,
+  addDays,
+  isSameDay,
+  isWithinInterval,
+  parseISO,
+} from "date-fns";
 import { id } from "date-fns/locale";
 
-const ITS_linear = "linear-linear(to right, #20417F, #3a5ca3)";
+const ITS_linear = "linear-gradient(to right, #20417F, #3a5ca3)";
 
 type ViewMode = "month" | "week" | "day";
 
 export default function KalenderPage() {
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<ViewMode>("month");
 
-  const formatDate = (d: Date) => format(d, "yyyy-MM-dd");
+  const formatDate = (d: Date): string => format(d, "yyyy-MM-dd");
 
+  /* ================= FETCH DATA ================= */
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const start = formatDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
-        const end = formatDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 2, 0));
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const start = formatDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+      const end = formatDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 2, 0));
 
-        const res = await getBookingSchedule({ start_date: start, end_date: end });
-        setBookings(res.filter((b) => b.status_pengajuan === "disetujui"));
-      } catch (err) {
-        console.error("Gagal memuat jadwal:", err);
-      } finally {
-        setLoading(false);
+      
+      const res: Booking[] = await getBookingSchedule({
+        start_date: start,
+        end_date: end,
+      });
+
+      setBookings(
+        Array.isArray(res)
+          ? res.filter((b) => b.status_booking === "disetujui")
+          : []
+      );
+    } catch (error) {
+      console.error("Gagal memuat jadwal:", error);
+      setBookings([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchData();
+}, [currentDate.getFullYear(), currentDate.getMonth()]);
+
+  /* ================= SAFE DATE FILTER ================= */
+  const getBookingsForDay = (dateStr: string): Booking[] => {
+    return bookings.filter((b: Booking) => {
+      if (!b.tanggal_pinjam || !b.tanggal_kembali) return false;
+
+      const start = parseISO(b.tanggal_pinjam);
+      const end = parseISO(b.tanggal_kembali);
+      const target = parseISO(dateStr);
+
+      if (
+        isNaN(start.getTime()) ||
+        isNaN(end.getTime()) ||
+        isNaN(target.getTime())
+      ) {
+        return false;
       }
-    };
-    fetchData();
-  }, [currentDate.getFullYear(), currentDate.getMonth()]);
 
-  const getBookingsForDay = (dateStr: string) =>
-    bookings.filter((b) =>
-      isWithinInterval(parseISO(dateStr), {
-        start: parseISO(b.tanggal_peminjam),
-        end: parseISO(b.tanggal_kembali),
-      })
-    );
-
-  const isBooked = (dateStr: string) => getBookingsForDay(dateStr).length > 0;
+      return isWithinInterval(target, { start, end });
+    });
+  };
 
   const todayStr = formatDate(new Date());
 
-  const goPrev = () => {
-    if (viewMode === "month") setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
-    else if (viewMode === "week") setCurrentDate(addDays(currentDate, -7));
-    else if (viewMode === "day") setCurrentDate(addDays(currentDate, -1));
+  /* ================= NAVIGATION ================= */
+  const goPrev = (): void => {
+    if (viewMode === "month")
+      setCurrentDate(
+        new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
+      );
+    else if (viewMode === "week")
+      setCurrentDate(addDays(currentDate, -7));
+    else setCurrentDate(addDays(currentDate, -1));
   };
 
-  const goNext = () => {
-    if (viewMode === "month") setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
-    else if (viewMode === "week") setCurrentDate(addDays(currentDate, 7));
-    else if (viewMode === "day") setCurrentDate(addDays(currentDate, 1));
+  const goNext = (): void => {
+    if (viewMode === "month")
+      setCurrentDate(
+        new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
+      );
+    else if (viewMode === "week")
+      setCurrentDate(addDays(currentDate, 7));
+    else setCurrentDate(addDays(currentDate, 1));
   };
 
-  const goToday = () => setCurrentDate(new Date());
+  const goToday = (): void => setCurrentDate(new Date());
 
-  // Month helpers
+  /* ================= HELPERS ================= */
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
   const firstDay = new Date(year, month, 1).getDay() || 7;
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const prevMonthDays = new Date(year, month, 0).getDate();
 
-  // Week helpers
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
-  const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+  const weekDays: Date[] = Array.from({ length: 7 }, (_, i) =>
+    addDays(weekStart, i)
+  );
 
-  // Day helpers
   const currentDayStr = formatDate(currentDate);
   const dayBookings = getBookingsForDay(currentDayStr);
 
-  const title = {
+  const title: string = {
     month: format(currentDate, "MMMM yyyy", { locale: id }),
-    week: `${format(weekStart, "d MMM", { locale: id })} – ${format(endOfWeek(weekStart, { weekStartsOn: 1 }), "d MMM yyyy", { locale: id })}`,
+    week: `${format(weekStart, "d MMM", { locale: id })} – ${format(
+      endOfWeek(weekStart, { weekStartsOn: 1 }),
+      "d MMM yyyy",
+      { locale: id }
+    )}`,
     day: format(currentDate, "EEEE, dd MMMM yyyy", { locale: id }),
   }[viewMode];
 
-  const handleDayClick = (date: Date) => {
+  const handleDayClick = (date: Date): void => {
     setCurrentDate(date);
     setViewMode("day");
   };
@@ -358,7 +411,7 @@ export default function KalenderPage() {
 
                         <div>
                           <div className="font-medium">Mulai</div>
-                          <div>{b.tanggal_peminjam}</div>
+                          <div>{b.tanggal_pinjam}</div>
                         </div>
 
                         <div>

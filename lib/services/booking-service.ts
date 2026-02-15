@@ -44,7 +44,7 @@ export const getBookingSchedule = async (params: {
 
 // 🚘 Available vehicles by date
 export const getAvailableVehicles = async (params: {
-  tanggal_peminjaman: string;
+  tanggal_pinjam: string;
   tanggal_kembali: string;
 }) => {
   const res = await api.get<Vehicle[]>("/v1/booking/available-vehicles", { params });

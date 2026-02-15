@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-
 const ADMIN_ROUTES = ["/adminbma/dashboard", "/laporan", "/permintaan"];
 
 function isAdminRoute(pathname: string): boolean {
@@ -10,57 +9,56 @@ function isAdminRoute(pathname: string): boolean {
   );
 }
 
-
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Bukan route admin → lanjut
   if (!isAdminRoute(pathname)) {
     return NextResponse.next();
   }
 
-  try {
-    const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL;
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-    if (!apiUrl) {
-      console.error("API_URL not defined");
+  if (!apiUrl) {
+    console.error("NEXT_PUBLIC_API_URL not defined");
+    return NextResponse.redirect(new URL("/adminbma/login", req.url));
+  }
+
+  try {
+    const res = await fetch(`${apiUrl}/v1/adminbma/me`, {
+      method: "GET",
+      credentials: "include", 
+      headers: {
+        Accept: "application/json",
+      },
+      cache: "no-store",
+    });
+
+    // ❌ Belum login / cookie invalid
+    if (res.status === 401) {
       return NextResponse.redirect(
         new URL("/adminbma/login", req.url)
       );
     }
 
-    const res = await fetch(`${apiUrl}/v1/adminbma/me`, {
-      method: "GET",
-      headers: {
-        Cookie: req.headers.get("cookie") ?? "",
-        Accept: "application/json",
-      },
-      credentials: "include",
-      cache: "no-store",
-    });
-
     if (!res.ok) {
-      return NextResponse.redirect(
-        new URL("/adminbma/login", req.url)
-      );
+      // error lain → jangan paksa logout
+      console.error("Auth check failed:", res.status);
+      return NextResponse.next();
     }
 
     const user = await res.json();
 
+    // ❌ Bukan admin
     if (user?.role !== "admin") {
-      return NextResponse.redirect(
-        new URL("/", req.url)
-      );
+      return NextResponse.redirect(new URL("/", req.url));
     }
 
-  
+    // ✅ Aman
     return NextResponse.next();
-  } catch (error) {
-    console.error("Middleware auth error:", error);
-
-    return NextResponse.redirect(
-      new URL("/adminbma/login", req.url)
-    );
+  } catch (err) {
+    // ❗ network error → JANGAN logout paksa
+    console.error("Middleware network error:", err);
+    return NextResponse.next();
   }
 }
 

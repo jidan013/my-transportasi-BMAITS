@@ -6,10 +6,10 @@ export interface Booking {
   nrp: number;
   unit_kerja: string;
   vehicle_id: number;
-  tanggal_peminjam: string;
+  tanggal_pinjam: string;
   tanggal_kembali: string;
   keperluan: string;
-  status_pengajuan: "menunggu" | "disetujui" | "ditolak" | "dikembalikan";
+  status_booking: "menunggu" | "disetujui" | "ditolak" | "dikembalikan";
   created_at: string;
   updated_at: string;
   vehicle?: Vehicle;
@@ -17,10 +17,10 @@ export interface Booking {
 
 export interface BookingPayload {
   nama: string;
-  nrp: string;
+  nrp: number;
   unit_kerja: string;
   vehicle_id: number;
-  tanggal_peminjaman: string; 
+  tanggal_pinjam: string; 
   tanggal_kembali: string; 
-  detail_keperluan: string;
+  keperluan: string;
 }

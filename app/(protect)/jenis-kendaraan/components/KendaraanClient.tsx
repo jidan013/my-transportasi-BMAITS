@@ -92,7 +92,7 @@ export default function KendaraanPage(): JSX.Element {
   }
 
   return (
-    <main className="w-screen min-h-screen bg-gradient-to-b from-blue-50 via-white to-gray-50 px-8 py-10">
+    <main className="w-screen min-h-screen bg-linear-to-b from-blue-50 via-white to-gray-50 px-8 py-10">
       {/* HEADER */}
       <motion.div
         initial={{ opacity: 0, y: -25 }}
@@ -106,9 +106,9 @@ export default function KendaraanPage(): JSX.Element {
       </motion.div>
 
       {/* CHART */}
-      <section className="min-h-[480px] bg-white rounded-2xl shadow p-6 mb-10">
+      <section className="min-h-120 bg-white rounded-2xl shadow p-6 mb-10">
         <h2 className="font-semibold mb-4">📊 Pemakaian Bulanan</h2>
-        <div className="w-full h-[480px]">
+        <div className="w-full h-120">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={pemakaianBulanan}>
               <CartesianGrid strokeDasharray="3 3" />
