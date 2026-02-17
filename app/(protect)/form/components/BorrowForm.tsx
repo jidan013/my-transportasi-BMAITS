@@ -1,10 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import {
-  submitBooking,
-  getAvailableVehicles,
-} from "@/lib/services/booking-service";
+import axios, { isAxiosError } from "axios";
 import type { BookingPayload } from "@/types/booking";
 import type { Vehicle } from "@/types/vehicle";
 
@@ -106,12 +103,11 @@ export default function BorrowForm() {
     setLoadingAvailable(true);
 
     try {
-      const vehicles = await getAvailableVehicles({
-        tanggal_pinjam,
-        tanggal_kembali,
+      const res = await axios.get("/api/bookings/available-vehicles", {
+        params: { tanggal_pinjam, tanggal_kembali },
       });
 
-      setAvailableVehicles(vehicles);
+      setAvailableVehicles(res.data.data); // ⬅️ sesuai response BE
     } catch {
       setAvailableVehicles([]);
       setErrors((prev) => ({
@@ -159,7 +155,7 @@ export default function BorrowForm() {
         keperluan: formData.keperluan.trim(),
       };
 
-      await submitBooking(payload);
+      await axios.post("/api/bookings", payload);
 
       alert("✅ Booking berhasil diajukan!");
 
@@ -176,17 +172,20 @@ export default function BorrowForm() {
       setAvailableVehicles([]);
       setErrors({});
     } catch (err: unknown) {
-      alert("❌ Gagal mengajukan peminjaman");
-    } finally {
-      setLoading(false);
-    }
+  if (isAxiosError(err) && err.response?.status === 409) {
+    alert(err.response.data.message);
+  } else {
+    alert("❌ Gagal mengajukan peminjaman");
+  }
+} finally {
+  setLoading(false);
+}
   }, [formData]);
 
   /* ================= UI (TIDAK DIUBAH) ================= */
 
   return (
-       <div className="max-w-4xl mx-auto p-6 border-2 border-gray-300 rounded-3xl bg-white shadow-2xl">
-
+    <div className="max-w-4xl mx-auto p-6 border-2 border-gray-300 rounded-3xl bg-white shadow-2xl">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
           <label className="block font-semibold text-sm mb-2">Nama *</label>
@@ -288,7 +287,7 @@ export default function BorrowForm() {
             </option>
             {availableVehicles.map((v) => (
               <option key={v.id} value={v.id}>
-                {v.nama_kendaraan} - {v.nomor_polisi}
+                {v.nama_kendaraan} - {v.no_plat}
               </option>
             ))}
           </select>

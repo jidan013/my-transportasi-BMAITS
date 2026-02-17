@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const ADMIN_ROUTES = ["/adminbma/dashboard", "/laporan", "/permintaan"];
+const ADMIN_ROUTES = [
+  "/adminbma/dashboard",
+  "/laporan",
+  "/permintaan",
+];
 
 function isAdminRoute(pathname: string): boolean {
   return ADMIN_ROUTES.some(
@@ -12,52 +16,52 @@ function isAdminRoute(pathname: string): boolean {
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
+  // ⛔ Bukan route admin → lewat
   if (!isAdminRoute(pathname)) {
     return NextResponse.next();
   }
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
   if (!apiUrl) {
-    console.error("NEXT_PUBLIC_API_URL not defined");
     return NextResponse.redirect(new URL("/adminbma/login", req.url));
   }
+
+  // 🔑 KUNCI UTAMA: forward cookie browser ke BE
+  const cookie = req.headers.get("cookie");
 
   try {
     const res = await fetch(`${apiUrl}/v1/adminbma/me`, {
       method: "GET",
-      credentials: "include", 
       headers: {
         Accept: "application/json",
+        Cookie: cookie ?? "",
       },
       cache: "no-store",
     });
 
-    // ❌ Belum login / cookie invalid
+    // ❌ Belum login / session invalid
     if (res.status === 401) {
       return NextResponse.redirect(
         new URL("/adminbma/login", req.url)
       );
     }
 
+    // ⚠️ Error lain (timeout, 500, dll) → jangan paksa logout
     if (!res.ok) {
-      // error lain → jangan paksa logout
-      console.error("Auth check failed:", res.status);
       return NextResponse.next();
     }
 
     const user = await res.json();
 
-    // ❌ Bukan admin
+    // ❌ Login tapi bukan admin
     if (user?.role !== "admin") {
       return NextResponse.redirect(new URL("/", req.url));
     }
 
-    // ✅ Aman
+    // ✅ Login & admin
     return NextResponse.next();
-  } catch (err) {
-    // ❗ network error → JANGAN logout paksa
-    console.error("Middleware network error:", err);
+  } catch {
+    // ❗ Network error → JANGAN logout
     return NextResponse.next();
   }
 }

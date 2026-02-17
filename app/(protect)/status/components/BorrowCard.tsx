@@ -86,7 +86,6 @@ export default function BorrowCard({
   const doc = new jsPDF("p", "mm", "a4");
 
   const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
 
   const marginLeft = 25;
   const marginRight = 25;
@@ -258,7 +257,7 @@ kerja sama Bapak/Ibu, kami ucapkan terima kasih.
       {/* HEADER */}
       <div className="flex justify-between mb-5">
         <div className="flex gap-4">
-          <div className="p-2 rounded-xl bg-gradient-to-br from-[#00AEEF] to-[#002D72]">
+          <div className="p-2 rounded-xl bg-linear-to-br from-[#00AEEF] to-[#002D72]">
             <IconCar className="w-5 h-5 text-white" />
           </div>
           <div>
