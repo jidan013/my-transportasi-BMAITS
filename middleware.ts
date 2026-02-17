@@ -26,7 +26,6 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/adminbma/login", req.url));
   }
 
-  // 🔑 KUNCI UTAMA: forward cookie browser ke BE
   const cookie = req.headers.get("cookie");
 
   try {
