@@ -3,37 +3,8 @@
 import { useState, useCallback } from "react";
 import { getVehicles } from "@/lib/services/vehicle";
 import { getApprovedBookings } from "@/lib/services/booking-service";
-
-export type VehicleStatus = "tersedia" | "dipinjam";
-
-export interface Vehicle {
-  id: number;
-  nama_kendaraan: string;
-  jenis_kendaraan: string;
-  warna_kendaraan: string;
-  nomor_polisi: string;
-  bahan_bakar: string;
-  kapasitas_penumpang: number;
-  status_ketersediaan: VehicleStatus;
-  created_at: string;
-  updated_at: string;
-}
-
-
-export interface Booking {
-  id: number;
-  nama: string;
-  nrp: number;
-  unit_kerja: string;
-  vehicle_id: number;
-  tanggal_peminjam: string;
-  tanggal_kembali: string;
-  keperluan: string;
-  status_pengajuan: "menunggu" | "disetujui" | "ditolak" | "dikembalikan";
-  created_at: string;
-  updated_at: string;
-  vehicle?: Vehicle;
-}
+import type { Vehicle } from "@/types/vehicle";
+import type { Booking } from "@/types/booking";
 
 interface ApiError {
   message: string;
@@ -60,7 +31,7 @@ export default function TestAPIPage() {
         Nama: v.nama_kendaraan,
         Jenis: v.jenis_kendaraan,
         Status: v.status_ketersediaan,
-        Polisi: v.nomor_polisi
+        Polisi: v.no_plat
       })));
       
       setVehiclesData(data);
@@ -88,9 +59,9 @@ export default function TestAPIPage() {
         ID: b.id,
         Nama: b.nama,
         NRP: b.nrp,
-        Status: b.status_pengajuan,
+        Status: b.status_booking,
         Vehicle: b.vehicle_id,
-        Mulai: b.tanggal_peminjam.slice(0, 10)
+        Mulai: b.tanggal_pinjam.slice(0, 10)
       })));
       
       setBookingsData(data);
@@ -156,7 +127,7 @@ export default function TestAPIPage() {
                   <div key={vehicle.id} className="p-3 bg-gray-50 rounded-lg border">
                     <div className="font-mono text-sm text-gray-900">{vehicle.nama_kendaraan}</div>
                     <div className="text-xs text-gray-600">
-                      {vehicle.jenis_kendaraan} • {vehicle.nomor_polisi}
+                      {vehicle.jenis_kendaraan} • {vehicle.no_plat}
                     </div>
                     <div className={`text-xs font-medium mt-1 px-2 py-1 rounded-full w-fit ${
                       vehicle.status_ketersediaan === 'tersedia' 
@@ -224,7 +195,7 @@ export default function TestAPIPage() {
                     </div>
                     <div className="flex flex-col sm:flex-row gap-2 items-end sm:items-center">
                       <div className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-mono">
-                        {new Date(booking.tanggal_peminjam).toLocaleDateString('id-ID')}
+                        {new Date(booking.tanggal_pinjam).toLocaleDateString('id-ID')}
                       </div>
                       <span className="text-xs text-gray-500">→</span>
                       <div className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-mono">
