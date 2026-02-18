@@ -24,6 +24,7 @@ export interface BorrowItem {
   plate: string;
   borrowDate: string;
   returnDate: string;
+  keperluan: string;
   status: "approved" | "pending" | "rejected" | "terbit";
   timeline: TimelineItem[];
 }
@@ -33,6 +34,7 @@ export interface BorrowCardProps {
   borrower: string;
   vehicle: string;
   plate: string;
+  keperluan: string;
   borrowDate: string;
   returnDate: string;
   status: BorrowStatus;

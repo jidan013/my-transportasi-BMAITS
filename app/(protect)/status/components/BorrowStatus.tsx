@@ -17,6 +17,7 @@ const mockHistory: BorrowItem[] = [
     plate: "B 1234 XYZ",
     borrowDate: "2025-10-12",
     returnDate: "2025-10-13",
+    keperluan: "Kegiatan monitoring lapangan",
     status: "terbit", 
     timeline: [
       { key: "diajukan", label: "Diajukan", time: "12 Okt 2025" },
@@ -32,6 +33,7 @@ const mockHistory: BorrowItem[] = [
     plate: "L 4321 ABC",
     borrowDate: "2025-09-28",
     returnDate: "2025-09-29",
+    keperluan: "Kunjungan kerja",
     status: "rejected",
     timeline: [
       { key: "diajukan", label: "Diajukan", time: "28 Sep 2025" },
@@ -45,6 +47,7 @@ const mockHistory: BorrowItem[] = [
     plate: "N 9988 DD",
     borrowDate: "2025-10-05",
     returnDate: "2025-10-10",
+    keperluan: "Kegiatan monitoring lapangan",
     status: "rejected",
     timeline: [
       { key: "diajukan", label: "Diajukan", time: "5 Okt 2025" },
@@ -58,6 +61,7 @@ const mockHistory: BorrowItem[] = [
     plate: "B 7744 TT",
     borrowDate: "2025-11-01",
     returnDate: "2025-11-03",
+    keperluan: "Kegiatan monitoring lapangan",
     status: "pending",
     timeline: [{ key: "diajukan", label: "Diajukan", time: "1 Nov 2025" }],
   },
