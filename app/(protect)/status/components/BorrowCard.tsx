@@ -12,12 +12,12 @@ import {
 } from "@tabler/icons-react";
 import type { IconProps } from "@tabler/icons-react";
 import type { ComponentType, ReactNode } from "react";
-import { jsPDF } from "jspdf";
 import type {
   BorrowStatus,
   TimelineKey,
   BorrowCardProps,
 } from "@/types/times";
+import { approveBooking } from "@/lib/services/booking-service";
 
 /* =====================
    TYPES
@@ -81,176 +81,24 @@ export default function BorrowCard({
   const statusMeta = statusConfig[status];
 
   /* =====================
-     PDF GENERATOR — OFFICIAL ITS
+     DOWNLOAD PDF (FROM BE)
   ===================== */
-  const handleDownloadESurat = () => {
-    const doc = new jsPDF("p", "mm", "a4");
+  const handleDownloadESurat = async () => {
+    try {
+      const res = await approveBooking(id);
 
-    const pageWidth = doc.internal.pageSize.getWidth();
+      if (!res.downloadUrl) {
+        alert("❌ File PDF tidak tersedia");
+        return;
+      }
 
-    const marginLeft = 25;
-    const marginRight = 25;
-    const contentWidth = pageWidth - marginLeft - marginRight;
-
-    let y = 30;
-
-    /* =====================
-       KOP SURAT (ITS STYLE)
-    ===================== */
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(14);
-    doc.text(
-      "INSTITUT TEKNOLOGI SEPULUH NOPEMBER",
-      pageWidth / 2,
-      y,
-      { align: "center" }
-    );
-
-    y += 7;
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.text(
-      "Kampus ITS Sukolilo, Surabaya 60111, Indonesia",
-      pageWidth / 2,
-      y,
-      { align: "center" }
-    );
-
-    y += 5;
-    doc.text(
-      "Telepon (031) 5994251 | https://www.its.ac.id",
-      pageWidth / 2,
-      y,
-      { align: "center" }
-    );
-
-    y += 6;
-    doc.setLineWidth(0.8);
-    doc.line(marginLeft, y, pageWidth - marginRight, y);
-
-    /* =====================
-       JUDUL SURAT
-    ===================== */
-    y += 18;
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(12);
-    doc.text(
-      "SURAT IZIN PEMINJAMAN KENDARAAN DINAS",
-      pageWidth / 2,
-      y,
-      { align: "center" }
-    );
-
-    /* =====================
-       NOMOR & PERIHAL
-    ===================== */
-    y += 15;
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    doc.text(`Nomor   : ${id}/ITS/BMA/2025`, marginLeft, y);
-    y += 6;
-    doc.text("Perihal : Izin Peminjaman Kendaraan Dinas", marginLeft, y);
-
-    /* =====================
-       TUJUAN
-    ===================== */
-    y += 16;
-    doc.text("Kepada Yth.", marginLeft, y);
-    y += 6;
-    doc.text("Kepala Biro Manajemen Aset", marginLeft, y);
-    y += 6;
-    doc.text("Institut Teknologi Sepuluh Nopember", marginLeft, y);
-    y += 6;
-    doc.text("Surabaya", marginLeft, y);
-
-    /* =====================
-       ISI SURAT
-    ===================== */
-    y += 14;
-    const isiSurat = `
-Dengan hormat,
-
-Sehubungan dengan pelaksanaan kegiatan kedinasan di lingkungan
-Institut Teknologi Sepuluh Nopember, bersama ini kami mengajukan
-permohonan izin peminjaman kendaraan dinas dengan rincian sebagai berikut:
-  `.trim();
-
-    doc.text(isiSurat, marginLeft, y, {
-      maxWidth: contentWidth,
-      lineHeightFactor: 1.5,
-    });
-
-    /* =====================
-       DATA PEMINJAMAN
-    ===================== */
-    y += 34;
-    doc.setFont("helvetica", "bold");
-    doc.text("DATA PEMINJAMAN", marginLeft, y);
-
-    y += 10;
-    doc.setFont("helvetica", "normal");
-
-    const labelX = marginLeft;
-    const valueX = marginLeft + 45;
-
-    doc.text("Nama Peminjam", labelX, y);
-    doc.text(`: ${borrower}`, valueX, y);
-
-    y += 7;
-    doc.text("Jenis Kendaraan", labelX, y);
-    doc.text(`: ${vehicle}`, valueX, y);
-
-    y += 7;
-    doc.text("Nomor Polisi", labelX, y);
-    doc.text(`: ${plate}`, valueX, y);
-
-    y += 7;
-    doc.text("Tanggal Peminjaman", labelX, y);
-    doc.text(
-      `: ${new Date(borrowDate).toLocaleDateString("id-ID")} s.d. ${new Date(
-        returnDate
-      ).toLocaleDateString("id-ID")}`,
-      valueX,
-      y
-    );
-
-    y += 7;
-    doc.text("Keperluan", labelX, y);
-    doc.text(`: ${keperluan}`, valueX, y);
-
-    /* =====================
-       PENUTUP
-    ===================== */
-    y += 16;
-    const penutup = `
-Demikian permohonan izin ini kami sampaikan. Atas perhatian dan
-kerja sama Bapak/Ibu, kami ucapkan terima kasih.
-  `.trim();
-
-    doc.text(penutup, marginLeft, y, {
-      maxWidth: contentWidth,
-      lineHeightFactor: 1.5,
-    });
-
-    /* =====================
-       TANDA TANGAN
-    ===================== */
-    y += 35;
-    const ttdX = pageWidth - marginRight - 70;
-
-    doc.text("Surabaya, ........................................", ttdX, y);
-    y += 18;
-    doc.text("Kepala Biro Manajemen Aset", ttdX, y);
-    y += 22;
-    doc.setFont("helvetica", "bold");
-    doc.text("Yayuk Pamikatsih, S.Pd.", ttdX, y);
-
-
-    /* =====================
-       SAVE
-    ===================== */
-    doc.save(`E-Surat-Peminjaman-Kendaraan-ITS-${id}.pdf`);
+      // buka file dari Laravel
+      window.open(res.downloadUrl, "_blank");
+    } catch (error) {
+      alert("❌ Gagal mengunduh E-Surat");
+    }
   };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}

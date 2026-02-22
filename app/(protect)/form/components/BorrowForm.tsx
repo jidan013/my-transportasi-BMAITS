@@ -206,7 +206,7 @@ export default function BorrowForm() {
         </div>
 
         <div>
-          <label className="block font-semibold text-sm mb-2">NRP *</label>
+          <label className="block font-semibold text-sm mb-2">NRP / NIP*</label>
           {errors.nrp && <p className="text-red-500 text-xs">{errors.nrp}</p>}
           <input
             name="nrp"
