@@ -1,9 +1,15 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import axios, { isAxiosError } from "axios";
+import { isAxiosError } from "axios";
+
 import type { BookingPayload } from "@/types/booking";
 import type { Vehicle } from "@/types/vehicle";
+
+import {
+  submitBooking,
+  getAvailableVehicles,
+} from "@/lib/services/booking-service";
 
 /* ================= DATA UNIT KERJA ITS ================= */
 
@@ -103,11 +109,12 @@ export default function BorrowForm() {
     setLoadingAvailable(true);
 
     try {
-      const res = await axios.get("/api/bookings/available-vehicles", {
-        params: { tanggal_pinjam, tanggal_kembali },
+      const vehicles = await getAvailableVehicles({
+        tanggal_pinjam,
+        tanggal_kembali,
       });
 
-      setAvailableVehicles(res.data.data); // ⬅️ sesuai response BE
+      setAvailableVehicles(vehicles);
     } catch {
       setAvailableVehicles([]);
       setErrors((prev) => ({
@@ -155,7 +162,7 @@ export default function BorrowForm() {
         keperluan: formData.keperluan.trim(),
       };
 
-      await axios.post("/api/bookings", payload);
+      await submitBooking(payload);
 
       alert("✅ Booking berhasil diajukan!");
 
@@ -172,14 +179,14 @@ export default function BorrowForm() {
       setAvailableVehicles([]);
       setErrors({});
     } catch (err: unknown) {
-  if (isAxiosError(err) && err.response?.status === 409) {
-    alert(err.response.data.message);
-  } else {
-    alert("❌ Gagal mengajukan peminjaman");
-  }
-} finally {
-  setLoading(false);
-}
+      if (isAxiosError(err) && err.response?.status === 409) {
+        alert(err.response.data.message);
+      } else {
+        alert("❌ Gagal mengajukan peminjaman");
+      }
+    } finally {
+      setLoading(false);
+    }
   }, [formData]);
 
   /* ================= UI (TIDAK DIUBAH) ================= */

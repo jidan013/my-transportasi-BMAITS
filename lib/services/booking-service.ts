@@ -2,9 +2,6 @@ import api from "@/lib/axios";
 import type { Booking, BookingPayload } from "@/types/booking";
 import type { Vehicle } from "@/types/vehicle";
 
-/* ===============================
-   API RESPONSE WRAPPER (Laravel)
-================================ */
 interface ApiResponse<T> {
   success: boolean;
   message?: string;
@@ -12,9 +9,6 @@ interface ApiResponse<T> {
   total?: number;
 }
 
-/* ===============================
-   PUBLIC
-================================ */
 
 //  Submit booking
 export const submitBooking = async (payload: BookingPayload) => {
