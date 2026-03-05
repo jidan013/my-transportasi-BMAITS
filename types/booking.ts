@@ -24,3 +24,13 @@ export interface BookingPayload {
   tanggal_kembali: string; 
   keperluan: string;
 }
+
+export interface BookingCalendar {
+  id: number
+  tanggal_pinjam: string
+  tanggal_kembali: string
+  vehicle: {
+    nama_kendaraan: string
+  }
+  unit_kerja: string
+}

@@ -28,6 +28,11 @@ const ITS_linear = "linear-gradient(to right, #20417F, #3a5ca3)";
 
 type ViewMode = "month" | "week" | "day";
 
+interface BookingApiResponse {
+  success?: boolean;
+  data?: Booking[];
+}
+
 export default function KalenderPage() {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -38,33 +43,36 @@ export default function KalenderPage() {
 
   /* ================= FETCH DATA ================= */
   useEffect(() => {
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const start = formatDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
-      const end = formatDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 2, 0));
+    const fetchData = async () => {
+      setLoading(true);
 
-      
-      const res: Booking[] = await getBookingSchedule({
-        start_date: start,
-        end_date: end,
-      });
+      try {
+        const start = formatDate(
+          new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
+        );
 
-      setBookings(
-        Array.isArray(res)
-          ? res.filter((b) => b.status_booking === "disetujui")
-          : []
-      );
-    } catch (error) {
-      console.error("Gagal memuat jadwal:", error);
-      setBookings([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+        const end = formatDate(
+          new Date(currentDate.getFullYear(), currentDate.getMonth() + 2, 0)
+        );
 
-  fetchData();
-}, [currentDate.getFullYear(), currentDate.getMonth()]);
+        const data = await getBookingSchedule({
+          start_date: start,
+          end_date: end,
+        });
+
+        setBookings(
+          data.filter((b) => b.status_booking === "disetujui")
+        );
+      } catch (error) {
+        console.error("Gagal memuat jadwal:", error);
+        setBookings([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [currentDate.getFullYear(), currentDate.getMonth()]);
 
   /* ================= SAFE DATE FILTER ================= */
   const getBookingsForDay = (dateStr: string): Booking[] => {
@@ -95,8 +103,7 @@ export default function KalenderPage() {
       setCurrentDate(
         new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
       );
-    else if (viewMode === "week")
-      setCurrentDate(addDays(currentDate, -7));
+    else if (viewMode === "week") setCurrentDate(addDays(currentDate, -7));
     else setCurrentDate(addDays(currentDate, -1));
   };
 
@@ -105,8 +112,7 @@ export default function KalenderPage() {
       setCurrentDate(
         new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
       );
-    else if (viewMode === "week")
-      setCurrentDate(addDays(currentDate, 7));
+    else if (viewMode === "week") setCurrentDate(addDays(currentDate, 7));
     else setCurrentDate(addDays(currentDate, 1));
   };
 
@@ -120,6 +126,7 @@ export default function KalenderPage() {
   const prevMonthDays = new Date(year, month, 0).getDate();
 
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
+
   const weekDays: Date[] = Array.from({ length: 7 }, (_, i) =>
     addDays(weekStart, i)
   );
@@ -145,7 +152,6 @@ export default function KalenderPage() {
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-50 via-white to-blue-50/40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
-        {/* Header */}
         <div className="mb-12 text-center md:text-left">
           <h1
             className="text-3xl md:text-3xl lg:text-3xl font-extrabold tracking-tight bg-clip-text text-transparent"
@@ -153,12 +159,12 @@ export default function KalenderPage() {
           >
             Kalender Peminjaman Kendaraan
           </h1>
+
           <p className="mt-4 text-lg md:text-xl text-gray-700 max-w-3xl">
             Monitoring real-time jadwal kendaraan resmi ITS
           </p>
         </div>
 
-        {/* Controls */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-10">
           <div className="flex items-center gap-4 flex-wrap">
             <button
@@ -184,7 +190,9 @@ export default function KalenderPage() {
               Hari Ini
             </button>
 
-            <h2 className="text-3xl font-bold text-gray-900 ml-2 lg:ml-6">{title}</h2>
+            <h2 className="text-3xl font-bold text-gray-900 ml-2 lg:ml-6">
+              {title}
+            </h2>
           </div>
 
           <div className="inline-flex bg-white/90 backdrop-blur-lg p-1.5 rounded-2xl shadow-xl border border-gray-200/70">
@@ -194,14 +202,18 @@ export default function KalenderPage() {
                 onClick={() => setViewMode(mode)}
                 className={`
                   px-6 py-3 rounded-xl font-medium transition-all duration-300 relative
-                  ${viewMode === mode ? "text-white shadow-lg scale-105" : "text-gray-700 hover:text-gray-900 hover:bg-gray-100/60"}
+                  ${viewMode === mode
+                    ? "text-white shadow-lg scale-105"
+                    : "text-gray-700 hover:text-gray-900 hover:bg-gray-100/60"
+                  }
                 `}
                 style={viewMode === mode ? { backgroundImage: ITS_linear } : {}}
               >
-                {mode === "month" ? "Bulan" : mode === "week" ? "Minggu" : "Hari"}
-                {viewMode === mode && (
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-8 h-1 bg-white/50 rounded-full animate-pulse" />
-                )}
+                {mode === "month"
+                  ? "Bulan"
+                  : mode === "week"
+                    ? "Minggu"
+                    : "Hari"}
               </button>
             ))}
           </div>
@@ -434,7 +446,9 @@ export default function KalenderPage() {
         {loading && (
           <div className="mt-20 flex flex-col items-center text-[#20417F] animate-pulse">
             <Loader2 className="w-14 h-14 animate-spin mb-6" />
-            <p className="text-xl font-semibold">Memuat jadwal peminjaman kendaraan...</p>
+            <p className="text-xl font-semibold">
+              Memuat jadwal peminjaman kendaraan...
+            </p>
           </div>
         )}
       </div>
