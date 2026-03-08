@@ -31,7 +31,6 @@ export default function AdminLoginPage() {
           }
         }
       } catch {
-        // Not authenticated, stay on login page
       }
     };
 
@@ -53,23 +52,22 @@ export default function AdminLoginPage() {
     setShowPassword(prev => !prev);
   };
 
-  // ✅ Type-safe error handling tanpa any
   const getErrorMessage = (err: unknown): string => {
     if (err instanceof Error) {
       return err.message;
     }
-    
+
     // Handle axios error pattern
-    const axiosError = err as { 
-      response?: { 
-        data?: { 
-          message?: string 
-        } 
-      } 
+    const axiosError = err as {
+      response?: {
+        data?: {
+          message?: string
+        }
+      }
     };
-    
-    return axiosError.response?.data?.message ?? 
-           "Login gagal. Periksa email dan password.";
+
+    return axiosError.response?.data?.message ??
+      "Login gagal. Periksa email dan password.";
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
@@ -82,18 +80,21 @@ export default function AdminLoginPage() {
 
     try {
       const res: LoginResponse = await loginAdmin(credentials);
-      
+
       console.log("Login response:", res);
-      
+
       // CEK access_token
       if (res.access_token) {
         localStorage.setItem("admin_token", res.access_token);
         localStorage.setItem("admin_user", JSON.stringify(res.user));
-        
+
+        // simpan juga di cookie untuk middleware
+        document.cookie = `admin_token=${res.access_token}; path=/; Secure; SameSite=Strict`;;
+
         console.log("💾 Token saved:", res.access_token);
-        
+
         setSuccess(true);
-        
+
         setTimeout(() => {
           console.log("🚀 Redirecting to dashboard...");
           router.push("/adminbma/dashboard");
@@ -101,7 +102,7 @@ export default function AdminLoginPage() {
       } else {
         throw new Error("Token tidak ditemukan dalam response");
       }
-      
+
     } catch (err: unknown) {
       console.error("❌ Login error:", err);
       setError(getErrorMessage(err));
