@@ -36,7 +36,7 @@ import Image from "next/image";
 import Link from "next/link";
 import api from "@/lib/axios";
 
-/* ================= NAV DATA ================= */
+/* NAV DATA */
 
 const NAV_MAIN: (NavItem & { adminOnly?: boolean })[] = [
   { title: "Dashboard", url: "/", icon: IconDashboard },
@@ -55,47 +55,23 @@ const DOCUMENTS: DocumentItem[] = [
   { name: "Kontak Admin", url: "/kontak", icon: IconHelp },
 ];
 
-/* ================= COMPONENT ================= */
-
-export default function AppSidebar(
-  props: React.ComponentPropsWithRef<typeof Sidebar>
-) {
+export default function AppSidebar(props: React.ComponentPropsWithRef<typeof Sidebar>) {
   const [user, setUser] = React.useState<Admin | null>(null);
   const [loading, setLoading] = React.useState(true);
 
-  const fetchedRef = React.useRef(false);
-
   React.useEffect(() => {
-    if (fetchedRef.current) return;
-    fetchedRef.current = true;
-
-    let isMounted = true;
-
     api
-      .get<Admin>("/v1/adminbma/me")
-      .then((res) => {
-        if (isMounted) setUser(res.data);
-      })
-      .catch(() => {
-        if (isMounted) setUser(null);
-      })
-      .finally(() => {
-        if (isMounted) setLoading(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
+      .get<Admin>("/v1/adminbma/me") 
+      .then((res) => setUser(res.data))
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false));
   }, []);
 
   if (loading) return null;
 
-  const filteredNavMain = NAV_MAIN.filter((item) => {
-    if (item.adminOnly) {
-      return user?.role === "admin";
-    }
-    return true;
-  });
+  const filteredNavMain = NAV_MAIN.filter((item) =>
+    item.adminOnly ? user?.role === "admin" : true
+  );
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -104,13 +80,7 @@ export default function AppSidebar(
           <SidebarMenuItem>
             <Link href="/">
               <SidebarMenuButton>
-                <Image
-                  src="/Logo.png"
-                  alt="Logo"
-                  width={220}
-                  height={48}
-                  priority
-                />
+                <Image src="/Logo.png" alt="Logo" width={220} height={48} priority />
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
@@ -127,9 +97,7 @@ export default function AppSidebar(
         {user ? (
           <NavUser user={{ name: user.name, email: user.email }} />
         ) : (
-          <div className="p-4 text-xs text-muted-foreground text-center">
-            Guest
-          </div>
+          <div className="p-4 text-xs text-muted-foreground text-center">Guest</div>
         )}
       </SidebarFooter>
     </Sidebar>

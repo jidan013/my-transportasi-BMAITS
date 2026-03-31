@@ -5,72 +5,55 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { loginAdmin, getAdminMe } from "@/lib/services/auth-service";
 import type { LoginResponse, LoginPayload } from "@/types/auth";
+import type { AxiosError } from "axios";
 
 export default function AdminLoginPage() {
   const router = useRouter();
 
   const [credentials, setCredentials] = useState<LoginPayload>({
     email: "",
-    password: ""
+    password: "",
   });
+
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  // 🔍 CEK TOKEN DI COOKIE
   useEffect(() => {
-    let isMounted = true;
-
-    const checkAuth = async (): Promise<void> => {
+    const verify = async () => {
       try {
-        const token = localStorage.getItem("admin_token");
-        if (token) {
-          await getAdminMe();
-          if (isMounted) {
-            router.replace("/adminbma/dashboard");
-          }
-        }
+        await getAdminMe();      // axios otomatis kirim cookie
+        router.replace("/adminbma/dashboard");
       } catch {
+        // token tidak valid → tetap di login
       }
     };
-
-    checkAuth();
-    return () => { isMounted = false; };
+    verify();
   }, [router]);
 
-  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    setCredentials(prev => ({ ...prev, email: e.target.value }));
+  // 🎯 CHANGE HANDLER
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setCredentials((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     if (error) setError(null);
   };
 
-  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    setCredentials(prev => ({ ...prev, password: e.target.value }));
-    if (error) setError(null);
-  };
+  const togglePassword = () => setShowPassword((prev) => !prev);
 
-  const togglePassword = (): void => {
-    setShowPassword(prev => !prev);
-  };
-
-  const getErrorMessage = (err: unknown): string => {
-    if (err instanceof Error) {
-      return err.message;
+  // 🎯 STRONG TYPED AXIOS ERROR HANDLER
+  const getErrorMessage = (err: AxiosError | Error): string => {
+    if ("response" in err) {
+      return (
+        (err.response?.data as { message?: string })?.message ||
+        "Login gagal. Cek email & password."
+      );
     }
-
-    // Handle axios error pattern
-    const axiosError = err as {
-      response?: {
-        data?: {
-          message?: string
-        }
-      }
-    };
-
-    return axiosError.response?.data?.message ??
-      "Login gagal. Periksa email dan password.";
+    return err.message || "Terjadi kesalahan.";
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+  // 🎯 HANDLE LOGIN
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (loading) return;
 
@@ -81,31 +64,25 @@ export default function AdminLoginPage() {
     try {
       const res: LoginResponse = await loginAdmin(credentials);
 
-      console.log("Login response:", res);
-
-      // CEK access_token
-      if (res.access_token) {
-        localStorage.setItem("admin_token", res.access_token);
-        localStorage.setItem("admin_user", JSON.stringify(res.user));
-
-        // simpan juga di cookie untuk middleware
-        document.cookie = `admin_token=${res.access_token}; path=/; Secure; SameSite=Strict`;;
-
-        console.log("💾 Token saved:", res.access_token);
-
-        setSuccess(true);
-
-        setTimeout(() => {
-          console.log("🚀 Redirecting to dashboard...");
-          router.push("/adminbma/dashboard");
-        }, 1500);
-      } else {
-        throw new Error("Token tidak ditemukan dalam response");
+      if (!res.access_token) {
+        throw new Error("Token tidak ditemukan pada response backend.");
       }
 
-    } catch (err: unknown) {
-      console.error("❌ Login error:", err);
-      setError(getErrorMessage(err));
+      // ------------------------------
+      // ✔ SIMPAN TOKEN KE COOKIE
+      // ------------------------------
+      document.cookie =
+        `token=${res.access_token}; Path=/; Secure; SameSite=Lax`;
+
+      setSuccess(true);
+
+      setTimeout(() => {
+        router.push("/adminbma/dashboard");
+      }, 800);
+
+    } catch (err) {
+      const errorMsg = getErrorMessage(err as AxiosError);
+      setError(errorMsg);
       setSuccess(false);
     } finally {
       setLoading(false);
@@ -115,48 +92,47 @@ export default function AdminLoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-100 px-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 space-y-6">
+        
         <div className="text-center">
           <h1 className="text-2xl font-bold">Admin Panel</h1>
           <p className="text-sm text-slate-500">Login administrator</p>
         </div>
 
         {error && (
-          <div className="p-3 bg-red-100 rounded-xl text-sm text-red-700" role="alert">
+          <div className="p-3 bg-red-100 rounded-xl text-sm text-red-700">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+        <form onSubmit={handleSubmit} className="space-y-4">
           <input
-            id="email"
-            type="email"
             name="email"
+            type="email"
+            value={credentials.email}
+            onChange={handleChange}
+            placeholder="admin@its.ac.id"
             required
             disabled={loading || success}
-            value={credentials.email}
-            onChange={handleEmailChange}
-            placeholder="admin@its.ac.id"
             className="w-full px-4 py-3 border rounded-xl disabled:bg-gray-100"
           />
 
           <div className="relative">
             <input
-              id="password"
-              type={showPassword ? "text" : "password"}
               name="password"
+              type={showPassword ? "text" : "password"}
+              value={credentials.password}
+              onChange={handleChange}
+              placeholder="••••••••"
               required
               disabled={loading || success}
-              value={credentials.password}
-              onChange={handlePasswordChange}
-              placeholder="••••••••"
               className="w-full px-4 py-3 border rounded-xl pr-12 disabled:bg-gray-100"
             />
+
             <button
               type="button"
               onClick={togglePassword}
               disabled={loading || success}
-              className="absolute inset-y-0 right-3 text-slate-500 disabled:opacity-50"
-              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="absolute inset-y-0 right-3 text-slate-500"
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
@@ -165,7 +141,7 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={loading || success}
-            className="w-full bg-black text-white py-3 rounded-xl flex justify-center items-center gap-2 disabled:opacity-50 hover:bg-gray-900 transition-colors"
+            className="w-full bg-black text-white py-3 rounded-xl flex justify-center items-center gap-2 disabled:opacity-50"
           >
             {loading && <Loader2 className="animate-spin" size={18} />}
             {success ? "✓ Login berhasil!" : "Masuk Admin"}
