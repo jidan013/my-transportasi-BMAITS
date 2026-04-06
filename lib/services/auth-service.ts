@@ -8,6 +8,15 @@ export const loginAdmin = async (
   return res.data;
 };
 
+// Tambahkan helper ini di atas auth-service.ts
+const getCookie = (name: string) => {
+  if (typeof document === "undefined") return null;
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift();
+  return null;
+};
+
 export const getAdminMe = async (): Promise<Admin> => {
   const token = localStorage.getItem("admin_token");
 
