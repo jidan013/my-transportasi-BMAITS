@@ -15,33 +15,36 @@ export default function AdminLoginPage() {
     password: "",
   });
 
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [success, setSuccess] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 🔍 CEK TOKEN DI COOKIE
+  // CEK TOKEN AWAL
   useEffect(() => {
+    let mounted = true;
+
     const verify = async () => {
       try {
-        await getAdminMe();      // axios otomatis kirim cookie
-        router.replace("/adminbma/dashboard");
+        await getAdminMe();
+        if (mounted) router.replace("/adminbma/dashboard");
       } catch {
-        // token tidak valid → tetap di login
+        // tetap di halaman login
       }
     };
+
     verify();
+
+    return () => {
+      mounted = false;
+    };
   }, [router]);
 
-  // 🎯 CHANGE HANDLER
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setCredentials((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     if (error) setError(null);
   };
 
-  const togglePassword = () => setShowPassword((prev) => !prev);
-
-  // 🎯 STRONG TYPED AXIOS ERROR HANDLER
   const getErrorMessage = (err: AxiosError | Error): string => {
     if ("response" in err) {
       return (
@@ -52,7 +55,6 @@ export default function AdminLoginPage() {
     return err.message || "Terjadi kesalahan.";
   };
 
-  // 🎯 HANDLE LOGIN
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (loading) return;
@@ -64,22 +66,14 @@ export default function AdminLoginPage() {
     try {
       const res: LoginResponse = await loginAdmin(credentials);
 
-      if (!res.access_token) {
-        throw new Error("Token tidak ditemukan pada response backend.");
-      }
-
-      // ------------------------------
-      // ✔ SIMPAN TOKEN KE COOKIE
-      // ------------------------------
-      document.cookie =
-        `token=${res.access_token}; Path=/; Secure; SameSite=Lax`;
+      // SIMPAN TOKEN DI COOKIE
+      document.cookie = `token=${res.access_token}; Path=/; SameSite=Lax; Max-Age=86400`;
 
       setSuccess(true);
 
       setTimeout(() => {
         router.push("/adminbma/dashboard");
       }, 800);
-
     } catch (err) {
       const errorMsg = getErrorMessage(err as AxiosError);
       setError(errorMsg);
@@ -130,7 +124,7 @@ export default function AdminLoginPage() {
 
             <button
               type="button"
-              onClick={togglePassword}
+              onClick={() => setShowPassword(!showPassword)}
               disabled={loading || success}
               className="absolute inset-y-0 right-3 text-slate-500"
             >
