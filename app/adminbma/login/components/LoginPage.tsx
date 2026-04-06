@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { loginAdmin, getAdminMe } from "@/lib/services/auth-service";
 import type { LoginResponse, LoginPayload } from "@/types/auth";
-import type { AxiosError } from "axios";
+import axios, { AxiosError } from "axios";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -20,16 +20,26 @@ export default function AdminLoginPage() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // CEK TOKEN AWAL
+  // CEK TOKEN AWAL - TypeScript Safe
   useEffect(() => {
     let mounted = true;
 
     const verify = async () => {
+      // Pastikan kode berjalan di client side sebelum akses document.cookie
+      if (typeof document === "undefined") return;
+
+      const hasToken = document.cookie
+        .split(';')
+        .some((item) => item.trim().startsWith('token='));
+      
+      if (!hasToken) return;
+
       try {
         await getAdminMe();
         if (mounted) router.replace("/adminbma/dashboard");
-      } catch {
-        // tetap di halaman login
+      } catch (err) {
+        // Jika token tidak valid, biarkan di halaman login
+        console.log("Unauthorized session");
       }
     };
 
@@ -41,18 +51,21 @@ export default function AdminLoginPage() {
   }, [router]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setCredentials((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setCredentials((prev) => ({ ...prev, [name]: value }));
     if (error) setError(null);
   };
 
-  const getErrorMessage = (err: AxiosError | Error): string => {
-    if ("response" in err) {
-      return (
-        (err.response?.data as { message?: string })?.message ||
-        "Login gagal. Cek email & password."
-      );
+  // Helper Error Message dengan Type Guard yang tepat
+  const getErrorMessage = (err: unknown): string => {
+    if (axios.isAxiosError(err)) {
+      const data = err.response?.data as { message?: string; errors?: Record<string, string[]> };
+      return data?.message || "Login gagal. Cek email & password.";
     }
-    return err.message || "Terjadi kesalahan.";
+    if (err instanceof Error) {
+      return err.message;
+    }
+    return "Terjadi kesalahan koneksi ke server.";
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -67,7 +80,9 @@ export default function AdminLoginPage() {
       const res: LoginResponse = await loginAdmin(credentials);
 
       // SIMPAN TOKEN DI COOKIE
-      document.cookie = `token=${res.access_token}; Path=/; SameSite=Lax; Max-Age=86400`;
+      if (typeof document !== "undefined") {
+        document.cookie = `token=${res.access_token}; Path=/; SameSite=Lax; Max-Age=86400`;
+      }
 
       setSuccess(true);
 
@@ -75,8 +90,7 @@ export default function AdminLoginPage() {
         router.push("/adminbma/dashboard");
       }, 800);
     } catch (err) {
-      const errorMsg = getErrorMessage(err as AxiosError);
-      setError(errorMsg);
+      setError(getErrorMessage(err));
       setSuccess(false);
     } finally {
       setLoading(false);

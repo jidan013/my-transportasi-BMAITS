@@ -13,6 +13,7 @@ export const getAdminMe = async (): Promise<Admin> => {
 
   const res = await api.get<Admin>("/v1/adminbma/me", {
     headers: {
+      Accept: "application/json",
       Authorization: `Bearer ${token}`,
     },
   });
