@@ -1,32 +1,22 @@
 "use client";
 
 import {
-  IconDotsVertical,
-  IconLogout,
-  IconLogin,
+  IconDotsVertical, IconLogout, IconLogin,
 } from "@tabler/icons-react";
 import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
+  Avatar, AvatarFallback, AvatarImage,
 } from "@/components/ui/avatar";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
+  DropdownMenu, DropdownMenuContent, DropdownMenuGroup,
+  DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
+  SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { logoutAdmin } from "@/lib/services/auth-service";
 
 interface User {
   name: string;
@@ -37,59 +27,49 @@ interface User {
 export function NavUser({
   user,
   isGuest = false,
+  onLogout,  // ✅ ADD optional onLogout
 }: {
-  user: User;
+  user?: User;  // ✅ Optional user
   isGuest?: boolean;
+  onLogout?: () => void;  // ✅ From parent
 }) {
   const { isMobile } = useSidebar();
   const { user: authUser } = useAuth();
 
-  const handleLogout = (): void => {
-    localStorage.removeItem("admin_token");
-    localStorage.removeItem("admin_user");
-    document.cookie = "admin_token=; path=/; max-age=0; SameSite=lax";
-    window.location.href = "/adminbma/login";
+  const handleLogout = async () => {
+    try {
+      await logoutAdmin();  // BE + clear cookie
+    } catch {
+      // Safe fallback
+    }
+    window.location.replace("/adminbma/login");  // ✅ FULL PAGE REPLACE
   };
 
   // Guest / belum login
-  if (isGuest || !authUser) {
+  if (isGuest || !user || !authUser) {
     return (
       <SidebarMenu>
         <SidebarMenuItem>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <SidebarMenuButton
-                size="lg"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-              >
+              <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
                 <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-blue-100 text-blue-600 rounded-lg font-medium">
-                    ?
-                  </AvatarFallback>
+                  <AvatarFallback className="bg-blue-100 text-blue-600 rounded-lg font-medium">?</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">Tamu</span>
-                  <span className="text-muted-foreground truncate text-xs">
-                    Administrator
-                  </span>
+                  <span className="text-muted-foreground truncate text-xs">Administrator</span>
                 </div>
                 <IconDotsVertical className="ml-auto size-4" />
               </SidebarMenuButton>
             </DropdownMenuTrigger>
-            <DropdownMenuContent
-              className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-              side={isMobile ? "bottom" : "right"}
-              align="end"
-              sideOffset={4}
-            >
-              <DropdownMenuLabel>
-                Logout as Guest
-              </DropdownMenuLabel>
+            <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg" side={isMobile ? "bottom" : "right"} align="end" sideOffset={4}>
+              <DropdownMenuLabel>Logout as Guest</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link href="/adminbma/login" className="flex items-center">
                   <IconLogin className="mr-2 h-4 w-4" />
-                  <span>Logout</span> 
+                  <span>Login</span>
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -105,62 +85,41 @@ export function NavUser({
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
+            <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
               <Avatar className="h-8 w-8 rounded-lg grayscale">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">
-                  {user.name.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
+                <AvatarFallback className="rounded-lg">{user.name.slice(0, 2).toUpperCase()}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
-                <span className="text-muted-foreground truncate text-xs">
-                  {user.email}
-                </span>
+                <span className="text-muted-foreground truncate text-xs">{user.email}</span>
               </div>
               <IconDotsVertical className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "right"}
-            align="end"
-            sideOffset={4}
-          >
+          <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg" side={isMobile ? "bottom" : "right"} align="end" sideOffset={4}>
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">
-                    {user.name.slice(0, 2).toUpperCase()}
-                  </AvatarFallback>
+                  <AvatarFallback className="rounded-lg">{user.name.slice(0, 2).toUpperCase()}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
-                  <span className="text-muted-foreground truncate text-xs">
-                    {user.email}
-                  </span>
+                  <span className="text-muted-foreground truncate text-xs">{user.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              {authUser?.role === "admin" && ( 
+              {authUser?.role === "admin" && (
                 <DropdownMenuItem asChild>
-                  <Link href="/admin" className="flex items-center">
-                    Panel Admin
-                  </Link>
+                  <Link href="/admin" className="flex items-center">Panel Admin</Link>
                 </DropdownMenuItem>
               )}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              onClick={handleLogout} 
-              className="cursor-pointer flex items-center"
-            >
+            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer flex items-center">
               <IconLogout className="mr-2 h-4 w-4" />
               Logout
             </DropdownMenuItem>

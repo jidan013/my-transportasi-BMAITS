@@ -1,17 +1,11 @@
+// AppSidebar.tsx - FULLY FIXED (copy langsung)
 "use client";
 
 import * as React from "react";
 import {
-  IconCalendar,
-  IconCar,
-  IconDashboard,
-  IconDatabase,
-  IconFile,
-  IconHistory,
-  IconReport,
-  IconHelp,
-  IconCurrencyDollar,
-  IconPhoto,
+  IconCalendar, IconCar, IconDashboard, IconDatabase, 
+  IconFile, IconHistory, IconReport, IconHelp, 
+  IconCurrencyDollar, IconPhoto
 } from "@tabler/icons-react";
 
 import type { Admin } from "@/types/auth";
@@ -23,20 +17,15 @@ import { NavSecondary } from "@/components/home/navbar-second";
 import { NavUser } from "@/components/home/navbar-user";
 
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
+  Sidebar, SidebarContent, SidebarFooter, 
+  SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem
 } from "@/components/ui/sidebar";
 
 import Image from "next/image";
 import Link from "next/link";
 import api from "@/lib/axios";
-
-/* NAV DATA */
+import { logoutAdmin } from "@/lib/services/auth-service";
+import { useRouter } from "next/navigation";
 
 const NAV_MAIN: (NavItem & { adminOnly?: boolean })[] = [
   { title: "Dashboard", url: "/", icon: IconDashboard },
@@ -58,19 +47,33 @@ const DOCUMENTS: DocumentItem[] = [
 export default function AppSidebar(props: React.ComponentPropsWithRef<typeof Sidebar>) {
   const [user, setUser] = React.useState<Admin | null>(null);
   const [loading, setLoading] = React.useState(true);
+  const router = useRouter();
 
   React.useEffect(() => {
     api
-      .get<Admin>("/v1/adminbma/me") 
-      .then((res) => setUser(res.data))
+      .get<{ user: Admin }>("/v1/adminbma/me")
+      .then((res) => setUser(res.data.user))
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return null;
+  const handleLogout = async () => {
+    try { await logoutAdmin(); } catch {}
+    window.location.replace("/adminbma/login");  // ✅ FULL PAGE
+  };
+
+  if (loading) {
+    return (
+      <Sidebar {...props}>
+        <SidebarHeader className="p-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto" />
+        </SidebarHeader>
+      </Sidebar>
+    );
+  }
 
   const filteredNavMain = NAV_MAIN.filter((item) =>
-    item.adminOnly ? user?.role === "admin" : true
+    item.adminOnly ? user?.role === "admin" : true  // ✅ NO ERROR
   );
 
   return (
@@ -95,9 +98,9 @@ export default function AppSidebar(props: React.ComponentPropsWithRef<typeof Sid
 
       <SidebarFooter>
         {user ? (
-          <NavUser user={{ name: user.name, email: user.email }} />
+          <NavUser user={{ name: user.name, email: user.email }} onLogout={handleLogout} />
         ) : (
-          <div className="p-4 text-xs text-muted-foreground text-center">Guest</div>
+          <NavUser isGuest />
         )}
       </SidebarFooter>
     </Sidebar>

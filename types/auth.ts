@@ -1,17 +1,10 @@
 export type UserRole = "admin" | "user";
 
-export interface User {
+export interface Admin {
   id: number;
   name: string;
   email: string;
-  role: UserRole;
-}
-
-
-export interface Admin {
-  id: number;
-  email: string;
-  name?: string;  
+  role: UserRole;  // ✅ role added
 }
 
 export interface LoginPayload {
@@ -19,20 +12,17 @@ export interface LoginPayload {
   password: string;
 }
 
-
 export interface LoginResponse {
-  message: string;  
-  user: Admin;      
+  message: string;
+  user: Admin;
   access_token: string;
   token_type: "Bearer";
 }
 
-// Auth service response types
 export interface MeResponse {
   user: Admin;
 }
 
-// Frontend state types
 export interface AuthState {
   user: Admin | null;
   token: string | null;
