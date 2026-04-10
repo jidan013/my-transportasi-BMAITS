@@ -7,15 +7,11 @@ export interface User {
   role: UserRole;
 }
 
+
 export interface Admin {
   id: number;
-  name: string;
   email: string;
-  password: string;
-  remember_token?: string;
-  created_at?: string;
-  updated_at?: string;
-  role?:string;
+  name?: string;  
 }
 
 export interface LoginPayload {
@@ -23,9 +19,22 @@ export interface LoginPayload {
   password: string;
 }
 
+
 export interface LoginResponse {
-  success: boolean;
-  message: string;
+  message: string;  
+  user: Admin;      
   access_token: string;
+  token_type: "Bearer";
+}
+
+// Auth service response types
+export interface MeResponse {
   user: Admin;
+}
+
+// Frontend state types
+export interface AuthState {
+  user: Admin | null;
+  token: string | null;
+  isAuthenticated: boolean;
 }
