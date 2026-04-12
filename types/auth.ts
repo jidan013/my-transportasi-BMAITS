@@ -4,7 +4,6 @@ export interface Admin {
   id: number;
   name: string;
   email: string;
-  role: UserRole;  // ✅ role added
 }
 
 export interface LoginPayload {
