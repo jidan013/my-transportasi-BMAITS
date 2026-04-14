@@ -1,10 +1,10 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api",
   headers: {
     "Content-Type": "application/json",
-    Accept: "application/json",
+    "Accept": "application/json",
   },
 });
 
@@ -32,7 +32,7 @@ api.interceptors.response.use(
 
       if (status === 401 && !isLoginRequest) {
         document.cookie = "token=; Path=/; Max-Age=0; SameSite=Lax";
-        window.location.href = "/adminbma/login";
+        window.location.href = "http://localhost:8000/api/v1/adminbma/login";
       }
     }
     return Promise.reject(error);

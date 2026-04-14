@@ -16,18 +16,18 @@ export const saveAuth = (token: string) => {
 };
 
 export const loginAdmin = async (payload: LoginPayload): Promise<LoginResponse> => {
-  const res = await api.post<LoginResponse>("/v1/adminbma/login", payload);
+  const res = await api.post<LoginResponse>("http://localhost:8000/api/v1/adminbma/login", payload);
   return res.data;
 };
 
 export const getAdminMe = async (): Promise<Admin> => {
-  const res = await api.get<{ user: Admin }>("/v1/adminbma/me");
+  const res = await api.get<{ user: Admin }>("http://localhost:8000/api/v1/adminbma/me");
   return res.data.user;
 };
 
 export const logoutAdmin = async () => {
   try {
-    const res = await api.delete("/v1/adminbma/logout");
+    const res = await api.delete("http://localhost:8000/api/v1/adminbma/logout");
     return res.data;
   } finally {
     clearAuth();
