@@ -9,6 +9,7 @@ import {
 import {
   SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar,
 } from "@/components/ui/sidebar";
+import { toast } from "sonner";  
 import type { Admin } from "@/types/auth";
 
 export function NavUser({
@@ -23,6 +24,30 @@ export function NavUser({
   const initials = user?.email
     ? user.email.slice(0, 2).toUpperCase()
     : "G";
+
+
+  const handleLogout = async () => {
+ 
+  const toastId = toast.loading("Sedang keluar...", {
+    description: "Mohon tunggu sebentar.",
+  });
+
+  try {
+    await onLogout?.();
+
+    
+    toast.success("Logout berhasil", {
+      id: toastId,
+      description: "Anda telah keluar dari sistem.",
+    });
+  } catch {
+    
+    toast.error("Logout gagal", {
+      id: toastId,
+      description: "Terjadi kesalahan, coba lagi.",
+    });
+  }
+};
 
   return (
     <SidebarMenu>
@@ -41,7 +66,6 @@ export function NavUser({
 
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">
-                  {/* Admin tampil email, guest tampil "Tamu" */}
                   {user?.email ?? "Tamu"}
                 </span>
                 <span className="text-muted-foreground truncate text-xs">
@@ -80,16 +104,14 @@ export function NavUser({
             <DropdownMenuSeparator />
 
             {user ? (
-              // ✅ Sudah login → tampil Logout
               <DropdownMenuItem
-                onClick={onLogout}
+                onClick={handleLogout}  
                 className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
               >
                 <IconLogout className="mr-2 h-4 w-4" />
                 <span>Logout</span>
               </DropdownMenuItem>
             ) : (
-              // ✅ Guest → tidak ada tombol apapun, hanya info
               <div className="px-2 py-1.5 text-xs text-muted-foreground">
                 Anda mengakses sebagai tamu
               </div>

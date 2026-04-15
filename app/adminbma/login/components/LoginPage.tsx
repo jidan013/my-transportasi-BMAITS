@@ -2,9 +2,10 @@
 import React, { useState, FormEvent, ChangeEvent, MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { loginAdmin, saveAuth } from "@/lib/services/auth-service";  // ✅ TAMBAH saveAuth
+import { loginAdmin, saveAuth } from "@/lib/services/auth-service";
 import type { LoginPayload } from "@/types/auth";
 import axios, { AxiosError } from "axios";
+import { toast } from "sonner";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -28,31 +29,51 @@ export default function AdminLoginPage() {
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
-    e.preventDefault();
-    if (loading) return;
+  e.preventDefault();
+  if (loading) return;
 
-    setLoading(true);
-    setError(null);
+  setLoading(true);
+  setError(null);
 
-    try {
-      const response = await loginAdmin(credentials);
-      
-      saveAuth(response.access_token);
+  
+  const toastId = toast.loading("Sedang masuk...", {
+    description: "Mohon tunggu sebentar.",
+  });
 
-      window.location.replace("/adminbma/dashboard");
-      
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err)) {
-        const axiosError = err as AxiosError<{ message?: string }>;
-        const message: string = axiosError.response?.data?.message || "Login gagal. Cek email & password.";
-        setError(message);
-      } else {
-        setError("Terjadi kesalahan koneksi ke server.");
-      }
-    } finally {
-      setLoading(false);
+  try {
+    const response = await loginAdmin(credentials);
+    saveAuth(response.access_token);
+
+    
+    toast.success("Login berhasil", {
+      id: toastId,
+      description: "Selamat datang di Admin BMA!",
+    });
+
+    window.location.replace("/adminbma/dashboard");
+
+  } catch (err: unknown) {
+    if (axios.isAxiosError(err)) {
+      const axiosError = err as AxiosError<{ message?: string }>;
+      const message: string = axiosError.response?.data?.message || "Login gagal. Cek email & password.";
+      setError(message);
+
+     
+      toast.error("Login gagal", {
+        id: toastId,
+        description: message,
+      });
+    } else {
+      setError("Terjadi kesalahan koneksi ke server.");
+      toast.error("Koneksi gagal", {
+        id: toastId,
+        description: "Tidak dapat terhubung ke server.",
+      });
     }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-100 px-4">

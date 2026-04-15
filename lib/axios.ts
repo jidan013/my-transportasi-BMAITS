@@ -31,9 +31,9 @@ api.interceptors.response.use(
       const isLoginRequest = url.includes("/adminbma/login");
 
       if (status === 401 && !isLoginRequest) {
-        document.cookie = "token=; Path=/; Max-Age=0; SameSite=Lax";
-        window.location.href = "http://localhost:8000/api/v1/adminbma/login";
-      }
+  document.cookie = "token=; Path=/; Max-Age=0; SameSite=Lax";
+  window.location.href = "/adminbma/login";
+}
     }
     return Promise.reject(error);
   }
