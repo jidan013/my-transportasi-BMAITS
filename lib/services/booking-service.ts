@@ -59,7 +59,7 @@ export const getAvailableVehicles = async (params: {
   tanggal_kembali: string;
 }): Promise<Vehicle[]> => {
   const res = await api.get<ApiResponse<Vehicle[]>>(
-    "/v1/booking/available-vehicles",
+    "http://localhost:8000/api/v1/booking/available-vehicles",
     { params }
   );
 
@@ -162,7 +162,7 @@ export const getBookingDetail = async (
   id: number
 ): Promise<Booking> => {
   const res = await api.get<ApiResponse<Booking>>(
-    `/v1/booking/${id}`
+    `/v1/booking/detail/${id}`
   );
 
   if (!res.data.success) {
