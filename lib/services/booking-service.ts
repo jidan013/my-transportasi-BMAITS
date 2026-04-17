@@ -39,18 +39,16 @@ export const checkBookingByNRP = async (
 
     return res.data.data ?? [];
   } catch (err: unknown) {
-  if (axios.isAxiosError(err)) {
-    if (err.response?.status === 404) {
-      return [];
+    if (axios.isAxiosError(err)) {
+      if (err.response?.status === 404) {
+        return [];
+      }
+      throw new Error(
+        err.response?.data?.message || "Terjadi kesalahan pada server"
+      );
     }
-
-    throw new Error(
-      err.response?.data?.message || "Terjadi kesalahan pada server"
-    );
+    throw new Error("Unexpected error");
   }
-
-  throw new Error("Unexpected error");
-}
 };
 
 // Get available vehicles
@@ -59,9 +57,13 @@ export const getAvailableVehicles = async (params: {
   tanggal_kembali: string;
 }): Promise<Vehicle[]> => {
   const res = await api.get<ApiResponse<Vehicle[]>>(
-    "http://localhost:8000/api/v1/booking/available-vehicles",
-    { params }
+    "/v1/booking/available-vehicles",
+    {
+      params, 
+    }
   );
+
+  console.log("API RESPONSE:", res.data);
 
   if (!res.data.success) {
     throw new Error(res.data.message || "Gagal memuat kendaraan");
@@ -75,7 +77,6 @@ export const getApprovedBookings = async (): Promise<Booking[]> => {
   const res = await api.get<ApiResponse<Booking[]>>(
     "/v1/booking/approved"
   );
-
   return res.data.data;
 };
 
@@ -89,7 +90,6 @@ export const getBookingSchedule = async (params: {
     "/v1/booking/schedule",
     { params }
   );
-
   return res.data.data;
 };
 
@@ -100,7 +100,6 @@ export const getBookingByVehicle = async (
   const res = await api.get<ApiResponse<Booking[]>>(
     `/v1/booking/vehicle/${vehicleId}`
   );
-
   return res.data.data;
 };
 
@@ -119,7 +118,6 @@ export const getPendingBookings = async (): Promise<Booking[]> => {
   const res = await api.get<ApiResponse<Booking[]>>(
     "/v1/booking/pending"
   );
-
   return res.data.data;
 };
 

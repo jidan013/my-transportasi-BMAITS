@@ -294,7 +294,7 @@ export default function BorrowForm() {
             </option>
             {availableVehicles.map((v) => (
               <option key={v.id} value={v.id}>
-                {v.nama_kendaraan} - {v.no_plat}
+                {v.nama_kendaraan} - {v.nomor_polisi}
               </option>
             ))}
           </select>

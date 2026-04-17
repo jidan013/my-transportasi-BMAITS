@@ -5,7 +5,7 @@ export interface Vehicle {
   nama_kendaraan: string;
   jenis_kendaraan: string;
   warna_kendaraan: string;
-  no_plat: string;
+  nomor_polisi: string;
   bahan_bakar: string;
   kapasitas_penumpang: number;
   status_ketersediaan: VehicleStatus;
