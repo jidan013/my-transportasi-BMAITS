@@ -189,7 +189,7 @@ export default function BorrowForm() {
     }
   }, [formData]);
 
-  /* ================= UI (TIDAK DIUBAH) ================= */
+
 
   return (
     <div className="max-w-4xl mx-auto p-6 border-2 border-gray-300 rounded-3xl bg-white shadow-2xl">
