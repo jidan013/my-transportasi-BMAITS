@@ -15,11 +15,14 @@ interface ApiResponse<T> {
    PUBLIC (NO AUTH)
 ================================ */
 
+// VARIABEL API
+const API_URL = "http://localhost:8000/api"
+
 // Submit booking
 export const submitBooking = async (
   payload: BookingPayload
 ): Promise<Booking> => {
-  const res = await api.post<ApiResponse<Booking>>("/v1/booking", payload);
+  const res = await api.post<ApiResponse<Booking>>(`${API_URL}/v1/booking`, payload);
 
   if (!res.data.success) {
     throw new Error(res.data.message || "Gagal mengajukan peminjaman");
@@ -34,7 +37,7 @@ export const checkBookingByNRP = async (
 ): Promise<Booking[]> => {
   try {
     const res = await api.get<ApiResponse<Booking[]>>(
-      `/v1/booking/check/${nrp}`
+      `${API_URL}/v1/booking/check/${nrp}`
     );
 
     return res.data.data ?? [];
@@ -57,7 +60,7 @@ export const getAvailableVehicles = async (params: {
   tanggal_kembali: string;
 }): Promise<Vehicle[]> => {
   const res = await api.get<ApiResponse<Vehicle[]>>(
-    "/v1/booking/available-vehicles",
+    `${API_URL}/v1/booking/available-vehicles`,
     {
       params, 
     }
@@ -75,7 +78,7 @@ export const getAvailableVehicles = async (params: {
 // Approved bookings (calendar)
 export const getApprovedBookings = async (): Promise<Booking[]> => {
   const res = await api.get<ApiResponse<Booking[]>>(
-    "/v1/booking/approved"
+    `${API_URL}/v1/booking/approved`
   );
   return res.data.data;
 };
@@ -87,7 +90,7 @@ export const getBookingSchedule = async (params: {
   vehicle_id?: number;
 }): Promise<Booking[]> => {
   const res = await api.get<ApiResponse<Booking[]>>(
-    "/v1/booking/schedule",
+    `${API_URL}/v1/booking/schedule`,
     { params }
   );
   return res.data.data;
@@ -98,7 +101,7 @@ export const getBookingByVehicle = async (
   vehicleId: number
 ): Promise<Booking[]> => {
   const res = await api.get<ApiResponse<Booking[]>>(
-    `/v1/booking/vehicle/${vehicleId}`
+    `${API_URL}/v1/booking/vehicle/${vehicleId}`
   );
   return res.data.data;
 };
@@ -109,14 +112,14 @@ export const getBookingByVehicle = async (
 
 // Get all bookings
 export const getAllBookings = async (): Promise<Booking[]> => {
-  const res = await api.get<ApiResponse<Booking[]>>("/v1/booking");
+  const res = await api.get<ApiResponse<Booking[]>>(`${API_URL}/v1/booking`);
   return res.data.data;
 };
 
 // Get pending bookings
 export const getPendingBookings = async (): Promise<Booking[]> => {
   const res = await api.get<ApiResponse<Booking[]>>(
-    "/v1/booking/pending"
+    `${API_URL}/v1/booking/pending`
   );
   return res.data.data;
 };
@@ -129,7 +132,7 @@ export const approveBooking = async (
   downloadUrl: string | null;
 }> => {
   const res = await api.patch<ApiResponse<Booking>>(
-    `/v1/booking/${id}/approve`
+    `${API_URL}/v1/booking/${id}/approve`
   );
 
   if (!res.data.success) {
@@ -145,7 +148,7 @@ export const approveBooking = async (
 // Reject booking
 export const rejectBooking = async (id: number): Promise<Booking> => {
   const res = await api.patch<ApiResponse<Booking>>(
-    `/v1/booking/${id}/reject`
+    `${API_URL}/v1/booking/${id}/reject`
   );
 
   if (!res.data.success) {
@@ -160,7 +163,7 @@ export const getBookingDetail = async (
   id: number
 ): Promise<Booking> => {
   const res = await api.get<ApiResponse<Booking>>(
-    `/v1/booking/detail/${id}`
+    `${API_URL}/v1/booking/detail/${id}`
   );
 
   if (!res.data.success) {

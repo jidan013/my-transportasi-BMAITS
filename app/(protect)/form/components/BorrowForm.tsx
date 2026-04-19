@@ -2,9 +2,12 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { isAxiosError } from "axios";
+// import axios from "axios";
 
 import type { BookingPayload } from "@/types/booking";
 import type { Vehicle } from "@/types/vehicle";
+
+// import api from "@/lib/axios";
 
 import {
   submitBooking,
@@ -54,7 +57,7 @@ interface BorrowFormData {
 
 /* ================= COMPONENT ================= */
 
-export default function BorrowForm() {
+export default function   BorrowForm() {
   const [loading, setLoading] = useState(false);
   const [loadingAvailable, setLoadingAvailable] = useState(false);
   const [availableVehicles, setAvailableVehicles] = useState<Vehicle[]>([]);
