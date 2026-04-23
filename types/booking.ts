@@ -1,19 +1,21 @@
 import { Vehicle } from "./vehicle";
 
-export interface Booking {
+export type Booking = {
   id: number;
   nama: string;
-  nrp: number;
+  nrp: string;
   unit_kerja: string;
   vehicle_id: number;
   tanggal_pinjam: string;
   tanggal_kembali: string;
   keperluan: string;
-  status_booking: "menunggu" | "disetujui" | "ditolak" | "dikembalikan";
-  created_at: string;
-  updated_at: string;
-  vehicle?: Vehicle;
-}
+  status_booking: "menunggu" | "disetujui" | "ditolak"; // bukan 'status'
+  vehicle?: {
+    id: number;
+    nama_kendaraan: string;
+    nomor_polisi: string; // sesuaikan dengan field di model Vehicle
+  };
+};
 
 export interface BookingPayload {
   nama: string;

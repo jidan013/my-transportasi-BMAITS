@@ -146,10 +146,10 @@ export default function BorrowCard({
 
       {/* TIMELINE */}
       <div className="mt-6 pt-4 border-t">
-        {timeline.map((t) => {
-          const Icon = timelineIcons[t.key];
-          return (
-            <div key={t.time} className="flex gap-3 mb-3">
+        {timeline.map((t, index) => {
+  const Icon = timelineIcons[t.key];
+  return (
+    <div key={`${t.key}-${t.time}-${index}`} className="flex gap-3 mb-3">
               <div className="w-7 h-7 rounded-full bg-blue-700 text-white flex items-center justify-center">
                 <Icon size={14} />
               </div>

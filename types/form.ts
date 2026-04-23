@@ -1,6 +1,6 @@
 import type { Vehicle } from './vehicle';
 
-// ✅ Form state (UI-friendly)
+
 export interface FormData {
   nama: string;
   nrp: string;
@@ -11,7 +11,7 @@ export interface FormData {
   keperluan: string;
 }
 
-// ✅ Step 1 Props
+
 export interface Step1Props {
   data: FormData;
   errors: Record<string, string>;
@@ -19,7 +19,7 @@ export interface Step1Props {
   formId: string;
 }
 
-// ✅ Step 2 Props  
+
 export interface Step2Props {
   data: FormData;
   errors: Record<string, string>;

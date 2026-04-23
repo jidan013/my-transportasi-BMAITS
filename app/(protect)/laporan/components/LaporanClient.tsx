@@ -95,6 +95,7 @@ export default function LaporanPage() {
       const matchesSearch =
         String(item.id).toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.nama?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.nrp?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.unit_kerja?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.vehicle?.nama_kendaraan?.toLowerCase().includes(searchTerm.toLowerCase());
 
@@ -128,6 +129,7 @@ export default function LaporanPage() {
       <tr>
         <td>${item.id}</td>
         <td>${item.nama ?? "-"}</td>
+        <td>${item.nrp ?? "-"}</td>
         <td>${item.unit_kerja ?? "-"}</td>
         <td>${item.vehicle?.nama_kendaraan ?? "-"} (${item.vehicle?.nomor_polisi ?? "-"})</td>
         <td>${formatDate(item.tanggal_pinjam)}</td>
@@ -157,7 +159,7 @@ export default function LaporanPage() {
           <table>
             <thead>
               <tr>
-                <th>ID</th><th>Nama</th><th>Unit Kerja</th><th>Kendaraan</th>
+                <th>ID</th><th>Nama</th><th>NRP</th><th>Unit Kerja</th><th>Kendaraan</th>
                 <th>Tgl Pinjam</th><th>Tgl Kembali</th><th>Keperluan</th><th>Status</th>
               </tr>
             </thead>
@@ -344,6 +346,7 @@ export default function LaporanPage() {
                 <TableRow className="hover:bg-transparent border-b-2">
                   <TableHead className="w-16">ID</TableHead>
                   <TableHead>Nama</TableHead>
+                  <TableHead className="text-center">NRP</TableHead>
                   <TableHead>Unit Kerja</TableHead>
                   <TableHead>Kendaraan</TableHead>
                   <TableHead className="text-center">Tgl Pinjam</TableHead>
@@ -356,13 +359,13 @@ export default function LaporanPage() {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
+                    <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
                       Memuat data...
                     </TableCell>
                   </TableRow>
                 ) : filteredData().length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
+                    <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
                       Tidak ada data yang sesuai filter
                     </TableCell>
                   </TableRow>
@@ -375,6 +378,7 @@ export default function LaporanPage() {
                           #{item.id}
                         </TableCell>
                         <TableCell className="font-medium">{item.nama ?? "-"}</TableCell>
+                        <TableCell className="text-center">{item.nrp ?? "-"}</TableCell>
                         <TableCell>{item.unit_kerja ?? "-"}</TableCell>
                         <TableCell>
                           {item.vehicle?.nama_kendaraan ?? "-"}{" "}
