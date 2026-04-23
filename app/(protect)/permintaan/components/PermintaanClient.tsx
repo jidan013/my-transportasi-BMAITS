@@ -228,6 +228,7 @@ export default function PermintaanClient() {
           <thead className="bg-gray-100">
             <tr>
               <th className="p-3 text-left">Nama</th>
+              <th className="p-3 text-left">NRP</th>
               <th className="p-3 text-left">Unit Kerja</th>
               <th className="p-3 text-left">Kendaraan</th>
               <th className="p-3 text-left">Tanggal Pinjam</th>
@@ -258,6 +259,11 @@ export default function PermintaanClient() {
               data.map((item) => (
                 <tr key={item.id} className="border-t hover:bg-gray-50">
                   <td className="p-3">{item.nama}</td>
+
+                   <td className="p-3 text-center font-mono text-sm">
+              {item.nrp ?? "-"}
+            </td>
+
                   <td className="p-3">{item.unit_kerja}</td>
 
                   <td className="p-3">

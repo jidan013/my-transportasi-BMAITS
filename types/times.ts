@@ -19,6 +19,7 @@ export interface StatusTimelineItem {
 
 export interface BorrowItem {
     id: number;
+    nrp: string;
   borrower: string;
   vehicle: string;
   plate: string;

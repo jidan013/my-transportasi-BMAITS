@@ -2,124 +2,173 @@
 
 import { useState } from "react";
 import BorrowCard from "./BorrowCard";
-import { IconSearch } from "@tabler/icons-react";
+import { IconSearch, IconLoader2 } from "@tabler/icons-react";
 import type { BorrowItem } from "@/types/times";
+import { checkBookingByNRP, getAllBookings } from "@/lib/services/booking-service";
+import type { Booking } from "@/types/booking";
 
-/* ======================
-   MOCK DATA
-====================== */
+/* =====================
+   HELPER
+===================== */
+function mapBookingToBorrowItem(b: Booking): BorrowItem {
+  const timeline: BorrowItem["timeline"] = [
+    {
+      key: "diajukan",
+      label: "Diajukan",
+      time: formatWaktu(b.tanggal_pinjam),
+    },
+  ];
 
-const mockHistory: BorrowItem[] = [
-  {
-    id: 1,
-    borrower: "Andi Wijaya",
-    vehicle: "Toyota Avanza",
-    plate: "B 1234 XYZ",
-    borrowDate: "2025-10-12",
-    returnDate: "2025-10-13",
-    keperluan: "Kegiatan monitoring lapangan",
-    status: "terbit", 
-    timeline: [
-      { key: "diajukan", label: "Diajukan", time: "12 Okt 2025" },
-      { key: "ditinjau", label: "Ditinjau", time: "12 Okt 2025" },
-      { key: "disetujui", label: "Disetujui", time: "12 Okt 2025" },
-      { key: "diterbitkan", label: "Surat Diterbitkan", time: "12 Okt 2025" },
-    ],
-  },
-  {
-    id: 2,
-    borrower: "Siti Rahma",
-    vehicle: "Hiace",
-    plate: "L 4321 ABC",
-    borrowDate: "2025-09-28",
-    returnDate: "2025-09-29",
-    keperluan: "Kunjungan kerja",
-    status: "rejected",
-    timeline: [
-      { key: "diajukan", label: "Diajukan", time: "28 Sep 2025" },
-      { key: "ditinjau", label: "Ditinjau", time: "28 Sep 2025" },
-    ],
-  },
-  {
-    id: 3,
-    borrower: "Budi Santoso",
-    vehicle: "Toyota Avanza",
-    plate: "N 9988 DD",
-    borrowDate: "2025-10-05",
-    returnDate: "2025-10-10",
-    keperluan: "Kegiatan monitoring lapangan",
-    status: "rejected",
-    timeline: [
-      { key: "diajukan", label: "Diajukan", time: "5 Okt 2025" },
-      { key: "ditinjau", label: "Ditinjau", time: "6 Okt 2025" },
-    ],
-  },
-  {
-    id: 4,
-    borrower: "Rina Putri",
-    vehicle: "Toyota Avanza",
-    plate: "B 7744 TT",
-    borrowDate: "2025-11-01",
-    returnDate: "2025-11-03",
-    keperluan: "Kegiatan monitoring lapangan",
-    status: "pending",
-    timeline: [{ key: "diajukan", label: "Diajukan", time: "1 Nov 2025" }],
-  },
-];
+  if (b.status_booking === "disetujui" || b.status_booking === "ditolak") {
+    timeline.push({
+      key: "ditinjau",
+      label: "Ditinjau",
+      time: formatWaktu(b.tanggal_pinjam),
+    });
+  }
 
+  if (b.status_booking === "disetujui") {
+    timeline.push(
+      {
+        key: "disetujui",
+        label: "Disetujui",
+        time: formatWaktu(b.tanggal_kembali),
+      },
+      {
+        key: "diterbitkan",
+        label: "Surat Diterbitkan",
+        time: formatWaktu(b.tanggal_kembali),
+      }
+    );
+  }
 
+  const statusMap: Record<Booking["status_booking"], BorrowItem["status"]> = {
+    menunggu: "pending",
+    disetujui: "terbit",
+    ditolak: "rejected",
+  };
 
-/* ======================
+  return {
+    id: b.id,
+    borrower: b.nama,
+    nrp: b.nrp, 
+    vehicle: b.vehicle?.nama_kendaraan ?? "—",
+    plate: b.vehicle?.nomor_polisi ?? "—",
+    borrowDate: b.tanggal_pinjam,
+    returnDate: b.tanggal_kembali,
+    keperluan: b.keperluan,
+    status: statusMap[b.status_booking],
+    timeline,
+  };
+}
+
+function formatWaktu(raw: string): string {
+  if (!raw) return "—";
+  try {
+    return new Date(raw).toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  } catch {
+    return raw;
+  }
+}
+
+/* =====================
    COMPONENT
-====================== */
-
-export default function BorrowStat() {
+===================== */
+export default function BorrowStat({ isAdmin = false }: { isAdmin?: boolean }) {
   const [search, setSearch] = useState("");
+  const [items, setItems] = useState<BorrowItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [searched, setSearched] = useState(false);
 
-  const filtered = mockHistory.filter(
-    (item) =>
-      item.vehicle.toLowerCase().includes(search.toLowerCase()) ||
-      item.borrower.toLowerCase().includes(search.toLowerCase()) ||
-      item.plate.toLowerCase().includes(search.toLowerCase())
-  );
+  const handleSearch = async () => {
+    const q = search.trim();
+    if (!q) return;
+
+    setLoading(true);
+    setError(null);
+    setSearched(true);
+
+    try {
+      let raw: Booking[] = [];
+
+      if (/^\d+$/.test(q)) {
+        raw = await checkBookingByNRP(q);
+      } else {
+        if (isAdmin) {
+          raw = await getAllBookings();
+        } else {
+          setError("Masukkan NRP (angka).");
+          setLoading(false);
+          return;
+        }
+      }
+
+      const mapped = raw.map(mapBookingToBorrowItem);
+
+      const filtered = isAdmin
+        ? mapped.filter((i) => {
+            const qLower = q.toLowerCase();
+            return (
+              i.borrower.toLowerCase().includes(qLower) ||
+              i.vehicle.toLowerCase().includes(qLower) ||
+              i.plate.toLowerCase().includes(qLower) ||
+              String(i.id).includes(qLower)
+            );
+          })
+        : mapped;
+
+      setItems(filtered);
+    } catch {
+      setError("Data tidak ditemukan.");
+      setItems([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="max-w-6xl mx-auto p-6">
+
       {/* HEADER */}
       <div className="mb-8">
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-          Status Peminjaman
-        </h2>
+        <h2 className="text-2xl font-bold">Status Peminjaman</h2>
+        <p className="text-sm text-gray-500">
+          {isAdmin
+            ? "Cari data peminjaman"
+            : "Masukkan NRP Anda"}
+        </p>
       </div>
 
       {/* SEARCH */}
-      <div className="relative mb-8">
-        <IconSearch className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+      <div className="flex gap-3 mb-8">
         <input
-          type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Cari kendaraan, plat, atau peminjam..."
-          className="w-full pl-12 pr-4 py-3 rounded-2xl
-                     border border-gray-300 dark:border-gray-700
-                     bg-white dark:bg-gray-900
-                     text-gray-700 dark:text-gray-200
-                     focus:ring-2 focus:ring-[#00AEEF]
-                     focus:outline-none"
+          placeholder="Masukkan NRP..."
+          className="flex-1 border rounded-xl px-4 py-3"
         />
+
+        <button
+          onClick={handleSearch}
+          className="px-6 py-3 bg-blue-700 text-white rounded-xl"
+        >
+          {loading ? <IconLoader2 className="animate-spin" /> : "Cari"}
+        </button>
       </div>
 
-      {/* LIST */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {filtered.length > 0 ? (
-          filtered.map((item) => (
-            <BorrowCard key={item.id} {...item} />
-          ))
-        ) : (
-          <p className="col-span-2 py-10 text-center text-gray-500 dark:text-gray-400">
-            Tidak ada data peminjaman ditemukan.
-          </p>
-        )}
+      {/* ERROR */}
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+
+      {/* RESULT */}
+      <div className="grid md:grid-cols-2 gap-6">
+        {items.map((item) => (
+          <BorrowCard key={item.id} {...item} />
+        ))}
       </div>
     </div>
   );
