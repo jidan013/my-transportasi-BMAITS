@@ -75,15 +75,11 @@ export const getAvailableVehicles = async (params: {
 // Approved bookings (calendar)
 export const getApprovedBookings = async (): Promise<Booking[]> => {
   const res = await api.get<ApiResponse<Booking[]>>(
-    "/v1/booking/approved-list"
+    "/v1/booking/approve-list"
   );
-
-  if (!res.data.success) {
-    throw new Error(res.data.message || "Gagal ambil data approved");
-  }
-
   return res.data.data;
 };
+
 // Booking schedule by date range
 export const getBookingSchedule = async (params: {
   start_date: string;

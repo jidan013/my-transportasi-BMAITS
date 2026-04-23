@@ -36,7 +36,6 @@ export default function KalenderPage() {
 
   const formatDate = (d: Date): string => format(d, "yyyy-MM-dd");
 
-  /* ─── FETCH — dipicu setiap kali bulan / tahun berubah ─── */
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
