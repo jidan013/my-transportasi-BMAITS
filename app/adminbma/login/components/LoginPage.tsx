@@ -76,76 +76,118 @@ export default function AdminLoginPage() {
 };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100 px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 space-y-6">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">Admin Panel BMA</h1>
-          <p className="text-sm text-slate-500 mt-1">Masuk untuk mengelola sistem</p>
+  <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-4">
+
+    {/* LOGO + TITLE */}
+    <div className="text-center mb-8">
+      <h1 className="mt-4 text-2xl font-bold text-gray-900">Intitut Teknologi Sepuluh Nopember</h1>
+      <p className="text-sm text-gray-500">Biro Manajemen Aset</p>
+    </div>
+
+    {/* CARD */}
+    <div className="w-full max-w-md bg-white border border-gray-200 rounded-2xl shadow-sm p-8 space-y-6">
+
+      <div>
+        <h2 className="text-xl font-semibold text-gray-900">Administrator Login</h2>
+        <p className="text-sm text-gray-500 mt-1">
+          Please enter your credentials to access the portal.
+        </p>
+      </div>
+
+      {error && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+          {error}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+
+        {/* EMAIL */}
+        <div>
+          <label className="text-xs font-semibold text-gray-500 uppercase">
+            Email or Username
+          </label>
+          <input
+            name="email"
+            type="email"
+            placeholder="e.g. example@its.ac.id"
+            value={credentials.email}
+            onChange={handleChange}
+            disabled={loading}
+            className="mt-1 w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none"
+          />
         </div>
 
-        {error && (
-          <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
-            <svg className="shrink-0 mt-0.5 w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-            </svg>
-            <p className="font-medium">{error}</p>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-          <div>
-            <input
-              name="email"
-              type="email"
-              placeholder="admin@its.ac.id"
-              value={credentials.email}
-              onChange={handleChange}
-              required
-              disabled={loading}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-black focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-              aria-describedby="email-error"
-            />
+        {/* PASSWORD */}
+        <div>
+          <div className="flex justify-between text-xs font-semibold text-gray-500 uppercase">
+            <span>Password</span>
+            <span className="text-blue-600 cursor-pointer hover:underline">
+              Forgot Password?
+            </span>
           </div>
 
-          <div className="relative">
+          <div className="relative mt-1">
             <input
               name="password"
               type={showPassword ? "text" : "password"}
               placeholder="••••••••"
               value={credentials.password}
               onChange={handleChange}
-              required
               disabled={loading}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-black focus:border-transparent pr-12 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-              aria-describedby="password-error"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none pr-10"
             />
+
             <button
               type="button"
               onClick={togglePasswordVisibility}
-              disabled={loading}
-              className="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-slate-600 disabled:opacity-50 transition-colors duration-200"
-              aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
+              className="absolute inset-y-0 right-3 flex items-center text-gray-400"
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
+        </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-black hover:bg-gray-800 text-white py-3 rounded-xl font-bold flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="animate-spin w-5 h-5" />
-                <span>Memasuki sistem...</span>
-              </>
-            ) : (
-              "Masuk Sekarang"
-            )}
-          </button>
-        </form>
+        {/* REMEMBER */}
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <input type="checkbox" className="rounded border-gray-300" />
+          <span>Keep me logged in</span>
+        </div>
+
+        {/* BUTTON */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-blue-700 hover:bg-blue-800 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition"
+        >
+          {loading ? (
+            <>
+              <Loader2 className="animate-spin w-4 h-4" />
+              Logging in...
+            </>
+          ) : (
+            "Log in"
+          )}
+        </button>
+      </form>
+
+      {/* FOOTER */}
+      <div className="pt-4 border-t text-center text-xs text-gray-400 space-y-1">
+        <p>🔒 Secure Institutional Access</p>
+        <div className="flex justify-center gap-4">
+          <span className="hover:underline cursor-pointer">Support</span>
+          <span className="hover:underline cursor-pointer">Privacy Policy</span>
+          <span className="hover:underline cursor-pointer">Terms</span>
+        </div>
       </div>
     </div>
-  );
+
+    {/* COPYRIGHT */}
+    <p className="mt-6 text-xs text-gray-400 text-center">
+      © 2024 Institut Teknologi Sepuluh Nopember <br />
+      DIGITAL TRANSFORMATION OFFICE
+    </p>
+
+  </div>
+);
 }

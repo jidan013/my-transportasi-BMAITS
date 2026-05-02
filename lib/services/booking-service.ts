@@ -59,11 +59,9 @@ export const getAvailableVehicles = async (params: {
   const res = await api.get<ApiResponse<Vehicle[]>>(
     "/v1/booking/available-vehicles",
     {
-      params, 
+      params,
     }
   );
-
-  console.log("API RESPONSE:", res.data);
 
   if (!res.data.success) {
     throw new Error(res.data.message || "Gagal memuat kendaraan");
@@ -72,10 +70,10 @@ export const getAvailableVehicles = async (params: {
   return res.data.data;
 };
 
-// Approved bookings (calendar)
+// Approved bookings
 export const getApprovedBookings = async (): Promise<Booking[]> => {
   const res = await api.get<ApiResponse<Booking[]>>(
-    "/v1/booking/approve-list"
+    "/v1/booking/approved-list"
   );
   return res.data.data;
 };
@@ -100,6 +98,12 @@ export const getBookingByVehicle = async (
   const res = await api.get<ApiResponse<Booking[]>>(
     `/v1/booking/schedule/vehicle/${vehicleId}`
   );
+  return res.data.data;
+};
+
+// Calendar events
+export const getCalendarEvents = async (): Promise<Booking[]> => {
+  const res = await api.get<ApiResponse<Booking[]>>("/v1/calendar");
   return res.data.data;
 };
 

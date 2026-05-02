@@ -120,3 +120,32 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+/* SUCCESS (biru ITS feel, bukan hijau default) */
+[data-sonner-toast][data-type="success"] {
+  background: #eff6ff !important;
+  color: #1e3a8a !important;
+  border: 1px solid #bfdbfe !important;
+}
+
+/* ERROR */
+[data-sonner-toast][data-type="error"] {
+  background: #fef2f2 !important;
+  color: #991b1b !important;
+  border: 1px solid #fecaca !important;
+}
+
+/* LOADING */
+[data-sonner-toast][data-type="loading"] {
+  background: #f9fafb !important;
+  color: #374151 !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+/* INFO */
+[data-sonner-toast][data-type="info"] {
+  background: #f0f9ff !important;
+  color: #075985 !important;
+  border: 1px solid #bae6fd !important;
+}

@@ -8,7 +8,8 @@ export function middleware(req: NextRequest) {
   // Hanya protect laporan & permintaan saja
   const isAdminOnly =
     pathname.startsWith("/adminbma/dashboard/permintaan") ||
-    pathname.startsWith("/adminbma/dashboard/laporan");
+    pathname.startsWith("/adminbma/dashboard/laporan") || 
+    pathname.startsWith("/adminbma/dashboard/biaya");
 
   // Belum login & coba akses fitur admin → redirect login
   if (isAdminOnly && !token) {

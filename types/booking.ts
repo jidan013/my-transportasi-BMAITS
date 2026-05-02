@@ -13,7 +13,7 @@ export type Booking = {
   vehicle?: {
     id: number;
     nama_kendaraan: string;
-    nomor_polisi: string; // sesuaikan dengan field di model Vehicle
+    nomor_polisi: string; 
   };
 };
 

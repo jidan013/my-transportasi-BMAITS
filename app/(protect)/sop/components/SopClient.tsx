@@ -1,283 +1,461 @@
 "use client"
 
-import { motion, AnimatePresence } from "framer-motion"
+import * as React from "react"
+import { motion } from "framer-motion"
 import {
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
-import {
-  ChevronDown,
   FileText,
   ClipboardList,
-  FolderKanban,
-  CheckCircle,
-  FileSignature,
-  Workflow,
-  BookOpen,
-  LucideIcon,
+  Phone,
+  Shield,
+  UploadCloud,
+  CheckCircle2,
+  LayoutGrid,
+  List,
+  TrendingUp,
+  Clock,
+  AlertTriangle,
+  Download,
+  FileCheck2,
+  FileSpreadsheet,
+  FileBadge,
+  Search,
 } from "lucide-react"
-import * as React from "react"
 
-function MotionContent({
-  children,
-  isOpen,
-}: {
-  children: React.ReactNode
-  isOpen: boolean
-}) {
-  return (
-    <AnimatePresence initial={false}>
-      {isOpen && (
-        <motion.div
-          key="motion-content"
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          exit={{ opacity: 0, height: 0 }}
-          transition={{
-            duration: 0.4,
-            ease: [0.25, 0.1, 0.25, 1],
-          }}
-          className="overflow-hidden text-gray-700 leading-relaxed mt-3"
-        >
-          {children}
-        </motion.div>
-      )}
-    </AnimatePresence>
-  )
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+type StatusType = "AKTIF" | "REVIEW" | "DIARSIPKAN"
+
+interface SopDocument {
+  id: number
+  name: string
+  description: string
+  lastUpdated: string
+  fileSize: string
+  status: StatusType
+  icon: React.ReactNode
 }
 
-function SmoothTrigger({
-  icon: Icon,
-  children,
-  isOpen,
-}: {
-  icon: LucideIcon
-  children: React.ReactNode
-  isOpen: boolean
-}) {
+interface Category {
+  label: string
+  count: number
+  icon: React.ReactNode
+  active?: boolean
+}
+
+// ─── Data ────────────────────────────────────────────────────────────────────
+
+const categories: Category[] = [
+  {
+    label: "Standard Operating Procedures",
+    count: 10,
+    icon: <FileText className="w-4 h-4 text-amber-500" />,
+    active: true,
+  },
+  {
+    label: "Protokol Pemeliharaan",
+    count: 6,
+    icon: <ClipboardList className="w-4 h-4 text-gray-400" />,
+  },
+  {
+    label: "Kontak Darurat",
+    count: 4,
+    icon: <Phone className="w-4 h-4 text-gray-400" />,
+  },
+  {
+    label: "Legal & Asuransi",
+    count: 5,
+    icon: <Shield className="w-4 h-4 text-gray-400" />,
+  },
+]
+
+const documents: SopDocument[] = [
+  {
+    id: 1,
+    name: "SOP_Peminjaman_Kendaraan_Dinas_v2",
+    description: "Prosedur peminjaman kendaraan dinas ITS – pengajuan s/d pengembalian",
+    lastUpdated: "10 Apr 2025",
+    fileSize: "1.8 MB",
+    status: "AKTIF",
+    icon: <FileBadge className="w-5 h-5 text-red-500" />,
+  },
+  {
+    id: 2,
+    name: "SOP_Penugasan_Sopir_Kendaraan",
+    description: "Mekanisme penugasan sopir & distribusi Surat Perintah Jalan",
+    lastUpdated: "2 Mar 2025",
+    fileSize: "980 KB",
+    status: "AKTIF",
+    icon: <FileBadge className="w-5 h-5 text-red-500" />,
+  },
+  {
+    id: 3,
+    name: "SOP_Pemeriksaan_Kelayakan_Kendaraan",
+    description: "Checklist kelayakan teknis sebelum & sesudah penggunaan kendaraan",
+    lastUpdated: "15 Feb 2025",
+    fileSize: "1.2 MB",
+    status: "REVIEW",
+    icon: <FileBadge className="w-5 h-5 text-red-500" />,
+  },
+  {
+    id: 4,
+    name: "Template_Surat_Permohonan_Kendaraan",
+    description: "Template surat permohonan peminjaman sesuai Tata Naskah ITS",
+    lastUpdated: "20 Jan 2025",
+    fileSize: "320 KB",
+    status: "AKTIF",
+    icon: <FileSpreadsheet className="w-5 h-5 text-blue-500" />,
+  },
+  {
+    id: 5,
+    name: "Template_Surat_Perintah_Jalan",
+    description: "Formulir SPJ kendaraan dinas – Biro Manajemen Aset ITS",
+    lastUpdated: "20 Jan 2025",
+    fileSize: "280 KB",
+    status: "AKTIF",
+    icon: <FileSpreadsheet className="w-5 h-5 text-blue-500" />,
+  },
+  {
+    id: 6,
+    name: "SOP_Pelaporan_Penggunaan_Kendaraan",
+    description: "Prosedur pembuatan laporan kondisi, BBM, dan kilometer kendaraan",
+    lastUpdated: "5 Nov 2024",
+    fileSize: "760 KB",
+    status: "DIARSIPKAN",
+    icon: <FileCheck2 className="w-5 h-5 text-red-500" />,
+  },
+]
+
+const statusStyle: Record<StatusType, string> = {
+  AKTIF: "bg-green-100 text-green-700",
+  REVIEW: "bg-yellow-100 text-yellow-700",
+  DIARSIPKAN: "bg-gray-200 text-gray-500",
+}
+
+// ─── Storage Bar ─────────────────────────────────────────────────────────────
+
+function StorageBar() {
+  const used = 4.2
+  const total = 10
+  const pct = Math.round((used / total) * 100)
   return (
-    <div
-      className={`flex justify-between items-center rounded-xl px-6 py-5 transition-all duration-300 shadow-sm ${isOpen
-          ? "bg-linear-to-r from-blue-50 to-white border border-blue-200"
-          : "bg-white hover:bg-blue-50 border border-gray-200"
-        }`}
-    >
-      <div className="flex items-center gap-3 text-gray-900 font-semibold text-lg">
-        <Icon className="w-5 h-5 text-blue-600" />
-        {children}
+    <div className="mt-4 bg-white border border-gray-200 rounded-xl p-4">
+      <p className="text-sm font-semibold text-gray-700 mb-3">Penggunaan Penyimpanan</p>
+      <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div
+          className="h-full bg-blue-600 rounded-full transition-all duration-700"
+          style={{ width: `${pct}%` }}
+        />
       </div>
-      <motion.div
-        initial={false}
-        animate={{ rotate: isOpen ? 180 : 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        <ChevronDown className="w-5 h-5 text-blue-600" />
-      </motion.div>
+      <p className="text-xs text-gray-500 mt-2">
+        {used} GB dari {total} GB penyimpanan institusi digunakan
+      </p>
     </div>
   )
 }
 
-export default function SopAccordionPage() {
-  const [openItem, setOpenItem] = React.useState<string | null>("item-1")
+// ─── Main Page ────────────────────────────────────────────────────────────────
 
-  const renderTrigger = (id: string, label: string, icon: LucideIcon) => (
-    <AccordionTrigger
-      onClick={() => setOpenItem(openItem === id ? null : id)}
-      className="w-full no-underline p-0 bg-transparent focus-visible:ring-0 focus-visible:outline-none"
-    >
-      <SmoothTrigger icon={icon} isOpen={openItem === id}>
-        {label}
-      </SmoothTrigger>
-    </AccordionTrigger>
+export default function SopContentPage() {
+  const [view, setView] = React.useState<"grid" | "list">("list")
+  const [query, setQuery] = React.useState("")
+  const [activeCategory, setActiveCategory] = React.useState(0)
+
+  const filtered = documents.filter(
+    (d) =>
+      d.name.toLowerCase().includes(query.toLowerCase()) ||
+      d.description.toLowerCase().includes(query.toLowerCase())
   )
 
   return (
-    <main className="min-h-screen bg-linear-to-b from-blue-50 via-white to-gray-50 py-16 px-6">
-      {/* HEADER */}
-      <motion.header
-        initial={{ opacity: 0, y: -25 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="max-w-5xl mx-auto text-center mb-14"
-      >
-        <h1 className="text-5xl font-extrabold text-gray-900 tracking-tight mb-3">
-          Standard Operating Procedure
-        </h1>
-        <h2 className="text-3xl font-semibold text-blue-700">
-          Layanan Peminjaman Mobil Dinas
-        </h2>
-        <p className="text-gray-500 mt-2 text-sm">
-          Nomor: 7.2.4.3.2/IT2.II.3/2020 — Biro Manajemen Aset ITS
-        </p>
-        <div className="h-0.75 w-24 bg-blue-600 mx-auto mt-6 rounded-full" />
-      </motion.header>
+    <div className="min-h-screen bg-gray-50 font-sans">
 
-      {/* ACCORDION */}
-      <motion.section
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="max-w-5xl mx-auto bg-white/90 backdrop-blur-xl border border-gray-100 shadow-2xl rounded-3xl p-10"
-      >
-        <Accordion
-          type="single"
-          collapsible
-          value={openItem || undefined}
-          onValueChange={setOpenItem}
-          className="space-y-5"
+      {/* ── TOP SEARCH BAR ── */}
+      <div className="bg-white border-b border-gray-200 px-8 py-3 flex items-center justify-between">
+        <div className="relative w-96">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Cari SOP, manual, atau protokol..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full pl-9 pr-4 py-2 text-sm bg-gray-100 rounded-lg border border-transparent focus:outline-none focus:border-blue-300 focus:bg-white transition"
+          />
+        </div>
+        <p className="text-sm text-gray-400">24 Okt 2023 · 09:41</p>
+      </div>
+
+      <div className="px-8 py-6 max-w-screen-xl mx-auto">
+
+        {/* ── HERO BANNER ── */}
+        <motion.div
+          initial={{ opacity: 0, y: -16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="relative rounded-2xl overflow-hidden mb-8"
+          style={{ background: "linear-gradient(135deg, #1a3a6b 0%, #2d5fa8 60%, #3b7dd8 100%)" }}
         >
-          {/* 1 */}
-          <AccordionItem value="item-1">
-            {renderTrigger("item-1", "1. Tujuan", FileText)}
-            <MotionContent isOpen={openItem === "item-1"}>
-              Memberikan pedoman pelaksanaan layanan peminjaman kendaraan dinas di lingkungan
-              Institut Teknologi Sepuluh Nopember (ITS) agar terlaksana secara tertib,
-              terkendali, akuntabel, dan sesuai ketentuan yang berlaku.
+          {/* decorative circles */}
+          <div className="absolute -right-12 -top-12 w-64 h-64 rounded-full bg-white/5" />
+          <div className="absolute right-24 bottom-0 w-40 h-40 rounded-full bg-white/5" />
 
-            </MotionContent>
-          </AccordionItem>
+          <div className="relative z-10 px-10 py-10">
+            <h1 className="text-3xl font-bold text-white mb-2">
+              Prosedur Operasional Standar Kendaraan
+            </h1>
+            <p className="text-blue-200 text-sm max-w-xl mb-6">
+              Akses protokol armada institusi ITS, standar pemeliharaan, dan panduan pengelolaan
+              kendaraan dinas secara terpusat.
+            </p>
+            <div className="flex gap-3">
+              <button className="flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold text-sm px-5 py-2.5 rounded-lg transition">
+                <UploadCloud className="w-4 h-4" />
+                Perbarui Protokol
+              </button>
+              <button className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold text-sm px-5 py-2.5 rounded-lg border border-white/20 transition">
+                <CheckCircle2 className="w-4 h-4" />
+                Status Kepatuhan
+              </button>
+            </div>
+          </div>
+        </motion.div>
 
-          {/* 2 */}
-          <AccordionItem value="item-2">
-            {renderTrigger("item-2", "2. Ruang Lingkup", FolderKanban)}
-            <MotionContent isOpen={openItem === "item-2"}>
-              Prosedur ini mencakup proses pengajuan, verifikasi, persetujuan, penugasan sopir,
-              penerbitan surat perintah jalan, hingga pengembalian kendaraan dinas yang
-              digunakan untuk kepentingan kedinasan.
+        {/* ── BODY: sidebar categories + document list ── */}
+        <div className="flex gap-6">
 
-            </MotionContent>
-          </AccordionItem>
+          {/* LEFT: Categories */}
+          <motion.aside
+            initial={{ opacity: 0, x: -16 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="w-56 flex-shrink-0"
+          >
+            <p className="text-base font-bold text-gray-800 mb-3">Kategori</p>
+            <div className="flex flex-col gap-1">
+              {categories.map((cat, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActiveCategory(i)}
+                  className={`flex items-center justify-between w-full px-3 py-2.5 rounded-xl text-left transition text-sm ${
+                    activeCategory === i
+                      ? "bg-blue-50 border border-blue-200"
+                      : "hover:bg-gray-100 border border-transparent"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    {cat.icon}
+                    <span
+                      className={`leading-snug ${
+                        activeCategory === i
+                          ? "font-semibold text-blue-700"
+                          : "text-gray-600"
+                      }`}
+                    >
+                      {cat.label}
+                    </span>
+                  </div>
+                  <span
+                    className={`text-xs font-semibold ml-1 ${
+                      activeCategory === i ? "text-blue-600" : "text-gray-400"
+                    }`}
+                  >
+                    {cat.count.toString().padStart(2, "0")}
+                  </span>
+                </button>
+              ))}
+            </div>
 
-          {/* 3 */}
-          <AccordionItem value="item-3">
-            {renderTrigger("item-3", "3. Definisi", BookOpen)}
-            <MotionContent isOpen={openItem === "item-3"}>
-              <ul className="list-disc ml-6 space-y-2">
-                <li>
-                  <b>Kendaraan Dinas:</b> kendaraan milik ITS yang digunakan untuk mendukung
-                  pelaksanaan tugas kedinasan.
-                </li>
-                <li>
-                  <b>Peminjaman Kendaraan Dinas:</b> penggunaan kendaraan dinas oleh unit kerja
-                  atau pejabat ITS untuk keperluan resmi.
-                </li>
-                <li>
-                  <b>Surat Permohonan:</b> surat resmi pengajuan peminjaman kendaraan dinas dari
-                  unit kerja kepada Biro Manajemen Aset.
-                </li>
-                <li>
-                  <b>Surat Perintah Jalan:</b> dokumen resmi sebagai dasar operasional penggunaan
-                  kendaraan dinas.
-                </li>
-              </ul>
+            <StorageBar />
+          </motion.aside>
 
-            </MotionContent>
-          </AccordionItem>
+          {/* RIGHT: Document List */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.15 }}
+            className="flex-1 min-w-0"
+          >
+            {/* sub-header */}
+            <div className="flex items-end justify-between mb-4">
+              <div>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-0.5">
+                  Menelusuri
+                </p>
+                <h2 className="text-xl font-bold text-gray-800">
+                  {categories[activeCategory].label}
+                </h2>
+              </div>
+              <div className="flex gap-1">
+                <button
+                  onClick={() => setView("grid")}
+                  className={`p-2 rounded-lg border transition ${
+                    view === "grid"
+                      ? "bg-blue-600 border-blue-600 text-white"
+                      : "border-gray-200 text-gray-400 hover:bg-gray-100"
+                  }`}
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setView("list")}
+                  className={`p-2 rounded-lg border transition ${
+                    view === "list"
+                      ? "bg-blue-600 border-blue-600 text-white"
+                      : "border-gray-200 text-gray-400 hover:bg-gray-100"
+                  }`}
+                >
+                  <List className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
 
-          {/* 4 */}
-          <AccordionItem value="item-4">
-            {renderTrigger("item-4", "4. Dokumen Terkait", FileSignature)}
-            <MotionContent isOpen={openItem === "item-4"}>
-              <ul className="list-disc ml-6 space-y-1">
-                <li>Surat Permohonan Peminjaman Kendaraan Dinas</li>
-                <li>Surat Perintah Jalan Kendaraan Dinas</li>
-                <li>Dokumen pendukung kegiatan kedinasan</li>
-              </ul>
-
-            </MotionContent>
-          </AccordionItem>
-
-          {/* 5 */}
-          <AccordionItem value="item-5">
-            {renderTrigger("item-5", "5. Rincian Prosedur", ClipboardList)}
-            <MotionContent isOpen={openItem === "item-5"}>
-              <table className="min-w-full border border-gray-200 text-sm bg-white rounded-lg overflow-hidden shadow-sm">
-                <thead className="bg-linear-to-r from-blue-100 to-blue-50 text-gray-700 font-semibold">
-                  <tr>
-                    <th className="border px-3 py-2 text-left w-10">No</th>
-                    <th className="border px-3 py-2 text-left w-52">Penanggung Jawab</th>
-                    <th className="border px-3 py-2 text-left">Aktivitas</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {[
-                    ["Pemohon", "Mengajukan surat permohonan peminjaman sesuai Tata Naskah ITS."],
-                    ["Staf Layanan Surat", "Mencatat surat masuk dan meneruskan ke Kepala Biro Manajemen Aset."],
-                    ["Kepala Biro Manajemen Aset", "Menelaah dan meneruskan ke Kabag Logistik dan Keamanan."],
-                    ["Kabag Logistik & Keamanan", "Menelaah kegiatan serta rekomendasi biaya perawatan & BBM."],
-                    ["Kasubbag Layanan Logistik", "Menugaskan sopir dan memerintahkan penerbitan Surat Jalan."],
-                    ["Staf", "Menggandakan surat jalan, mengarsipkan, dan menyerahkan kepada sopir."],
-                    ["Sopir", "Menerima surat perintah jalan dan melaksanakan kegiatan."],
-                  ].map(([a, b], i) => (
-                    <tr key={i} className="hover:bg-gray-50 transition-colors">
-                      <td className="border px-3 py-2">{i + 1}</td>
-                      <td className="border px-3 py-2 font-medium">{a}</td>
-                      <td className="border px-3 py-2">{b}</td>
+            {/* table/list */}
+            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+              {view === "list" ? (
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-100">
+                      <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                        Nama Dokumen
+                      </th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide whitespace-nowrap">
+                        Terakhir Diperbarui
+                      </th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                        Ukuran
+                      </th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                        Status
+                      </th>
+                      <th className="px-4 py-3" />
                     </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {filtered.map((doc) => (
+                      <tr key={doc.id} className="hover:bg-gray-50 transition-colors group">
+                        <td className="px-5 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="flex-shrink-0">{doc.icon}</div>
+                            <div>
+                              <p className="font-semibold text-blue-700 group-hover:underline cursor-pointer leading-snug">
+                                {doc.name}
+                              </p>
+                              <p className="text-xs text-gray-400 mt-0.5">{doc.description}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-4 py-4 text-gray-500 whitespace-nowrap">
+                          {doc.lastUpdated}
+                        </td>
+                        <td className="px-4 py-4 text-gray-500">{doc.fileSize}</td>
+                        <td className="px-4 py-4">
+                          <span
+                            className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusStyle[doc.status]}`}
+                          >
+                            {doc.status}
+                          </span>
+                        </td>
+                        <td className="px-4 py-4">
+                          <button className="opacity-0 group-hover:opacity-100 transition p-1.5 rounded-lg hover:bg-gray-100">
+                            <Download className="w-4 h-4 text-gray-500" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="grid grid-cols-2 gap-4 p-5">
+                  {filtered.map((doc) => (
+                    <div
+                      key={doc.id}
+                      className="border border-gray-200 rounded-xl p-4 hover:border-blue-300 hover:bg-blue-50/30 transition cursor-pointer"
+                    >
+                      <div className="flex items-start gap-3">
+                        {doc.icon}
+                        <div className="min-w-0">
+                          <p className="font-semibold text-blue-700 text-sm leading-snug truncate">
+                            {doc.name}
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1 line-clamp-2">
+                            {doc.description}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between mt-3">
+                        <span
+                          className={`text-xs font-semibold px-2 py-0.5 rounded-full ${statusStyle[doc.status]}`}
+                        >
+                          {doc.status}
+                        </span>
+                        <span className="text-xs text-gray-400">{doc.lastUpdated}</span>
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </table>
-            </MotionContent>
-          </AccordionItem>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </div>
 
-          {/* 6 */}
-          <AccordionItem value="item-6">
-            {renderTrigger("item-6", "6. Record / Catatan Mutu", FileText)}
-            <MotionContent isOpen={openItem === "item-6"}>
-              <ul className="list-disc ml-6 space-y-1">
-                <li>Arsip Surat Permohonan Peminjaman</li>
-                <li>Arsip Surat Perintah Jalan</li>
-                <li>Catatan penggunaan kendaraan dinas</li>
-              </ul>
+        {/* ── BOTTOM CARDS ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.25 }}
+          className="grid grid-cols-3 gap-4 mt-6"
+        >
+          {/* Latest Update */}
+          <div className="bg-white border border-gray-200 rounded-2xl p-5">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3 flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5" /> Pembaruan Terbaru
+            </p>
+            <p className="font-bold text-gray-800 text-sm mb-0.5">
+              SOP Peminjaman Kendaraan v2
+            </p>
+            <p className="text-xs text-gray-500 mb-4">Diperbarui oleh Budi Santoso</p>
+            <button className="text-sm font-semibold text-blue-600 hover:underline flex items-center gap-1">
+              Lihat Perubahan →
+            </button>
+          </div>
 
-            </MotionContent>
-          </AccordionItem>
+          {/* Most Downloaded */}
+          <div className="bg-white border border-gray-200 rounded-2xl p-5">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3 flex items-center gap-1.5">
+              <TrendingUp className="w-3.5 h-3.5" /> Paling Banyak Diunduh
+            </p>
+            <p className="font-bold text-gray-800 text-sm mb-0.5">
+              Template Surat Perintah Jalan
+            </p>
+            <p className="text-xs text-gray-500 mb-4">87 unduhan minggu ini</p>
+            <button className="text-sm font-semibold text-blue-600 hover:underline flex items-center gap-1">
+              Ambil Salinan ↓
+            </button>
+          </div>
 
-          {/* 7 */}
-          <AccordionItem value="item-7">
-            {renderTrigger("item-7", "7. Indikator Keberhasilan", CheckCircle)}
-            <MotionContent isOpen={openItem === "item-7"}>
-              Pelayanan peminjaman kendaraan dinas dilaksanakan sesuai prosedur dan
-              Surat Perintah Jalan diterbitkan maksimal <b>1 (satu) hari kerja</b>
-              setelah permohonan disetujui.
+          {/* Audit Required */}
+          <div className="bg-[#1a3a6b] rounded-2xl p-5 text-white relative overflow-hidden">
+            <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-white text-lg font-bold cursor-pointer hover:bg-white/20 transition">
+              +
+            </div>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-9 h-9 rounded-xl bg-amber-400 flex items-center justify-center flex-shrink-0">
+                <AlertTriangle className="w-5 h-5 text-gray-900" />
+              </div>
+              <div>
+                <p className="text-xs text-blue-300 uppercase font-semibold tracking-wide">
+                  Sistem
+                </p>
+                <p className="font-bold text-white text-sm">Audit Diperlukan</p>
+              </div>
+            </div>
+            <p className="text-sm text-blue-200 mb-4">3 protokol kedaluwarsa dalam 15 hari</p>
+            <button className="w-full bg-amber-400 hover:bg-amber-500 text-gray-900 font-bold text-sm py-2 rounded-lg transition">
+              Mulai Tinjauan
+            </button>
+          </div>
+        </motion.div>
 
-            </MotionContent>
-          </AccordionItem>
-
-          {/* 8 */}
-          <AccordionItem value="item-8">
-            {renderTrigger("item-8", "8. Alur / Flowchart Prosedur", Workflow)}
-            <MotionContent isOpen={openItem === "item-8"}>
-              <ol className="list-decimal ml-6 space-y-1">
-                <li>Unit kerja mengajukan surat permohonan peminjaman kendaraan dinas.</li>
-                <li>Surat diterima dan diverifikasi oleh Biro Manajemen Aset.</li>
-                <li>Permohonan disetujui oleh pejabat berwenang.</li>
-                <li>Kabag Logistik dan Keamanan memberikan rekomendasi operasional.</li>
-                <li>Kasubbag Layanan Logistik menugaskan sopir dan kendaraan.</li>
-                <li>Surat Perintah Jalan diterbitkan.</li>
-                <li>Kendaraan digunakan sesuai ketentuan dan dikembalikan setelah kegiatan selesai.</li>
-              </ol>
-
-            </MotionContent>
-          </AccordionItem>
-        </Accordion>
-      </motion.section>
-
-      {/* FOOTER */}
-      <motion.footer
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.6, duration: 1 }}
-        className="text-center text-gray-500 mt-16 text-sm"
-      >
-        <div className="h-0.5 w-24 bg-blue-600 mx-auto mb-4 rounded-full" />
-        <p className="font-medium">Subbagian Layanan Transportasi</p>
-        <p>Biro Manajemen Aset – Institut Teknologi Sepuluh Nopember (ITS)</p>
-        <p className="mt-1 text-gray-400 italic">
-          Dokumen Internal • Versi Terkendali • © 2025
-        </p>
-      </motion.footer>
-    </main>
+      </div>
+    </div>
   )
 }

@@ -34,13 +34,13 @@ const NAV_PUBLIC: NavItem[] = [
 const NAV_ADMIN: NavItem[] = [
   { title: "Permintaan",         url: "/permintaan", icon: IconDatabase },
   { title: "Laporan Peminjaman", url: "/laporan",    icon: IconReport   },
+  { title: "Biaya Kendaraan",    url: "/biaya",      icon: IconCurrencyDollar },
 ];
 
 const DOCUMENTS: DocumentItem[] = [
   { name: "SOP Kendaraan",   url: "/sop",             icon: IconReport         },
   { name: "Foto Kendaraan",  url: "/foto",            icon: IconPhoto          },
   { name: "Jenis Kendaraan", url: "/jenis-kendaraan", icon: IconCar            },
-  { name: "Biaya Kendaraan", url: "/biaya",           icon: IconCurrencyDollar },
   { name: "Kontak Admin",    url: "/kontak",          icon: IconHelp           },
 ];
 
