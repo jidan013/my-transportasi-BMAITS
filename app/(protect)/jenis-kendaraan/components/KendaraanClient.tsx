@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback, JSX } from "react"
+import { useState, useEffect, JSX } from "react"
 import { RefreshCw, Search, MoreVertical, Plus, Users, Package, Zap, Car, Bus, Truck } from "lucide-react"
 import { motion } from "framer-motion"
 import {
@@ -13,10 +13,6 @@ import {
   Tooltip,
 } from "recharts"
 
-// ==========================================
-// TODO: Sesuaikan path import di bawah ini 
-// dengan struktur folder project kamu
-// ==========================================
 import type { Vehicle } from "@/types/vehicle"
 import type { Booking } from "@/types/booking"
 import { getVehicles } from "@/lib/services/vehicle"
@@ -27,9 +23,9 @@ import { getAllBookings } from "@/lib/services/booking-service"
 type VehicleStatus = "tersedia" | "dipinjam" | string
 type FilterStatus = VehicleStatus | "Semua"
 
-interface PemakaianBulanan { 
-  bulan: string; 
-  pemakaian: number 
+interface PemakaianBulanan {
+  bulan: string
+  pemakaian: number
 }
 
 /* ─── Helpers ────────────────────────────────────────────── */
@@ -58,7 +54,6 @@ function statusBadge(s: VehicleStatus) {
     }
   }
 
-  // ✅ fallback biar tidak undefined
   return {
     bg: "bg-gray-100 text-gray-600 border border-gray-200",
     dot: "bg-gray-400",
@@ -70,8 +65,8 @@ function VehicleIcon({ jenis, size = 18 }: { jenis?: string; size?: number }) {
   if (!jenis) return <Car size={size} />
   const j = jenis.toLowerCase()
   if (j.includes("bus") || j.includes("minibus") || j.includes("microbus")) return <Bus size={size} />
-  if (j.includes("truk") || j.includes("pickup"))                           return <Truck size={size} />
-  if (j.includes("elektrik") || j.includes("ev") || j.includes("elektro"))  return <Zap size={size} />
+  if (j.includes("truk") || j.includes("pickup")) return <Truck size={size} />
+  if (j.includes("elektrik") || j.includes("ev") || j.includes("elektro")) return <Zap size={size} />
   return <Car size={size} />
 }
 
@@ -236,83 +231,98 @@ function CategoryCard({
 /* ─── Main Page ──────────────────────────────────────────── */
 
 export default function KendaraanPage(): JSX.Element {
-  const [kendaraan, setKendaraan]           = useState<Vehicle[]>([])
-  const [pemakaian, setPemakaian]           = useState<PemakaianBulanan[]>([])
-  const [loading, setLoading]               = useState(true)
-  const [search, setSearch]                 = useState("")
-  const [filterStatus, setFilterStatus]     = useState<FilterStatus>("Semua")
+  const [kendaraan, setKendaraan] = useState<Vehicle[]>([])
+  const [pemakaian, setPemakaian] = useState<PemakaianBulanan[]>([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState("")
+  const [filterStatus, setFilterStatus] = useState<FilterStatus>("Semua")
 
-  const fetchAll = useCallback(async () => {
-    setLoading(true)
-    try {
-      // 1. Fetch Data Kendaraan
-      const vehiclesData = await getVehicles()
-      setKendaraan(vehiclesData || [])
+  // ✅ Trigger refresh manual — increment untuk re-run useEffect
+  const [refreshTick, setRefreshTick] = useState(0)
 
-      // 2. Fetch Data Booking untuk Chart (Agregasi Bulanan)
-      const bookingsData = await getAllBookings()
-      
-      if (bookingsData && bookingsData.length > 0) {
-        const BULAN = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"]
-        const counts: Record<number, number> = {}
+  // ✅ Pola yang benar: async function didefinisikan & dipanggil di dalam useEffect
+  //    Tidak menggunakan useCallback agar linter tidak memperingatkan
+  //    "calling setState synchronously within an effect"
+  useEffect(() => {
+    // Cleanup flag: cegah setState setelah komponen unmount
+    let cancelled = false
 
-        for (const booking of bookingsData) {
-          // Mendefinisikan struktur sementara untuk menghindari 'any'
-          const b = booking as typeof booking & {
-            tanggal_pinjam?: string | number | Date;
-            start_date?: string | number | Date;
-            created_at?: string | number | Date;
-          };
+    async function fetchAll() {
+      setLoading(true)
+      try {
+        // 1. Fetch Data Kendaraan
+        const vehiclesData = await getVehicles()
+        if (cancelled) return
+        setKendaraan(vehiclesData || [])
 
-          // Mengambil tanggal dengan aman
-          const rawDate = b.tanggal_pinjam || b.start_date || b.created_at || Date.now();
-            
-          const d = new Date(rawDate);
-          const m = d.getMonth(); // 0-11
-          counts[m] = (counts[m] ?? 0) + 1;
+        // 2. Fetch Data Booking untuk Chart (Agregasi Bulanan)
+        const bookingsData = await getAllBookings()
+        if (cancelled) return
+
+        if (bookingsData && bookingsData.length > 0) {
+          const BULAN = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"]
+          const counts: Record<number, number> = {}
+
+          for (const booking of bookingsData) {
+            const b = booking as typeof booking & {
+              tanggal_pinjam?: string | number | Date
+              start_date?: string | number | Date
+              created_at?: string | number | Date
+            }
+
+            const rawDate = b.tanggal_pinjam || b.start_date || b.created_at || Date.now()
+            const m = new Date(rawDate).getMonth() // 0–11
+            counts[m] = (counts[m] ?? 0) + 1
+          }
+
+          const built: PemakaianBulanan[] = BULAN.map((bulan, i) => ({
+            bulan,
+            pemakaian: counts[i] ?? 0,
+          }))
+
+          setPemakaian(built)
+        } else {
+          setPemakaian([])
         }
-
-        const built: PemakaianBulanan[] = BULAN.map((bulan, i) => ({
-          bulan,
-          pemakaian: counts[i] ?? 0,
-        }))
-        setPemakaian(built)
-      } else {
-        setPemakaian([])
+      } catch (e) {
+        console.error("Gagal memuat data dari API:", e)
+      } finally {
+        if (!cancelled) setLoading(false)
       }
-    } catch (e) {
-      console.error("Gagal memuat data dari API:", e)
-    } finally {
-      setLoading(false)
     }
-  }, [])
 
-  useEffect(() => { 
-    fetchAll() 
-  }, [fetchAll])
+    fetchAll()
+
+    // Cleanup: tandai cancelled agar setState tidak dipanggil setelah unmount
+    return () => {
+      cancelled = true
+    }
+  }, [refreshTick]) // ← re-run setiap kali refreshTick berubah
 
   /* ── Derived Variables ── */
-  const tersedia      = kendaraan.filter(k => k.status_ketersediaan?.toLowerCase() === "tersedia")
-  const dipinjam      = kendaraan.filter(k => k.status_ketersediaan?.toLowerCase() === "dipinjam")
+  const tersedia = kendaraan.filter((k) => k.status_ketersediaan?.toLowerCase() === "tersedia")
+  const dipinjam = kendaraan.filter((k) => k.status_ketersediaan?.toLowerCase() === "dipinjam")
 
-  const featured0     = kendaraan[0] ?? null
-  const featured1     = kendaraan[1] ?? null
+  const featured0 = kendaraan[0] ?? null
+  const featured1 = kendaraan[1] ?? null
 
-  const massPassenger = kendaraan.filter(k =>
-    (k.jenis_kendaraan || "").toLowerCase().includes("bus") ||
-    (k.jenis_kendaraan || "").toLowerCase().includes("minibus") ||
-    (k.jenis_kendaraan || "").toLowerCase().includes("microbus") ||
-    (k.kapasitas_penumpang && k.kapasitas_penumpang >= 8)
+  const massPassenger = kendaraan.filter(
+    (k) =>
+      (k.jenis_kendaraan || "").toLowerCase().includes("bus") ||
+      (k.jenis_kendaraan || "").toLowerCase().includes("minibus") ||
+      (k.jenis_kendaraan || "").toLowerCase().includes("microbus") ||
+      (k.kapasitas_penumpang && k.kapasitas_penumpang >= 8)
   )
-  const utility = kendaraan.filter(k => !massPassenger.includes(k))
+  const utility = kendaraan.filter((k) => !massPassenger.includes(k))
 
-  const tableRows = kendaraan.filter(k =>
-    (filterStatus === "Semua" || k.status_ketersediaan === filterStatus) &&
-    (
-      (k.nama_kendaraan || "").toLowerCase().includes(search.toLowerCase()) ||
-      (k.jenis_kendaraan || "").toLowerCase().includes(search.toLowerCase()) ||
-      (k.nomor_polisi || "").toLowerCase().includes(search.toLowerCase())
-    )
+  const tableRows = kendaraan.filter(
+    (k) =>
+      (filterStatus === "Semua" || k.status_ketersediaan === filterStatus) &&
+      (
+        (k.nama_kendaraan || "").toLowerCase().includes(search.toLowerCase()) ||
+        (k.jenis_kendaraan || "").toLowerCase().includes(search.toLowerCase()) ||
+        (k.nomor_polisi || "").toLowerCase().includes(search.toLowerCase())
+      )
   )
 
   /* ── Loading State ── */
@@ -404,22 +414,23 @@ export default function KendaraanPage(): JSX.Element {
               <Search size={14} className="text-gray-400" />
               <input
                 value={search}
-                onChange={e => setSearch(e.target.value)}
+                onChange={(e) => setSearch(e.target.value)}
                 placeholder="Cari kendaraan..."
                 className="bg-transparent text-sm outline-none text-gray-700 placeholder-gray-400 w-40"
               />
             </div>
             <select
               value={filterStatus}
-              onChange={e => setFilterStatus(e.target.value as FilterStatus)}
+              onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
               className="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-gray-50 text-gray-700 outline-none"
             >
               <option value="Semua">Semua Status</option>
               <option value="tersedia">Tersedia</option>
               <option value="dipinjam">Dipinjam</option>
             </select>
+            {/* ✅ Refresh button kini trigger lewat setRefreshTick, bukan memanggil fetchAll langsung */}
             <button
-              onClick={fetchAll}
+              onClick={() => setRefreshTick((t) => t + 1)}
               className="flex items-center gap-1.5 px-3 py-2 text-sm font-bold bg-[#013C9E] text-white rounded-lg hover:bg-[#012f80] transition-colors"
             >
               <RefreshCw size={13} />
@@ -471,6 +482,12 @@ export default function KendaraanPage(): JSX.Element {
                       </td>
                       <td className="px-6 py-4 text-gray-600 text-sm">{hubLabel(k.jenis_kendaraan)}</td>
                       <td className="px-6 py-4 font-mono text-[#013C9E] font-semibold text-xs">{k.nomor_polisi || "-"}</td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex items-center gap-1.5 text-[10px] font-black tracking-wider px-2.5 py-1 rounded-md ${badge.bg}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
+                          {badge.label}
+                        </span>
+                      </td>
                       <td className="px-6 py-4 text-center">
                         <button className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
                           <MoreVertical size={15} />
@@ -494,7 +511,7 @@ export default function KendaraanPage(): JSX.Element {
         )}
       </motion.div>
 
-      {/* Usage Chart — Real data dari getAllBookings() API */}
+      {/* Usage Chart */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
