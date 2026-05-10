@@ -372,7 +372,26 @@ export default function PermintaanClient() {
   });
   const [rejectError, setRejectError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  // FIXED: fetchData moved inside useEffect to avoid ESLint warning
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const result = await getAllBookings();
+        setData(result);
+      } catch {
+        setError("Gagal memuat data permintaan.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Create refresh function for manual refresh
+  const refreshData = async () => {
     try {
       setLoading(true);
       setError(null);
@@ -385,48 +404,44 @@ export default function PermintaanClient() {
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const pendingBookings  = data.filter((b) => b.status_booking === "menunggu");
+  const pendingBookings = data.filter((b) => b.status_booking === "menunggu");
   const processedBookings = data.filter((b) => b.status_booking !== "menunggu");
 
- const handleApprove = async (id: number) => {
-  try {
-    setActionLoading(id);
-    setSuccessMsg(null);
-    setError(null);
+  const handleApprove = async (id: number) => {
+    try {
+      setActionLoading(id);
+      setSuccessMsg(null);
+      setError(null);
 
-    // 🔥 ambil data terbaru dulu (anti mismatch status)
-    const freshData = await getAllBookings();
-    const current = freshData.find((b) => b.id === id);
+      // ambil data terbaru dulu (anti mismatch status)
+      const freshData = await getAllBookings();
+      const current = freshData.find((b) => b.id === id);
 
-    if (!current) {
-      throw new Error("Data booking tidak ditemukan");
+      if (!current) {
+        throw new Error("Data booking tidak ditemukan");
+      }
+
+      if (current.status_booking !== "menunggu") {
+        throw new Error("Status sudah berubah, silakan refresh data");
+      }
+
+      // lanjut approve
+      const result = await approveBooking(id);
+
+      if (result.downloadUrl) {
+        setDownloadUrl(result.downloadUrl);
+      }
+
+      setSuccessMsg(`Peminjaman #${id} berhasil disetujui!`);
+      setSelectedBooking(null);
+
+      await refreshData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Gagal menyetujui peminjaman");
+    } finally {
+      setActionLoading(null);
     }
-
-    if (current.status_booking !== "menunggu") {
-      throw new Error("Status sudah berubah, silakan refresh data");
-    }
-
-    // lanjut approve
-    const result = await approveBooking(id);
-
-    if (result.downloadUrl) {
-      setDownloadUrl(result.downloadUrl);
-    }
-
-    setSuccessMsg(`Peminjaman #${id} berhasil disetujui!`);
-    setSelectedBooking(null);
-
-    await fetchData();
-  } catch (err) {
-    setError(err instanceof Error ? err.message : "Gagal menyetujui peminjaman");
-  } finally {
-    setActionLoading(null);
-  }
-};
+  };
 
   const openRejectModal = (id: number) => {
     setRejectModal({ open: true, id });
@@ -447,7 +462,7 @@ export default function PermintaanClient() {
       setSuccessMsg(`Peminjaman #${rejectModal.id} berhasil ditolak.`);
       setRejectModal({ open: false, id: null });
       setSelectedBooking(null);
-      await fetchData();
+      await refreshData();
     } catch (err) {
       setRejectError(err instanceof Error ? err.message : "Gagal menolak peminjaman");
     } finally {
@@ -482,7 +497,7 @@ export default function PermintaanClient() {
           </p>
         </div>
         <button
-          onClick={fetchData}
+          onClick={refreshData}
           disabled={loading}
           className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 shadow-sm transition-all disabled:opacity-50"
         >

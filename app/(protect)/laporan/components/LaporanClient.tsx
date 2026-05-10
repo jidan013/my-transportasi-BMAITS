@@ -307,7 +307,26 @@ export default function LaporanPage() {
   const [page, setPage] = useState(1)
   const PAGE_SIZE = 10
 
-  const fetchData = async () => {
+  // FIXED: fetchData moved inside useEffect to avoid ESLint warning
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const result = await getAllBookings()
+        setData(result)
+      } catch {
+        setError("Gagal memuat data laporan.")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  // Create refresh function for manual refresh
+  const refreshData = async () => {
     try {
       setLoading(true)
       setError(null)
@@ -320,36 +339,34 @@ export default function LaporanPage() {
     }
   }
 
-  useEffect(() => { fetchData() }, [])
+  const filteredData = useCallback(() => {
+    return data.filter((item) => {
+      const keyword = searchTerm.toLowerCase()
 
-const filteredData = useCallback(() => {
-  return data.filter((item) => {
-    const keyword = searchTerm.toLowerCase()
+      const matchesSearch =
+        String(item.id ?? "").toLowerCase().includes(keyword) ||
+        String(item.nama ?? "").toLowerCase().includes(keyword) ||
+        String(item.nrp ?? "").toLowerCase().includes(keyword) || 
+        String(item.unit_kerja ?? "").toLowerCase().includes(keyword) ||
+        String(item.vehicle?.nama_kendaraan ?? "").toLowerCase().includes(keyword)
 
-    const matchesSearch =
-      String(item.id ?? "").toLowerCase().includes(keyword) ||
-      String(item.nama ?? "").toLowerCase().includes(keyword) ||
-      String(item.nrp ?? "").toLowerCase().includes(keyword) || 
-      String(item.unit_kerja ?? "").toLowerCase().includes(keyword) ||
-      String(item.vehicle?.nama_kendaraan ?? "").toLowerCase().includes(keyword)
+      const matchesStatus =
+        statusFilter === "all" || item.status_booking === statusFilter
 
-    const matchesStatus =
-      statusFilter === "all" || item.status_booking === statusFilter
+      const matchesTripFilter =
+        tripFilter === "all" || item.status_booking === "menunggu"
 
-    const matchesTripFilter =
-      tripFilter === "all" || item.status_booking === "menunggu"
+      const itemDate = item.tanggal_pinjam?.split("T")[0] ?? ""
 
-    const itemDate = item.tanggal_pinjam?.split("T")[0] ?? ""
+      const matchesDate =
+        (!dateFrom && !dateTo) ||
+        (dateFrom && dateTo && itemDate >= dateFrom && itemDate <= dateTo) ||
+        (dateFrom && !dateTo && itemDate >= dateFrom) ||
+        (!dateFrom && dateTo && itemDate <= dateTo)
 
-    const matchesDate =
-      (!dateFrom && !dateTo) ||
-      (dateFrom && dateTo && itemDate >= dateFrom && itemDate <= dateTo) ||
-      (dateFrom && !dateTo && itemDate >= dateFrom) ||
-      (!dateFrom && dateTo && itemDate <= dateTo)
-
-    return matchesSearch && matchesStatus && matchesDate && matchesTripFilter
-  })
-}, [data, searchTerm, statusFilter, dateFrom, dateTo, tripFilter])
+      return matchesSearch && matchesStatus && matchesDate && matchesTripFilter
+    })
+  }, [data, searchTerm, statusFilter, dateFrom, dateTo, tripFilter])
 
   const stats = useCallback(() => {
     return {
@@ -674,7 +691,7 @@ const filteredData = useCallback(() => {
                 </button>
 
                 <button
-                  onClick={fetchData}
+                  onClick={refreshData}
                   disabled={loading}
                   className="p-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all disabled:opacity-50"
                   title="Refresh"

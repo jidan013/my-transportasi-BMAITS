@@ -48,27 +48,34 @@ export default function AppSidebar(props: React.ComponentPropsWithRef<typeof Sid
   const [admin, setAdmin] = React.useState<Admin | null>(null);
   const [loading, setLoading] = React.useState(true);
 
+  // FIXED: Moved all logic inside useEffect to avoid ESLint warning
   React.useEffect(() => {
-    const token = document.cookie
-      .split("; ")
-      .find(row => row.startsWith("token="))
-      ?.split("=")[1];
+    const initializeAdmin = async () => {
+      const token = document.cookie
+        .split("; ")
+        .find(row => row.startsWith("token="))
+        ?.split("=")[1];
 
-    // Tidak ada token → guest, skip hit API
-    if (!token) {
-      setLoading(false);
-      return;
-    }
+      // Tidak ada token → guest, skip hit API
+      if (!token) {
+        setLoading(false);
+        return;
+      }
 
-    // Ada token → ambil data admin dari BE
-    getAdminMe()
-      .then((data) => setAdmin(data))
-      .catch(() => {
+      // Ada token → ambil data admin dari BE
+      try {
+        const data = await getAdminMe();
+        setAdmin(data);
+      } catch {
         // Token invalid → hapus cookie, tetap sebagai guest
         document.cookie = "token=; Path=/; Max-Age=0; SameSite=Lax";
         setAdmin(null);
-      })
-      .finally(() => setLoading(false));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeAdmin();
   }, []); // Dependency array kosong — hanya jalan sekali
 
   const handleLogout = async () => {
@@ -109,7 +116,7 @@ export default function AppSidebar(props: React.ComponentPropsWithRef<typeof Sid
                   alt="Logo"
                   width={220}
                   height={48}
-                  style={{ width: "auto", height: "auto" }} // ✅ Fix warning Next.js Image
+                  style={{ width: "auto", height: "auto" }}
                   priority
                 />
               </SidebarMenuButton>

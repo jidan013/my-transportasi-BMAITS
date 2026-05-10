@@ -93,14 +93,26 @@ function Carousel({
     setApi(api)
   }, [api, setApi])
 
+  // FIXED: Use setTimeout to defer the initial onSelect call
   React.useEffect(() => {
     if (!api) return
-    onSelect(api)
-    api.on("reInit", onSelect)
-    api.on("select", onSelect)
+
+    // Defer the initial call to avoid cascading renders
+    const timeoutId = setTimeout(() => {
+      onSelect(api)
+    }, 0)
+
+    const handleSelect = () => {
+      onSelect(api)
+    }
+
+    api.on("reInit", handleSelect)
+    api.on("select", handleSelect)
 
     return () => {
-      api?.off("select", onSelect)
+      clearTimeout(timeoutId)
+      api.off("reInit", handleSelect)
+      api.off("select", handleSelect)
     }
   }, [api, onSelect])
 

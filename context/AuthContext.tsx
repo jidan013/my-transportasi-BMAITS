@@ -15,6 +15,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   logout: () => void;
+  refetch: () => Promise<void>;
 }
 
 interface AuthProviderProps {
@@ -25,6 +26,7 @@ const defaultAuthContext: AuthContextType = {
   user: null,
   loading: true,
   logout: () => {},
+  refetch: async () => {},
 };
 
 const AuthContext = createContext<AuthContextType>(defaultAuthContext);
@@ -33,65 +35,90 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const transformAdminToUser = (admin: Admin): User => {
+  const transformAdminToUser = useCallback((admin: Admin): User => {
     // Validasi role sesuai UserRole union type
-    const role: UserRole = (admin.role as UserRole) || 'admin';
+    let role: UserRole = 'admin'; // Default to admin
+    
+    if (admin.role === 'user') {
+      role = 'user';
+    } else if (admin.role === 'admin') {
+      role = 'admin';
+    }
     
     if (!['admin', 'user'].includes(role)) {
-      throw new Error(`Invalid role: ${admin.role}. Expected: admin|user`);
+      console.warn(`Unknown role: ${admin.role}, defaulting to admin`);
     }
 
     return {
       id: admin.id,
       name: admin.name,
       email: admin.email,
-      role: role as UserRole,
+      role: role,
     };
-  };
-
-  const initializeAuth = useCallback(async (): Promise<void> => {
-    try {
-      const token = localStorage.getItem("admin_token");
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
-      // Instant load dari cache
-      const cachedUser = localStorage.getItem("admin_user");
-      if (cachedUser) {
-        try {
-          const parsedUser = JSON.parse(cachedUser) as User;
-          // Double-check role validity
-          if (parsedUser.role && ['admin', 'user'].includes(parsedUser.role)) {
-            setUser(parsedUser);
-          }
-        } catch {
-        }
-      }
-
-      // Server validation
-      const adminData = await getAdminMe();
-      const userData = transformAdminToUser(adminData);
-      
-      localStorage.setItem("admin_user", JSON.stringify(userData));
-      setUser(userData);
-      
-    } catch (error: unknown) {
-      console.error("Auth restore failed:", error);
-      
-      localStorage.removeItem("admin_token");
-      localStorage.removeItem("admin_user");
-      document.cookie = "admin_token=; path=/; max-age=0";
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
   }, []);
 
+  // FIXED: Move all initialization logic inside useEffect
   useEffect(() => {
+    let isMounted = true;
+
+    const initializeAuth = async () => {
+      try {
+        const token = localStorage.getItem("admin_token");
+        if (!token) {
+          if (isMounted) {
+            setLoading(false);
+            setUser(null);
+          }
+          return;
+        }
+
+        // Instant load dari cache
+        const cachedUser = localStorage.getItem("admin_user");
+        if (cachedUser && isMounted) {
+          try {
+            const parsedUser = JSON.parse(cachedUser) as User;
+            // Double-check role validity
+            if (parsedUser.role && ['admin', 'user'].includes(parsedUser.role)) {
+              setUser(parsedUser);
+            }
+          } catch (error) {
+            console.error("Failed to parse cached user:", error);
+          }
+        }
+
+        // Server validation
+        const adminData = await getAdminMe();
+        
+        if (!isMounted) return;
+        
+        const userData = transformAdminToUser(adminData);
+        
+        localStorage.setItem("admin_user", JSON.stringify(userData));
+        setUser(userData);
+        
+      } catch (error: unknown) {
+        console.error("Auth restore failed:", error);
+        
+        if (isMounted) {
+          // Clear invalid auth data
+          localStorage.removeItem("admin_token");
+          localStorage.removeItem("admin_user");
+          document.cookie = "admin_token=; path=/; max-age=0";
+          setUser(null);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
     initializeAuth();
-  }, [initializeAuth]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [transformAdminToUser]);
 
   const logout = useCallback((): void => {
     localStorage.removeItem("admin_token");
@@ -101,10 +128,38 @@ export function AuthProvider({ children }: AuthProviderProps) {
     window.location.href = "/adminbma/login";
   }, []);
 
+  const refetch = useCallback(async (): Promise<void> => {
+    setLoading(true);
+    
+    try {
+      const token = localStorage.getItem("admin_token");
+      if (!token) {
+        setLoading(false);
+        setUser(null);
+        return;
+      }
+
+      const adminData = await getAdminMe();
+      const userData = transformAdminToUser(adminData);
+      
+      localStorage.setItem("admin_user", JSON.stringify(userData));
+      setUser(userData);
+    } catch (error: unknown) {
+      console.error("Refetch failed:", error);
+      localStorage.removeItem("admin_token");
+      localStorage.removeItem("admin_user");
+      document.cookie = "admin_token=; path=/; max-age=0";
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [transformAdminToUser]);
+
   const value: AuthContextType = {
     user,
     loading,
     logout,
+    refetch,
   };
 
   return (
