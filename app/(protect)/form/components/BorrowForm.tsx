@@ -474,6 +474,38 @@ function UnitKerjaSelect({
 }
 
 /* ─────────────────────────────────────────────────────────────
+   SECTION ICON COMPONENT (Moved outside of main component)
+───────────────────────────────────────────────────────────── */
+
+const SectionIcon = ({ children }: { children: React.ReactNode }) => (
+  <div className="w-7 h-7 rounded-lg bg-[#1a2744]/10 flex items-center justify-center shrink-0">
+    {children}
+  </div>
+);
+
+/* ─────────────────────────────────────────────────────────────
+   INFO CARDS (Moved outside of main component)
+───────────────────────────────────────────────────────────── */
+
+const INFO_CARDS = [
+  {
+    bg: "bg-green-50", title: "Priority Approval",
+    desc: "Requests for academic research events are prioritized within 24 hours.",
+    icon: <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" /></svg>,
+  },
+  {
+    bg: "bg-[#1a2744]/10", title: "Insurance Cover",
+    desc: "All vehicles include standard institutional insurance and roadside assistance.",
+    icon: <svg className="w-4 h-4 text-[#1a2744]" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>,
+  },
+  {
+    bg: "bg-amber-50", title: "Usage Policy",
+    desc: "Vehicles must be returned with a clean interior and minimum 1/4 fuel tank.",
+    icon: <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>,
+  },
+];
+
+/* ─────────────────────────────────────────────────────────────
    MAIN COMPONENT
 ───────────────────────────────────────────────────────────── */
 
@@ -542,28 +574,48 @@ export default function BorrowForm() {
   const debouncedPinjam = useDebounce(formData.tanggal_pinjam, 500);
   const debouncedKembali = useDebounce(formData.tanggal_kembali, 500);
 
+  // FIXED: Use useEffect with proper cleanup and avoid immediate setState on every render
   useEffect(() => {
-    if (!debouncedPinjam || !debouncedKembali) {
-      setAvailableVehicles([]);
-      return;
-    }
-    const dateError = validateDates(debouncedPinjam, debouncedKembali);
-    if (dateError) {
-      setAvailableVehicles([]);
-      return;
-    }
-
     let cancelled = false;
-    setLoadingVehicles(true);
-    getAvailableVehicles({ tanggal_pinjam: debouncedPinjam, tanggal_kembali: debouncedKembali })
-      .then((vehicles) => { if (!cancelled) setAvailableVehicles(vehicles); })
-      .catch(() => {
+    
+    const fetchVehicles = async () => {
+      if (!debouncedPinjam || !debouncedKembali) {
+        if (!cancelled) {
+          setAvailableVehicles([]);
+        }
+        return;
+      }
+      
+      const dateError = validateDates(debouncedPinjam, debouncedKembali);
+      if (dateError) {
+        if (!cancelled) {
+          setAvailableVehicles([]);
+        }
+        return;
+      }
+
+      setLoadingVehicles(true);
+      try {
+        const vehicles = await getAvailableVehicles({ 
+          tanggal_pinjam: debouncedPinjam, 
+          tanggal_kembali: debouncedKembali 
+        });
+        if (!cancelled) {
+          setAvailableVehicles(vehicles);
+        }
+      } catch (error) {
         if (!cancelled) {
           setAvailableVehicles([]);
           setErrors((prev) => ({ ...prev, vehicle_id: "Gagal memuat kendaraan tersedia." }));
         }
-      })
-      .finally(() => { if (!cancelled) setLoadingVehicles(false); });
+      } finally {
+        if (!cancelled) {
+          setLoadingVehicles(false);
+        }
+      }
+    };
+
+    fetchVehicles();
 
     return () => { cancelled = true; };
   }, [debouncedPinjam, debouncedKembali]);
@@ -689,30 +741,6 @@ export default function BorrowForm() {
     "w-full px-4 py-3 border border-gray-200 rounded-xl bg-white text-sm text-gray-800 placeholder-gray-400 " +
     "focus:outline-none focus:ring-2 focus:ring-[#1a2744]/20 focus:border-[#1a2744] transition-all";
   const labelBase = "block text-sm font-semibold text-gray-700 mb-1.5";
-
-  const SectionIcon = ({ children }: { children: React.ReactNode }) => (
-    <div className="w-7 h-7 rounded-lg bg-[#1a2744]/10 flex items-center justify-center shrink-0">
-      {children}
-    </div>
-  );
-
-  const infoCards = [
-    {
-      bg: "bg-green-50", title: "Priority Approval",
-      desc: "Requests for academic research events are prioritized within 24 hours.",
-      icon: <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" /></svg>,
-    },
-    {
-      bg: "bg-[#1a2744]/10", title: "Insurance Cover",
-      desc: "All vehicles include standard institutional insurance and roadside assistance.",
-      icon: <svg className="w-4 h-4 text-[#1a2744]" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>,
-    },
-    {
-      bg: "bg-amber-50", title: "Usage Policy",
-      desc: "Vehicles must be returned with a clean interior and minimum 1/4 fuel tank.",
-      icon: <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>,
-    },
-  ];
 
   /* ─────────────────────────────────────────────────────── */
 
@@ -897,7 +925,6 @@ export default function BorrowForm() {
                   />
                 </div>
               </div>
-
               {/*
                 ── HONEYPOT FIELD ──────────────────────────────────────
                 Visually hidden from real users; bots fill it automatically.
@@ -965,9 +992,9 @@ export default function BorrowForm() {
             </div>
           </div>
 
-          {/* Info cards */}
+          {/* Info cards - FIXED: using INFO_CARDS constant instead of recreating */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pb-4">
-            {infoCards.map(({ bg, title, desc, icon }) => (
+            {INFO_CARDS.map(({ bg, title, desc, icon }) => (
               <div key={title} className="bg-white rounded-2xl border border-gray-200 p-5 flex gap-3">
                 <div className={`mt-0.5 w-8 h-8 rounded-full ${bg} flex items-center justify-center shrink-0`}>
                   {icon}
